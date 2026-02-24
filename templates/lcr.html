@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="experiment-container">
+    <h1>LCR Series Circuit – Frequency Response and Resonance</h1>
+    <p class="experiment-description">
+    This experiment studies the frequency response of a series LCR circuit and determines its resonant frequency and quality factor.
+    </p>
+    <section class="input-section">
+        <h2>Input Parameters</h2>
+        <form id="experimentForm" method="post">
+            <div class="input-group">
+                <label for="R">Resistance R (ohms):</label>
+                <input type="number" id="R" name="R" step="any" min="0.0001" placeholder="e.g. 10" required>
+            </div>
+            <div class="input-group">
+                <label for="L">Inductance L (henry):</label>
+                <input type="number" id="L" name="L" step="any" min="0.0000001" placeholder="e.g. 0.1" required>
+            </div>
+            <div class="input-group">
+                <label for="C">Capacitance C (farad):</label>
+                <input type="number" id="C" name="C" step="any" min="0.0000000001" placeholder="e.g. 0.000001" required>
+            </div>
+            <div class="input-group">
+                <label for="f_min">Minimum Frequency f_min (Hz):</label>
+                <input type="number" id="f_min" name="f_min" step="any" min="0.1" placeholder="e.g. 10" required>
+            </div>
+            <div class="input-group">
+                <label for="f_max">Maximum Frequency f_max (Hz):</label>
+                <input type="number" id="f_max" name="f_max" step="any" min="0.1" placeholder="e.g. 1000" required>
+            </div>
+            <button type="button" id="runBtn">Run Experiment</button>
+        </form>
+    </section>
+
+    <section class="results-section">
+        <h2>Results</h2>
+        <div class="result-item">
+            <label>Resonant Frequency:</label>
+            <span id="resonantFrequency" class="result-value">-</span> 
+        </div>
+        <div class="result-item">
+            <label>Quality Factor:</label>
+            <span id="qualityFactor" class="result-value">-</span>
+        </div>
+    </section>
+
+    <section class="graphs-section">
+        <h2>Graphs</h2>
+        <div class="graph-container">
+            <h3>Frequency vs Current</h3>
+            <canvas id="currentGraph" width="600" height="300"></canvas>
+        </div>
+        <div class="graph-container">
+            <h3>Frequency vs Impedance</h3>
+            <canvas id="impedanceGraph" width="600" height="300"></canvas>
+        </div>
+    </section>
+</section>
+{% endblock %}
