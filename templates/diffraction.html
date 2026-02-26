@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="experiment-container">
+	<h1>Diffraction Grating – Determination of Wavelength</h1>
+
+	<div class="experiment-layout">
+		<!-- INPUT SECTION -->
+		<section class="input-section">
+			<h2>Input Parameters</h2>
+			<form id="diffraction-form">
+				<div class="form-group">
+					<label for="grating-lines">Grating Lines per Meter (N)</label>
+					<input 
+						type="number" 
+						id="grating-lines" 
+						name="grating-lines" 
+						placeholder="e.g., 600000"
+						step="1000"
+						min="0"
+						required
+					>
+				</div>
+
+				<div class="form-group">
+					<label for="screen-distance">Screen Distance (S) in meters</label>
+					<input 
+						type="number" 
+						id="screen-distance" 
+						name="screen-distance" 
+						placeholder="e.g., 1.0"
+						step="0.01"
+						min="0"
+						required
+					>
+				</div>
+
+				<div class="form-group">
+					<label for="orders-list">Orders List (comma-separated)</label>
+					<input 
+						type="text" 
+						id="orders-list" 
+						name="orders-list" 
+						placeholder="e.g., 1, 2, 3, 4"
+						required
+					>
+				</div>
+
+				<div class="form-group">
+					<label for="x-values-list">X Values List (comma-separated, in meters)</label>
+					<input 
+						type="text" 
+						id="x-values-list" 
+						name="x-values-list" 
+						placeholder="e.g., 0.05, 0.10, 0.15, 0.20"
+						required
+					>
+				</div>
+
+				<div class="button-group">
+					<button type="button" id="compute-btn" class="btn btn-primary">Compute</button>
+					<button type="reset" id="reset-btn" class="btn btn-secondary">Reset</button>
+				</div>
+			</form>
+		</section>
+
+		<!-- OUTPUT SECTION -->
+		<section class="output-section">
+			<h2>Results</h2>
+			<div class="output-grid">
+				<div class="output-card">
+					<label>Grating Constant (d)</label>
+					<div class="output-value" id="grating-constant">—</div>
+					<span class="unit">meters</span>
+				</div>
+
+				<div class="output-card">
+					<label>Average Wavelength</label>
+					<div class="output-value" id="avg-wavelength">—</div>
+					<span class="unit">nm</span>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<!-- GRAPH SECTION -->
+	<section class="graph-section">
+		<h2>Visualization</h2>
+		<div class="graph-grid">
+			<div class="graph-container">
+				<h3>Order vs Theta (°)</h3>
+				<canvas id="order-theta-canvas" width="500" height="300"></canvas>
+			</div>
+
+			<div class="graph-container">
+				<h3>Order vs Wavelength</h3>
+				<canvas id="order-wavelength-canvas" width="500" height="300"></canvas>
+			</div>
+		</div>
+	</section>
+</div>
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/diffraction.js') }}"></script>
+{% endblock %}
+{% endblock %}
