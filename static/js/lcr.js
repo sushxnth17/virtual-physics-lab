@@ -20,7 +20,7 @@ async function runExperiment() {
         alert('Minimum frequency must be less than maximum frequency');
         return;
     }
-    const points= 200;
+    const points= 40;
     const payload = { R, L, C, f_min, f_max, points };
 
     try {
@@ -67,18 +67,21 @@ function plotCharts(data) {
     currentChart = new Chart(ctx1, {
         type: 'line',
         data: {
-            labels: freq,
             datasets: [{
                 label: 'Current (A)',
-                data: current,
+                data: freq.map((f, i) => ({ x: f, y: current[i] })),
                 borderColor: 'blue',
-                fill: false
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                pointHitRadius: 10,
+                fill: false,
+                tension: 0.1
             }]
         },
         options: {
             responsive: true,
             scales: {
-                x: { title: { display: true, text: 'Frequency (Hz)' } },
+                x: { type: 'linear', title: { display: true, text: 'Frequency (Hz)' } },
                 y: { title: { display: true, text: 'Current (A)' } }
             }
         }
@@ -88,18 +91,21 @@ function plotCharts(data) {
     impedanceChart = new Chart(ctx2, {
         type: 'line',
         data: {
-            labels: freq,
             datasets: [{
                 label: 'Impedance (Ω)',
-                data: impedance,
+                data: freq.map((f, i) => ({ x: f, y: impedance[i] })),
                 borderColor: 'red',
-                fill: false
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                pointHitRadius: 10,
+                fill: false,
+                tension: 0.1
             }]
         },
         options: {
             responsive: true,
             scales: {
-                x: { title: { display: true, text: 'Frequency (Hz)' } },
+                x: { type: 'linear', title: { display: true, text: 'Frequency (Hz)' } },
                 y: { title: { display: true, text: 'Impedance (Ω)' } }
             }
         }
