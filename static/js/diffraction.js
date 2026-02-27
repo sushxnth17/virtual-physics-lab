@@ -117,7 +117,7 @@ function createOrderThetaChart(orders, theta) {
 		},
 		options: {
 			responsive: true,
-			maintainAspectRatio: false,
+			maintainAspectRatio: true,
 			plugins: {
 				legend: {
 					display: true
@@ -180,7 +180,7 @@ function createOrderWavelengthChart(orders, wavelength) {
 		},
 		options: {
 			responsive: true,
-			maintainAspectRatio: false,
+			maintainAspectRatio: true,
 			plugins: {
 				legend: {
 					display: true
