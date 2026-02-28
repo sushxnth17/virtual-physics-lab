@@ -1,6 +1,7 @@
 """Backend computations for the diffraction grating experiment."""
 
 from math import atan, sin
+from math import asin, sqrt
 
 
 def compute_diffraction_response(N, S, orders, x_values):
@@ -36,8 +37,8 @@ def compute_diffraction_response(N, S, orders, x_values):
 
 	grating_constant = 1.0 / float(N)
 
-	theta = [atan(float(xm) / float(S)) for xm in x_values]
-	sin_theta = [sin(t) for t in theta]
+	sin_theta = [float(xm) / sqrt(float(xm)**2 + float(S)**2) for xm in x_values]
+	theta = [asin(st) for st in sin_theta]
 	wavelength = [grating_constant * st / float(m) for st, m in zip(sin_theta, orders)]
 
 	average_wavelength = sum(wavelength) / float(len(wavelength))

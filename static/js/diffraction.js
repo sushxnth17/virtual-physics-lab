@@ -2,7 +2,7 @@
  * Diffraction Grating Experiment Calculator
  * Reads lab data from table inputs and sends to backend for processing
  */
-
+let diffractionChart = null;
 // Constants
 const GRATING_LPI = 500; // Lines per inch
 const LPI_TO_LPM = 1 / 0.0254; // Conversion factor: lines per inch to lines per meter
@@ -195,6 +195,59 @@ function displayResults(tableData, apiResponse) {
 	}
 }
 
+function plotGraph(apiResponse) {
+    const ctx = document.getElementById('diffractionChart');
+
+    if (!ctx) return;
+
+    // Destroy old chart if exists
+    if (diffractionChart) {
+        diffractionChart.destroy();
+    }
+
+    const orders = apiResponse.orders;
+    const sinTheta = apiResponse.sin_theta;
+
+    diffractionChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: orders,
+            datasets: [{
+                label: 'sinθ',
+                data: sinTheta,
+                borderWidth: 2,
+                fill: false,
+                tension: 0,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+			maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Order (m)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'sinθ'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
 /**
  * Clear all result cells
  */
@@ -241,6 +294,8 @@ async function computeDiffraction() {
 
 		// Display results
 		displayResults(tableData, apiResponse);
+		// Plot graph
+		plotGraph(apiResponse);
 
 		console.log('Diffraction calculation completed successfully', apiResponse);
 	} catch (error) {
