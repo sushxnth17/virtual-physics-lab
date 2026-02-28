@@ -1,62 +1,66 @@
-// Chart instances for cleanup
-let orderThetaChart = null;
-let orderWavelengthChart = null;
+/**
+ * Diffraction Grating Experiment Calculator
+ * Reads lab data from table inputs and sends to backend for processing
+ */
+
+// Constants
+const GRATING_LPI = 500; // Lines per inch
+const LPI_TO_LPM = 1 / 0.0254; // Conversion factor: lines per inch to lines per meter
 
 /**
- * Parse comma-separated input and convert to numeric array
- * @param {string} input - Comma-separated values
- * @returns {number[]} Array of numbers
+ * Get screen distance S from input (convert cm to meters)
+ * @returns {number|null} Screen distance in meters, or null if invalid
  */
-function parseCommaSeparatedInput(input) {
-	return input
-		.split(',')
-		.map(val => parseFloat(val.trim()))
-		.filter(val => !isNaN(val));
+function getScreenDistance() {
+	const input = document.getElementById('screen-distance');
+	if (!input || !input.value) {
+		return null;
+	}
+	const S_cm = parseFloat(input.value);
+	if (isNaN(S_cm) || S_cm <= 0) {
+		return null;
+	}
+	return S_cm / 100; // Convert cm to meters
 }
 
 /**
- * Get input values from the form
- * @returns {object} Object containing form inputs
+ * Get all 2xm values from table inputs (in cm)
+ * Returns array with order and corresponding xm value
+ * @returns {Array<{order: number, xm_m: number}>} Array of {order, xm_m} objects
  */
-function getFormInputs() {
-	const N = parseFloat(document.getElementById('grating-lines').value);
-	const S = parseFloat(document.getElementById('screen-distance').value);
-	const orders = parseCommaSeparatedInput(document.getElementById('orders-list').value);
-	const x_values = parseCommaSeparatedInput(document.getElementById('x-values-list').value);
+function getTableData() {
+	const inputs = document.querySelectorAll('.two-xm-input');
+	const data = [];
 
-	return { N, S, orders, x_values };
+	inputs.forEach((input, index) => {
+		const order = index + 1; // Orders 1-8
+		if (input.value) {
+			const two_xm_cm = parseFloat(input.value);
+			if (!isNaN(two_xm_cm) && two_xm_cm > 0) {
+				const xm_cm = two_xm_cm / 2;
+				const xm_m = xm_cm / 100; // Convert cm to meters
+				data.push({ order, xm_m, xm_cm });
+			}
+		}
+	});
+
+	return data;
 }
 
 /**
- * Validate form inputs
- * @param {object} inputs - Form inputs object
+ * Validate collected data
+ * @param {number|null} S_m - Screen distance in meters
+ * @param {Array} tableData - Table data array
  * @returns {boolean} True if valid, false otherwise
  */
-function validateInputs(inputs) {
-	const { N, S, orders, x_values } = inputs;
-
-	if (!N || N <= 0) {
-		alert('Please enter a valid Grating Lines per Meter (N > 0)');
+function validateData(S_m, tableData) {
+	if (S_m === null) {
+		alert('Please enter a valid Screen Distance S (in cm, must be positive)');
 		return false;
 	}
 
-	if (!S || S <= 0) {
-		alert('Please enter a valid Screen Distance (S > 0)');
-		return false;
-	}
-
-	if (!orders || orders.length === 0) {
-		alert('Please enter valid Order values (comma-separated)');
-		return false;
-	}
-
-	if (!x_values || x_values.length === 0) {
-		alert('Please enter valid X values (comma-separated)');
-		return false;
-	}
-
-	if (orders.length !== x_values.length) {
-		alert('Orders and X values must have the same length');
+	if (tableData.length === 0) {
+		alert('Please enter at least one 2xm value in the table');
 		return false;
 	}
 
@@ -64,178 +68,152 @@ function validateInputs(inputs) {
 }
 
 /**
- * Update output display elements
- * @param {object} data - Backend response data
+ * Prepare API request payload
+ * @param {number} S_m - Screen distance in meters
+ * @param {Array<{order: number, xm_m: number}>} tableData - Table data
+ * @returns {object} API request payload
  */
-function updateOutputs(data) {
-	// Grating constant (convert to scientific notation for readability)
-	const gratConstantElement = document.getElementById('grating-constant');
-	gratConstantElement.textContent = data.grating_constant.toExponential(4);
+function prepareAPIPayload(S_m, tableData) {
+	const N = GRATING_LPI * LPI_TO_LPM; // Convert LPI to lines per meter
 
-	// Average wavelength (convert meters to nanometers)
-	const avgWavelengthNm = data.average_wavelength * 1e9;
-	const avgWavelengthElement = document.getElementById('avg-wavelength');
-	avgWavelengthElement.textContent = avgWavelengthNm.toFixed(2);
+	const orders = tableData.map(item => item.order);
+	const x_values = tableData.map(item => item.xm_m);
+
+	return {
+		N: N,
+		S: S_m,
+		orders: orders,
+		x_values: x_values
+	};
 }
 
 /**
- * Destroy existing Chart.js chart instance if it exists
- * @param {Chart} chartInstance - Chart instance to destroy
+ * Call backend API
+ * @param {object} payload - API request payload
+ * @returns {Promise<object>} API response data
  */
-function destroyChart(chartInstance) {
-	if (chartInstance) {
-		chartInstance.destroy();
-	}
-}
-
-/**
- * Create Order vs Theta chart
- * @param {number[]} orders - Array of order values
- * @param {number[]} theta - Array of theta values (in degrees)
- * @returns {Chart} Chart instance
- */
-function createOrderThetaChart(orders, theta) {
-	destroyChart(orderThetaChart);
-
-	const ctx = document.getElementById('order-theta-canvas').getContext('2d');
-	orderThetaChart = new Chart(ctx, {
-		type: 'scatter',
-		data: {
-			datasets: [{
-				label: 'Order vs Theta',
-				data: orders.map((order, index) => ({
-					x: order,
-					y: theta[index]
-				})),
-				backgroundColor: 'rgba(75, 192, 192, 0.6)',
-				borderColor: 'rgba(75, 192, 192, 1)',
-				borderWidth: 2,
-				pointRadius: 6,
-				showLine: true,
-				tension: 0.1
-			}]
-		},
-		options: {
-			responsive: true,
-			maintainAspectRatio: true,
-			plugins: {
-				legend: {
-					display: true
-				},
-				title: {
-					display: false
-				}
-			},
-			scales: {
-				x: {
-					title: {
-						display: true,
-						text: 'Order'
-					},
-					beginAtZero: true
-				},
-				y: {
-					title: {
-						display: true,
-						text: 'Theta (°)'
-					},
-					beginAtZero: true
-				}
-			}
-		}
-	});
-
-	return orderThetaChart;
-}
-
-/**
- * Create Order vs Wavelength chart
- * @param {number[]} orders - Array of order values
- * @param {number[]} wavelength - Array of wavelength values (in meters)
- * @returns {Chart} Chart instance
- */
-function createOrderWavelengthChart(orders, wavelength) {
-	destroyChart(orderWavelengthChart);
-
-	// Convert wavelength from meters to nanometers
-	const wavelengthNm = wavelength.map(w => w * 1e9);
-
-	const ctx = document.getElementById('order-wavelength-canvas').getContext('2d');
-	orderWavelengthChart = new Chart(ctx, {
-		type: 'scatter',
-		data: {
-			datasets: [{
-				label: 'Order vs Wavelength',
-				data: orders.map((order, index) => ({
-					x: order,
-					y: wavelengthNm[index]
-				})),
-				backgroundColor: 'rgba(153, 102, 255, 0.6)',
-				borderColor: 'rgba(153, 102, 255, 1)',
-				borderWidth: 2,
-				pointRadius: 6,
-				showLine: true,
-				tension: 0.1
-			}]
-		},
-		options: {
-			responsive: true,
-			maintainAspectRatio: true,
-			plugins: {
-				legend: {
-					display: true
-				},
-				title: {
-					display: false
-				}
-			},
-			scales: {
-				x: {
-					title: {
-						display: true,
-						text: 'Order'
-					},
-					beginAtZero: true
-				},
-				y: {
-					title: {
-						display: true,
-						text: 'Wavelength (nm)'
-					},
-					beginAtZero: true
-				}
-			}
-		}
-	});
-
-	return orderWavelengthChart;
-}
-
-/**
- * Call backend API to perform diffraction calculation
- * @param {object} inputs - Form inputs object
- * @returns {object} Backend response data
- */
-async function callDiffractionAPI(inputs) {
+async function callDiffractionAPI(payload) {
 	try {
 		const response = await fetch('/api/diffraction', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(inputs)
+			body: JSON.stringify(payload)
 		});
 
 		if (!response.ok) {
-			throw new Error(`API Error: ${response.status} ${response.statusText}`);
+			throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 		}
 
 		const data = await response.json();
 		return data;
 	} catch (error) {
-		console.error('Error calling API:', error);
-		alert(`Error: ${error.message}`);
+		console.error('API Error:', error);
 		throw error;
+	}
+}
+
+/**
+ * Display results in table cells
+ * @param {Array<{order: number, xm_m: number, xm_cm: number}>} tableData - Table data with original xm_cm
+ * @param {object} apiResponse - API response containing calculations
+ */
+function displayResults(tableData, apiResponse) {
+	const inputs = document.querySelectorAll('.two-xm-input');
+
+	// Map tableData by order for easy lookup
+	const dataMap = {};
+	tableData.forEach(item => {
+		dataMap[item.order] = item;
+	});
+
+	// Map API response by order for easy lookup
+	const responseMap = {};
+	if (apiResponse.orders && apiResponse.theta && apiResponse.sin_theta && apiResponse.wavelength) {
+		apiResponse.orders.forEach((order, index) => {
+			responseMap[order] = {
+				theta: apiResponse.theta[index],
+				sin_theta: apiResponse.sin_theta[index],
+				wavelength: apiResponse.wavelength[index]
+			};
+		});
+	}
+
+	// Fill table cells for each row
+	inputs.forEach((input, index) => {
+		const order = index + 1;
+		const row = input.closest('tr');
+
+		if (!row) return;
+
+		const xmCell = row.querySelector('.xm-value');
+		const thetaCell = row.querySelector('.theta-value');
+		const sinThetaCell = row.querySelector('.sin-theta-value');
+		const lambdaCell = row.querySelector('.lambda-value');
+
+		if (dataMap[order]) {
+			// Display xm in cm
+			if (xmCell) {
+				xmCell.textContent = dataMap[order].xm_cm.toFixed(2);
+			}
+		}
+
+		if (responseMap[order]) {
+			const result = responseMap[order];
+
+			// Display theta in degrees
+			if (thetaCell) {
+				const theta_deg = result.theta * (180 / Math.PI);
+				thetaCell.textContent = theta_deg.toFixed(2);
+			}
+
+			// Display sin(theta)
+			if (sinThetaCell) {
+				sinThetaCell.textContent = result.sin_theta.toFixed(4);
+			}
+
+			// Display wavelength in nm
+			if (lambdaCell) {
+				const wavelength_nm = result.wavelength * 1e9;
+				lambdaCell.textContent = wavelength_nm.toFixed(2);
+			}
+		}
+	});
+
+	// Display average wavelength
+	const avgWavelengthNm = apiResponse.average_wavelength * 1e9;
+	const avgWavelengthElement = document.getElementById('average-wavelength');
+	if (avgWavelengthElement) {
+		avgWavelengthElement.textContent = avgWavelengthNm.toFixed(2);
+	}
+
+	// Display final wavelength result
+	const finalWavelengthElement = document.getElementById('final-wavelength');
+	if (finalWavelengthElement) {
+		finalWavelengthElement.textContent = avgWavelengthNm.toFixed(2);
+	}
+}
+
+/**
+ * Clear all result cells
+ */
+function clearResults() {
+	// Clear table data cells
+	document.querySelectorAll('.xm-value, .theta-value, .sin-theta-value, .lambda-value').forEach(cell => {
+		cell.textContent = '';
+	});
+
+	// Clear average wavelength
+	const avgWavelengthElement = document.getElementById('average-wavelength');
+	if (avgWavelengthElement) {
+		avgWavelengthElement.textContent = '';
+	}
+
+	// Clear final wavelength
+	const finalWavelengthElement = document.getElementById('final-wavelength');
+	if (finalWavelengthElement) {
+		finalWavelengthElement.textContent = '';
 	}
 }
 
@@ -244,42 +222,31 @@ async function callDiffractionAPI(inputs) {
  */
 async function computeDiffraction() {
 	try {
-		// Get and validate inputs
-		const inputs = getFormInputs();
-		if (!validateInputs(inputs)) {
+		// Clear previous results
+		clearResults();
+
+		// Collect and validate data
+		const S_m = getScreenDistance();
+		const tableData = getTableData();
+
+		if (!validateData(S_m, tableData)) {
 			return;
 		}
 
-		// Call backend API
-		const response = await callDiffractionAPI(inputs);
+		// Prepare API payload
+		const payload = prepareAPIPayload(S_m, tableData);
 
-		// Update output values
-		updateOutputs(response);
+		// Call API
+		const apiResponse = await callDiffractionAPI(payload);
 
-		// Create charts
-		const thetaDeg = response.theta.map(t => t * 180 / Math.PI);
-        createOrderThetaChart(response.orders, thetaDeg);
-		createOrderWavelengthChart(response.orders, response.wavelength);
+		// Display results
+		displayResults(tableData, apiResponse);
 
-		console.log('Diffraction calculation completed successfully', response);
+		console.log('Diffraction calculation completed successfully', apiResponse);
 	} catch (error) {
 		console.error('Computation failed:', error);
+		alert(`Calculation error: ${error.message}`);
 	}
-}
-
-/**
- * Reset output and charts
- */
-function resetResults() {
-	// Reset output values
-	document.getElementById('grating-constant').textContent = '—';
-	document.getElementById('avg-wavelength').textContent = '—';
-
-	// Destroy charts
-	destroyChart(orderThetaChart);
-	destroyChart(orderWavelengthChart);
-	orderThetaChart = null;
-	orderWavelengthChart = null;
 }
 
 /**
@@ -287,25 +254,14 @@ function resetResults() {
  */
 function initializeEventListeners() {
 	const computeBtn = document.getElementById('compute-btn');
-	const resetBtn = document.getElementById('reset-btn');
-	const form = document.getElementById('diffraction-form');
 
 	if (computeBtn) {
 		computeBtn.addEventListener('click', computeDiffraction);
 	}
-
-	if (resetBtn) {
-		resetBtn.addEventListener('click', resetResults);
-	}
-
-	// Optional: Reset results when form is reset
-	if (form) {
-		form.addEventListener('reset', resetResults);
-	}
 }
 
 /**
- * DOMContentLoaded event to initialize the page
+ * Initialize on page load
  */
 document.addEventListener('DOMContentLoaded', () => {
 	initializeEventListeners();
