@@ -2,105 +2,210 @@
 
 {% block content %}
 <div class="experiment-container">
-	<h1>Diffraction Grating – Determination of Wavelength</h1>
-
-	<div class="experiment-layout">
-		<!-- INPUT SECTION -->
-		<section class="input-section">
-			<h2>Input Parameters</h2>
-			<form id="diffraction-form">
-				<div class="form-group">
-					<label for="grating-lines">Grating Lines per Meter (N)</label>
-					<input 
-						type="number" 
-						id="grating-lines" 
-						name="grating-lines" 
-						placeholder="e.g., 600000"
-						step="1000"
-						min="0"
-						required
-					>
-				</div>
-
-				<div class="form-group">
-					<label for="screen-distance">Screen Distance (S) in meters</label>
-					<input 
-						type="number" 
-						id="screen-distance" 
-						name="screen-distance" 
-						placeholder="e.g., 1.0"
-						step="0.01"
-						min="0"
-						required
-					>
-				</div>
-
-				<div class="form-group">
-					<label for="orders-list">Orders List (comma-separated)</label>
-					<input 
-						type="text" 
-						id="orders-list" 
-						name="orders-list" 
-						placeholder="e.g., 1, 2, 3, 4"
-						required
-					>
-				</div>
-
-				<div class="form-group">
-					<label for="x-values-list">X Values List (comma-separated, in meters)</label>
-					<input 
-						type="text" 
-						id="x-values-list" 
-						name="x-values-list" 
-						placeholder="e.g., 0.05, 0.10, 0.15, 0.20"
-						required
-					>
-				</div>
-
-				<div class="button-group">
-					<button type="button" id="compute-btn" class="btn btn-primary">Compute</button>
-					<button type="reset" id="reset-btn" class="btn btn-secondary">Reset</button>
-				</div>
-			</form>
-		</section>
-
-		<!-- OUTPUT SECTION -->
-		<section class="output-section">
-			<h2>Results</h2>
-			<div class="output-grid">
-				<div class="output-card">
-					<label>Grating Constant (d)</label>
-					<div class="output-value" id="grating-constant">—</div>
-					<span class="unit">meters</span>
-				</div>
-
-				<div class="output-card">
-					<label>Average Wavelength</label>
-					<div class="output-value" id="avg-wavelength">—</div>
-					<span class="unit">nm</span>
-				</div>
-			</div>
-		</section>
+	
+	<!-- EXPERIMENT TITLE -->
+	<div class="experiment-header" style="text-align: center; border: 3px solid #000; padding: 20px; margin-bottom: 30px;">
+		<p style="font-size: 14px; margin: 0 0 10px 0;">Experiment: 5</p>
+		<h2 style="font-weight: bold; font-size: 24px; margin: 0; letter-spacing: 2px;">DIFFRACTION GRATING</h2>
 	</div>
 
-	<!-- GRAPH SECTION -->
-	<section class="graph-section">
-		<h2>Visualization</h2>
-		<div class="graph-grid">
-			<div class="graph-container">
-				<h3>Order vs Theta (°)</h3>
-				<canvas id="order-theta-canvas" width="500" height="300"></canvas>
-			</div>
+	<!-- AIM SECTION -->
+	<section class="experiment-section">
+		<h3><u>AIM</u></h3>
+		<p>To determine the wavelength of the Laser light using diffraction grating.</p>
+	</section>
 
-			<div class="graph-container">
-				<h3>Order vs Wavelength</h3>
-				<canvas id="order-wavelength-canvas" width="500" height="300"></canvas>
+	<!-- APPARATUS SECTION -->
+	<section class="experiment-section">
+		<h3><u>APPARATUS</u></h3>
+		<p>Diffraction Grating, meter scale, Diode laser</p>
+	</section>
+
+	<!-- INTRODUCTION SECTION -->
+	<section class="experiment-section">
+		<h3><u>INTRODUCTION</u></h3>
+		<p>Diffraction is the bending of light waves after they pass through narrow openings (or around the small obstacles). The diffraction of light wave is possible only when the size of the obstacle is of the order of wavelength of incident light. The diffraction pattern consists of variation in intensity of the image being formed.</p>
+		
+		<p>Laser stands for "light amplification by stimulated emission of radiation". Laser is a special type of light source, which emits a light of high monochromaticity, high directionality, high coherence and high intensity. The emission of laser beam is mainly due to process called stimulated emission. To diffract the laser light, diffraction gratings are used. A diffraction grating is an optically plane glass plate on which a number of equidistant parallel lines are ruled.</p>
+		
+		<p>When a parallel beam of laser light falls normally on the grating, it diffracts at every slit and interference between these waves gives rise to diffraction pattern with central maxima. I order and II order diffraction as shown in figure.</p>
+	</section>
+
+	<!-- RAY DIAGRAM SECTION -->
+	<section class="experiment-section">
+		<h3><u>RAY DIAGRAM</u></h3>
+		<div class="ray-diagram-container" style="border: 1px dashed #666; padding: 40px; text-align: center; background-color: #f9f9f9; margin: 15px 0;">
+			<p>[Image placeholder: Laser source → Grating → Screen showing central maxima and I, II order diffractions]</p>
+		</div>
+	</section>
+
+	<!-- FORMULAE SECTION -->
+	<section class="experiment-section">
+		<h3><u>FORMULAE</u></h3>
+		<div class="formulae-list">
+			<p><strong>1. λ = d sin θ<sub>m</sub> / m</strong></p>
+			<p><strong>2. d = 1 / N</strong></p>
+			<p><strong>3. θ = tan⁻¹(x<sub>m</sub> / S)</strong></p>
+		</div>
+		
+		<div class="formulae-definitions">
+			<p><strong>Where:</strong></p>
+			<ul>
+				<li><strong>m</strong> is the order of the diffraction</li>
+				<li><strong>λ</strong> is the wavelength of the laser in m</li>
+				<li><strong>d</strong> is the grating constant in m</li>
+				<li><strong>θ</strong> is the angle of diffraction in degree</li>
+				<li><strong>N</strong> is the number of lines per unit length of the grating in m⁻¹</li>
+				<li><strong>x<sub>m</sub></strong> is the distance between the central maxima and the m<sup>th</sup> order in m</li>
+				<li><strong>S</strong> is the distance between the grating and the screen in m</li>
+			</ul>
+		</div>
+	</section>
+
+	<!-- TABULAR COLUMN SECTION -->
+	<section class="experiment-section">
+		<h3><u>TABULAR COLUMN</u></h3>
+		<p><strong>1 inch = 2.54 cm = 0.0254 m</strong></p>
+		<p><strong>d = 1/N = 0.0254/500 = ................... m</strong></p>
+		
+		<div class="table-container">
+			<table class="observation-table">
+				<thead>
+					<tr>
+						<th colspan="6">
+    						<strong>
+        						500 LPI grating,
+        						S = <input type="number" step="0.1" id="screen-distance" style="width: 80px;"> cm
+    						</strong>
+						</th>
+					</tr>
+					<tr>
+						<th>Order<br>m</th>
+						<th>2x<sub>m</sub><br>(cm)</th>
+						<th>x<sub>m</sub><br>(cm)</th>
+						<th>θ<sub>m</sub> = tan⁻¹(x<sub>m</sub>/S)<br>(degree)</th>
+						<th>sin θ<sub>m</sub></th>
+						<th>λ = d sin θ<sub>m</sub> / m<br>(nm)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+    					<td>1</td>
+    					<td>
+        					<input type="number" step="0.01" class="two-xm-input" data-order="1">
+    					</td>
+    					<td class="xm-value"></td>
+    					<td class="theta-value"></td>
+    					<td class="sin-theta-value"></td>
+    					<td class="lambda-value"></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>
+							<input type="number" step="0.01" class="two-xm-input" data-order="2">
+						</td>
+						<td class="xm-value"></td>
+						<td class="theta-value"></td>
+						<td class="sin-theta-value"></td>
+						<td class="lambda-value"></td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>
+							<input type="number" step="0.01" class="two-xm-input" data-order="3">
+						</td>
+						<td class="xm-value"></td>
+						<td class="theta-value"></td>
+						<td class="sin-theta-value"></td>
+						<td class="lambda-value"></td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>
+							<input type="number" step="0.01" class="two-xm-input" data-order="4">
+						</td>
+						<td class="xm-value"></td>
+						<td class="theta-value"></td>
+						<td class="sin-theta-value"></td>
+						<td class="lambda-value"></td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td>
+							<input type="number" step="0.01" class="two-xm-input" data-order="5">
+						</td>
+						<td class="xm-value"></td>
+						<td class="theta-value"></td>
+						<td class="sin-theta-value"></td>
+						<td class="lambda-value"></td>
+					</tr>
+					<tr>
+						<td>6</td>
+						<td>
+							<input type="number" step="0.01" class="two-xm-input" data-order="6">
+						</td>
+						<td class="xm-value"></td>
+						<td class="theta-value"></td>
+						<td class="sin-theta-value"></td>
+						<td class="lambda-value"></td>
+					</tr>
+					<tr>
+						<td>7</td>
+						<td>
+							<input type="number" step="0.01" class="two-xm-input" data-order="7">
+						</td>
+						<td class="xm-value"></td>
+						<td class="theta-value"></td>
+						<td class="sin-theta-value"></td>
+						<td class="lambda-value"></td>
+					</tr>
+					<tr>
+						<td>8</td>
+						<td>
+							<input type="number" step="0.01" class="two-xm-input" data-order="8">
+						</td>
+						<td class="xm-value"></td>
+						<td class="theta-value"></td>
+						<td class="sin-theta-value"></td>
+						<td class="lambda-value"></td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td><span id="average-wavelength"></span> nm</td>
+					</tr>
+				</tfoot>
+			</table>
+			<div style="margin-top: 20px; text-align: center;">
+    			<button id="compute-btn" class="btn btn-primary">
+        			Calculate Wavelength
+    			</button>
 			</div>
 		</div>
 	</section>
+
+	<!-- PROCEDURE SECTION -->
+	<section class="experiment-section">
+		<h3><u>PROCEDURE</u></h3>
+		<ol class="procedure-list">
+			<li>Arrange the experimental set up as shown in the figure, such that the laser source, 500LPI grating and screen are in the same line.</li>
+			
+			<li>The diffraction pattern of laser light is observed on the screen. Equally spaced light spots are observed. The total numbers of spots are counted. A central bright ray and consecutive dots of higher order (which will be of lesser intensity) are observed on the screen.</li>
+			
+			<li>Set the distance between the plane of grating and the screen (S) as 100 cm. For this particular distance, mark the center of the spots of the diffraction pattern on the screen using a pencil. The distances between consecutive order of diffraction is measured using a scale and tabulated in table.</li>
+			
+			<li>The distance between the two first orders diffraction spots are measured, 2x₁ cm. Similarly the distance between the second order diffraction spots are measured and recorded in Table. 2x₂ cm. This is continued up to 8ᵗʰ order, 2x₈ cm.</li>
+			
+			<li>The angles of diffraction for all orders can be calculated using the formula θ<sub>m</sub> = tan⁻¹(x<sub>m</sub>/S), and the respective wavelengths are calculated using a formula λ = d sin θ<sub>m</sub>/m, and the average value of wave length is calculated.</li>
+		</ol>
+	</section>
+
+	<!-- RESULT SECTION -->
+	<section class="experiment-section">
+		<h3><u>RESULT</u></h3>
+		<p>The wavelength of the given laser source is <span id="final-wavelength" style="border-bottom: 1px solid #000; padding: 0 10px; min-width: 80px; display: inline-block;"></span> nm</p>
+	</section>
+
 </div>
-{% endblock %}
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/diffraction.js') }}"></script>
 {% endblock %}
 
