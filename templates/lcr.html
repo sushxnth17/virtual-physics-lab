@@ -1,85 +1,308 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="experiment-container">
-    <h1>LCR Series Circuit – Frequency Response and Resonance</h1>
-    <p class="experiment-description">
-        This experiment studies the frequency response of Series and Parallel LCR circuits:
-        <br><strong>Series LCR:</strong> Current peaks at resonance. Q = (1/R)√(L/C)
-        <br><strong>Parallel LCR:</strong> Current reaches minimum at resonance. Q = R√(C/L)
-    </p>
-    <section class="input-section">
-        <h2>Input Parameters</h2>
-        <form id="experimentForm" method="post">
-            <div class="input-group">
-                <label for="circuit_type">Circuit Type:</label>
-                <select id="circuit_type" name="circuit_type" required>
-                    <option value="series">Series</option>
-                    <option value="parallel">Parallel</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label for="R">Resistance R (ohms):</label>
-                <input type="number" id="R" name="R" step="any" min="0.0001" placeholder="e.g. 10" required>
-            </div>
-            <div class="input-group">
-                <label for="L">Inductance L (henry):</label>
-                <input type="number" id="L" name="L" step="any" min="0.0000001" placeholder="e.g. 0.1" required>
-            </div>
-            <div class="input-group">
-                <label for="C">Capacitance C (farad):</label>
-                <input type="number" id="C" name="C" step="any" min="0.0000000001" placeholder="e.g. 0.000001" required>
-            </div>
-            <div class="input-group">
-                <label for="f_min">Minimum Frequency f_min (Hz):</label>
-                <input type="number" id="f_min" name="f_min" step="any" min="0.1" placeholder="e.g. 10" required>
-            </div>
-            <div class="input-group">
-                <label for="f_max">Maximum Frequency f_max (Hz):</label>
-                <input type="number" id="f_max" name="f_max" step="any" min="0.1" placeholder="e.g. 1000" required>
-            </div>
-            <button type="button" id="runBtn">Run Experiment</button>
-        </form>
-    </section>
+<div class="experiment-container">
+	
+	<!-- EXPERIMENT TITLE -->
+	<div class="experiment-header" style="text-align: center; border: 3px solid #000; padding: 20px; margin-bottom: 30px;">
+		<p style="font-size: 14px; margin: 0 0 10px 0;">Experiment: 6</p>
+		<h2 style="font-weight: bold; font-size: 24px; margin: 0; letter-spacing: 2px;">LCR CIRCUITS - FORCED OSCILLATIONS IN ELECTRICAL CIRCUIT</h2>
+	</div>
 
-    <section class="results-section">
-        <h2>Results</h2>
-        <div class="result-item">
-            <label>Circuit Type:</label>
-            <span id="circuitType" class="result-value">-</span> 
-        </div>
-        <div class="result-item">
-            <label>Resonant Frequency:</label>
-            <span id="resonantFrequency" class="result-value">-</span> 
-        </div>
-        <div class="result-item">
-            <label>Bandwidth (Hz):</label>
-            <span id="bandwidth" class="result-value">-</span>
-        </div>
-        <div class="result-item">
-            <label>Half-Power Points:</label>
-            <span id="halfPowerPoints" class="result-value">-</span>
-        </div>
-        <div class="result-item">
-            <label>Theoretical Quality Factor:</label>
-            <span id="qualityFactorTheoretical" class="result-value">-</span>
-        </div>
-        <div class="result-item">
-            <label>Experimental Quality Factor:</label>
-            <span id="qualityFactorExperimental" class="result-value">-</span>
-        </div>
-    </section>
+	<!-- AIM SECTION -->
+	<section class="experiment-section">
+		<h3><u>AIM</u></h3>
+		<p>To study the frequency response of the series and parallel resonance circuits and to determine the resonant frequency, bandwidth and quality factor.</p>
+	</section>
 
-    <section class="graphs-section">
-        <h2>Graphs</h2>
-        <div class="graph-container">
-            <h3>Current vs Frequency Response</h3>
-            <canvas id="currentGraph" width="600" height="300"></canvas>
-        </div>
-    </section>
-</section>
+	<!-- APPARATUS SECTION -->
+	<section class="experiment-section">
+		<h3><u>APPARATUS</u></h3>
+		<p>Signal generator, Inductor, Capacitor, Resistor, Ammeter</p>
+	</section>
+
+	<!-- INTRODUCTION SECTION -->
+	<section class="experiment-section">
+		<h3><u>INTRODUCTION</u></h3>
+		<p>LCR circuit is an electrical circuit consisting of a resistor, an inductor, and a capacitor, connected in series or in parallel. Resonance in AC circuits implies a special frequency determined by the values of the resistance, capacitance and inductance. For series resonance the condition of resonance is straightforward and it is characterized by minimum impedance and zero phase. For parallel resonance, impedance is maximum at resonance.</p>
+		
+		<p>The effective reactance is inductive or capacitive depending upon whether X<sub>L</sub> &gt; X<sub>C</sub> or X<sub>L</sub> &lt; X<sub>C</sub>. The inductive reactance X<sub>L</sub> is directly proportional to the frequency and increases as the frequency increases from zero onwards. The capacitive reactance is inversely proportional to the frequency, decreases from an infinite value downwards. At certain frequency both reactances become equal and this frequency is called resonant frequency (f<sub>r</sub>). At resonant frequency the two reactances are equal i.e., X<sub>L</sub> = X<sub>C</sub> (or) X<sub>L</sub> - X<sub>C</sub> = 0.</p>
+
+		<p>The sharpness of the minimum depends on the value of R and is characterized by the "Q" of the circuit. Quality factor of LCR circuit is defined as the ratio of energy stored to the energy dissipated across resistance.</p>
+	</section>
+
+	<!-- SERIES RESONANCE CIRCUIT SECTION -->
+	<section class="experiment-section">
+		<h3><u>SERIES RESONANCE CIRCUIT</u></h3>
+		<p>The resonance of a series RLC circuit occurs when the inductive and capacitive reactance are equal in magnitude but cancel each other because they are 180 degrees apart in phase. The sharp minimum in impedance which occurs is useful in tuning applications.</p>
+		
+		<p>In a circuit containing R, L and C connected in series the impedance is given by:</p>
+		<p style="text-align: center; margin: 15px 0;"><strong>|Z| = √[R² + (ωL − 1/ωC)²]</strong></p>
+		
+		<p>At resonant frequency</p>
+		<p style="text-align: center; margin: 15px 0;"><strong>f<sub>r</sub> = 1 / (2π√LC)  Hz</strong></p>
+
+		<p>The quality factor of LCR circuit is defined as the ratio of energy stored to the energy dissipated across resistance:</p>
+		<p style="text-align: center; margin: 15px 0;"><strong>Q = (2πf<sub>r</sub>L) / R = (1/R)√(L/C) = f<sub>r</sub> / (f<sub>2</sub> − f<sub>1</sub>)</strong></p>
+	</section>
+
+	<!-- PARALLEL RESONANCE CIRCUIT SECTION -->
+	<section class="experiment-section">
+		<h3><u>PARALLEL RESONANCE CIRCUIT</u></h3>
+		<p>Here a coil (L) and capacitor (C) are connected in parallel with an AC power supply. When X<sub>L</sub> equals X<sub>C</sub>, the reactive branch currents are equal and opposite. Hence they cancel out each other to give minimum current in the main line. Since total current is minimum, in this state the total impedance is maximum. The resonant frequency of a parallel LCR circuit is given by:</p>
+		
+		<p style="text-align: center; margin: 15px 0;"><strong>f<sub>r</sub> = 1 / (2π√[LC − R²L²])</strong></p>
+
+		<p>If (R/L)² is negligible in comparison to (1/LC) then:</p>
+		<p style="text-align: center; margin: 15px 0;"><strong>f<sub>r</sub> = 1 / (2π√LC)  Hz</strong></p>
+
+		<p>This is same as for series circuit. For parallel LCR circuits, the current at resonance is minimum. There are many applications for this circuit. An important property of this circuit is its ability to resonate at a specific frequency, the resonance frequency. They are used in many different types of oscillator circuit. Another important application is for tuning, such as in radio receivers and television sets, where they are used to select a narrow range of frequencies from the ambient radio waves. An RLC circuit can be used as a band-pass filter or a band-stop filter.</p>
+	</section>
+
+	<!-- CIRCUIT DIAGRAM SECTION -->
+	<section class="experiment-section">
+		<h3><u>CIRCUIT DIAGRAM</u></h3>
+		
+		<h4 style="margin-top: 20px; margin-bottom: 10px;"><strong>Series LCR Circuit:</strong></h4>
+		<div class="diagram-container" style="border: 1px dashed #666; padding: 40px; text-align: center; background-color: #f9f9f9; margin: 15px 0;">
+			<p>[Image placeholder: Series LCR circuit with Signal Generator, Ammeter (m), Inductor (L), Capacitor (C), Resistor (330Ω)]</p>
+		</div>
+
+		<h4 style="margin-top: 20px; margin-bottom: 10px;"><strong>Parallel LCR Circuit:</strong></h4>
+		<div class="diagram-container" style="border: 1px dashed #666; padding: 40px; text-align: center; background-color: #f9f9f9; margin: 15px 0;">
+			<p>[Image placeholder: Parallel LCR circuit with Signal Generator, Ammeter (mA), Inductor (L), Capacitor (C), Resistor (330Ω)]</p>
+		</div>
+	</section>
+
+	<!-- FORMULAE SECTION -->
+	<section class="experiment-section">
+		<h3><u>FORMULAE</u></h3>
+		<div class="formulae-list">
+			<p><strong>1. L = 1 / (4π²f<sub>r</sub>²C)</strong></p>
+			<p><strong>2. Δf = f₂ − f₁</strong></p>
+			<p><strong>3. Quality factor (Series LCR) (Theoretical) = Q = (1/(R + r))√(L/C)</strong></p>
+			<p><strong>4. Quality factor (Experimental) = Q = f<sub>r</sub> / (f₂ − f₁)</strong></p>
+		</div>
+		
+		<div class="formulae-definitions" style="margin-top: 20px;">
+			<p><strong>Where:</strong></p>
+			<ul>
+				<li><strong>C</strong> is the capacitance of the capacitor in F</li>
+				<li><strong>Δf</strong> is the bandwidth in Hz</li>
+				<li><strong>r</strong> is the internal resistance of the inductor in Ω</li>
+				<li><strong>L</strong> is the inductance of the inductor in H</li>
+				<li><strong>R</strong> is the resistance of the resistor in Ω</li>
+				<li><strong>f<sub>r</sub></strong> is the resonant frequency in Hz</li>
+				<li><strong>f₁</strong> is the upper cut off frequency in Hz</li>
+				<li><strong>f₂</strong> is the lower cut off frequency in Hz</li>
+			</ul>
+		</div>
+	</section>
+
+	<!-- TABULAR COLUMN SECTION -->
+	<section class="experiment-section">
+		<h3><u>TABULAR COLUMN</u></h3>
+		
+		<h4 style="margin-top: 20px; margin-bottom: 15px;"><strong>Series LCR Circuit</strong></h4>
+		<div class="table-container">
+			<table class="observation-table">
+				<thead>
+					<tr>
+						<th>Frequency (f) (Hz)</th>
+						<th>Current (I) (mA)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr><td>1000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="1000"></td></tr>
+					<tr><td>1500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="1500"></td></tr>
+					<tr><td>2000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="2000"></td></tr>
+					<tr><td>2500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="2500"></td></tr>
+					<tr><td>3000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="3000"></td></tr>
+					<tr><td>3500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="3500"></td></tr>
+					<tr><td>4000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4000"></td></tr>
+					<tr><td>4100</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4100"></td></tr>
+					<tr><td>4200</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4200"></td></tr>
+					<tr><td>4300</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4300"></td></tr>
+					<tr><td>4400</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4400"></td></tr>
+					<tr><td>4500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4500"></td></tr>
+					<tr><td>4600</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4600"></td></tr>
+					<tr><td>4700</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4700"></td></tr>
+					<tr><td>4800</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4800"></td></tr>
+					<tr><td>4900</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4900"></td></tr>
+					<tr><td>5000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5000"></td></tr>
+					<tr><td>5100</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5100"></td></tr>
+					<tr><td>5200</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5200"></td></tr>
+					<tr><td>5300</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5300"></td></tr>
+					<tr><td>5400</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5400"></td></tr>
+					<tr><td>5500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5500"></td></tr>
+					<tr><td>6000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="6000"></td></tr>
+					<tr><td>6500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="6500"></td></tr>
+					<tr><td>7000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="7000"></td></tr>
+					<tr><td>7500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="7500"></td></tr>
+					<tr><td>8000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="8000"></td></tr>
+					<tr><td>8500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="8500"></td></tr>
+					<tr><td>9000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="9000"></td></tr>
+					<tr><td>9500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="9500"></td></tr>
+					<tr><td>10000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="10000"></td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h4 style="margin-top: 30px; margin-bottom: 15px;"><strong>Parallel LCR Circuit</strong></h4>
+		<div class="table-container">
+			<table class="observation-table">
+				<thead>
+					<tr>
+						<th>Frequency (f) (Hz)</th>
+						<th>Current (I) (mA)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr><td>1000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="1000"></td></tr>
+					<tr><td>1500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="1500"></td></tr>
+					<tr><td>2000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="2000"></td></tr>
+					<tr><td>2500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="2500"></td></tr>
+					<tr><td>3000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="3000"></td></tr>
+					<tr><td>3500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="3500"></td></tr>
+					<tr><td>4000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4000"></td></tr>
+					<tr><td>4100</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4100"></td></tr>
+					<tr><td>4200</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4200"></td></tr>
+					<tr><td>4300</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4300"></td></tr>
+					<tr><td>4400</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4400"></td></tr>
+					<tr><td>4500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4500"></td></tr>
+					<tr><td>4600</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4600"></td></tr>
+					<tr><td>4700</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4700"></td></tr>
+					<tr><td>4800</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4800"></td></tr>
+					<tr><td>4900</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4900"></td></tr>
+					<tr><td>5000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5000"></td></tr>
+					<tr><td>5100</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5100"></td></tr>
+					<tr><td>5200</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5200"></td></tr>
+					<tr><td>5300</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5300"></td></tr>
+					<tr><td>5400</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5400"></td></tr>
+					<tr><td>5500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5500"></td></tr>
+					<tr><td>6000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="6000"></td></tr>
+					<tr><td>6500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="6500"></td></tr>
+					<tr><td>7000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="7000"></td></tr>
+					<tr><td>7500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="7500"></td></tr>
+					<tr><td>8000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="8000"></td></tr>
+					<tr><td>8500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="8500"></td></tr>
+					<tr><td>9000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="9000"></td></tr>
+					<tr><td>9500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="9500"></td></tr>
+					<tr><td>10000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="10000"></td></tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<!-- PROCEDURE SECTION -->
+	<section class="experiment-section">
+		<h3><u>PROCEDURE</u></h3>
+		<ol class="procedure-list">
+			<li>The connections for series LCR circuit are made as shown in the circuit diagram.</li>
+			<li>The frequency of ac signal is increased in the steps given and corresponding current readings are tabulated.</li>
+			<li>A plot of frequency vs current is drawn.</li>
+			<li>From the graph, the resonant frequency (f<sub>r</sub>) and bandwidth are calculated.</li>
+			<li>The Quality factor (Q) and inductance (L) are calculated using the given formulae.</li>
+			<li>The same procedure is repeated for parallel LCR circuit as well.</li>
+		</ol>
+	</section>
+
+	<!-- DATA CALCULATION SECTION -->
+	<section class="experiment-section" style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #666;">
+		<h3><u>ANALYSIS AND CALCULATION</u></h3>
+		<p><strong>Instructions:</strong> Fill in the current values in the tables above for each frequency. Then select the circuit type and click the appropriate button to calculate results.</p>
+		
+		<div class="input-section" style="margin-top: 20px;">
+			<div class="input-group">
+				<label for="circuit_type_select">Select Circuit Type for Analysis:</label>
+				<select id="circuit_type_select" name="circuit_type_select">
+					<option value="series">Series LCR</option>
+					<option value="parallel">Parallel LCR</option>
+				</select>
+			</div>
+			<div class="input-group" style="margin-top: 10px;">
+				<label for="capacitanceInput">Capacitance C (µF):</label>
+				<input type="number" id="capacitanceInput" step="0.0001" placeholder="e.g. 0.047">
+			</div>
+			<div class="input-group" style="margin-top: 10px;">
+				<label for="resistanceInput">Total resistance R + r (Ω):</label>
+				<input type="number" id="resistanceInput" step="0.1" placeholder="e.g. 330">
+			</div>
+			<div style="margin-top: 15px;">
+				<button type="button" id="calculateBtn" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Calculate Results from Table Data</button>
+			</div>
+		</div>
+	</section>
+
+	<!-- GRAPH SECTION -->
+	<section class="graphs-section">
+		<h3><u>EXPERIMENTAL GRAPH</u></h3>
+		<div class="graph-container">
+			<h4>Current (mA) vs Frequency (Hz) - From Table Data</h4>
+			<canvas id="currentGraph" width="600" height="300"></canvas>
+		</div>
+	</section>
+
+
+	<!-- RESULT SECTION -->
+	<section class="experiment-section">
+		<h3><u>RESULT</u></h3>
+		<p>The frequency response of series and parallel LCR circuits is studied.</p>
+		
+		<!-- styled table for results -->
+		<style>
+			.result-section-table, .result-section-table th, .result-section-table td {
+				border: 1px solid #000;
+				border-collapse: collapse;
+				padding: 6px 8px;
+			}
+			.result-section-table th {
+				background-color: #f0f0f0;
+			}
+		</style>
+		<div class="table-container" style="margin-top: 20px;">
+			<table class="observation-table result-section-table" style="width:100%;">
+				<thead>
+					<tr>
+						<th></th>
+						<th>Series LCR</th>
+						<th>Parallel LCR</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><strong>Inductance</strong></td>
+						<td><span id="inductance_series" class="result-value">-</span> H</td>
+						<td><span id="inductance_parallel" class="result-value">-</span> H</td>
+					</tr>
+					<tr>
+						<td><strong>Resonant Frequency</strong></td>
+						<td><span id="resonant_freq_series" class="result-value">-</span> Hz</td>
+						<td><span id="resonant_freq_parallel" class="result-value">-</span> Hz</td>
+					</tr>
+					<tr>
+						<td><strong>Bandwidth</strong></td>
+						<td><span id="bandwidth_series" class="result-value">-</span> Hz</td>
+						<td><span id="bandwidth_parallel" class="result-value">-</span> Hz</td>
+					</tr>
+					<tr>
+						<td><strong>Quality Factor (Graph)</strong></td>
+						<td><span id="q_factor_graph_series" class="result-value">-</span></td>
+						<td><span id="q_factor_graph_parallel" class="result-value">-</span></td>
+					</tr>
+					<tr>
+						<td><strong>Quality Factor (Calculation)</strong></td>
+						<td><span id="q_factor_calc_series" class="result-value">-</span></td>
+						<td><span id="q_factor_calc_parallel" class="result-value">-</span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+</div>
 {% endblock %}
- 
+
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/lcr.js') }}"></script>
 {% endblock %}
