@@ -4,11 +4,20 @@
 <section class="experiment-container">
     <h1>LCR Series Circuit – Frequency Response and Resonance</h1>
     <p class="experiment-description">
-    This experiment studies the frequency response of a series LCR circuit and determines its resonant frequency and quality factor.
+        This experiment studies the frequency response of Series and Parallel LCR circuits:
+        <br><strong>Series LCR:</strong> Current peaks at resonance. Q = (1/R)√(L/C)
+        <br><strong>Parallel LCR:</strong> Current reaches minimum at resonance. Q = R√(C/L)
     </p>
     <section class="input-section">
         <h2>Input Parameters</h2>
         <form id="experimentForm" method="post">
+            <div class="input-group">
+                <label for="circuit_type">Circuit Type:</label>
+                <select id="circuit_type" name="circuit_type" required>
+                    <option value="series">Series</option>
+                    <option value="parallel">Parallel</option>
+                </select>
+            </div>
             <div class="input-group">
                 <label for="R">Resistance R (ohms):</label>
                 <input type="number" id="R" name="R" step="any" min="0.0001" placeholder="e.g. 10" required>
@@ -36,24 +45,36 @@
     <section class="results-section">
         <h2>Results</h2>
         <div class="result-item">
+            <label>Circuit Type:</label>
+            <span id="circuitType" class="result-value">-</span> 
+        </div>
+        <div class="result-item">
             <label>Resonant Frequency:</label>
             <span id="resonantFrequency" class="result-value">-</span> 
         </div>
         <div class="result-item">
-            <label>Quality Factor:</label>
-            <span id="qualityFactor" class="result-value">-</span>
+            <label>Bandwidth (Hz):</label>
+            <span id="bandwidth" class="result-value">-</span>
+        </div>
+        <div class="result-item">
+            <label>Half-Power Points:</label>
+            <span id="halfPowerPoints" class="result-value">-</span>
+        </div>
+        <div class="result-item">
+            <label>Theoretical Quality Factor:</label>
+            <span id="qualityFactorTheoretical" class="result-value">-</span>
+        </div>
+        <div class="result-item">
+            <label>Experimental Quality Factor:</label>
+            <span id="qualityFactorExperimental" class="result-value">-</span>
         </div>
     </section>
 
     <section class="graphs-section">
         <h2>Graphs</h2>
         <div class="graph-container">
-            <h3>Frequency vs Current</h3>
+            <h3>Current vs Frequency Response</h3>
             <canvas id="currentGraph" width="600" height="300"></canvas>
-        </div>
-        <div class="graph-container">
-            <h3>Frequency vs Impedance</h3>
-            <canvas id="impedanceGraph" width="600" height="300"></canvas>
         </div>
     </section>
 </section>

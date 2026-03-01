@@ -82,7 +82,7 @@ def compute_lcr_response(circuit_type, R, L, C, f_min, f_max, points=200, V=1.0)
     # ========== FREQUENCY SWEEP & IMPEDANCE/CURRENT CALCULATION ==========
     frequency = []
     current = []
-    
+    impedance = []
     for i in range(points):
         # Linear frequency sweep from f_min to f_max
         f = f_min + i * (f_max - f_min) / max(points - 1, 1)
@@ -102,36 +102,25 @@ def compute_lcr_response(circuit_type, R, L, C, f_min, f_max, points=200, V=1.0)
             XC = 1.0 / (omega * C)
         
         # Impedance calculation (circuit-specific)
-        if circuit_type == "series":
-            # Series: Z = √(R² + (XL − XC)²)
-            Z = math.sqrt(R**2 + (XL - XC)**2)
-        else:  # parallel
-            # Parallel: Admittance Y = √((1/R)² + (ωC − 1/(ωL))²); then Z = 1/Y
-            inv_R = 1.0 / R  # Conductance
-            
-            # Susceptance: B = ωC − 1/(ωL)
-            if abs(omega * L) < eps:
-                B = omega * C  # ωL term dominates numerator
-            else:
-                B = omega * C - 1.0 / (omega * L)
-            
-            # Total admittance
-            Y = math.sqrt(inv_R**2 + B**2)
-            
-            # Impedance (guard against very small Y)
-            if Y < eps:
-                Z = 1e15  # Very large impedance
-            else:
-                Z = 1.0 / Y
         
-        # Current magnitude: I = V / Z
-        if Z < eps:
-            I = 0.0
-        else:
-            I = V / Z
-        
-        current.append(I)
+
     
+            
+        
+        # Current magnitude: compute consistently as I = V / Z
+        # Protect against extremely small Z by using a large but finite current
+        if circuit_type == "series":
+            Z = math.sqrt(R**2 + (XL - XC)**2)
+            I = V / Z
+            impedance.append(Z)
+        else:
+            I_R = V / R
+            I_L = V / (omega * L) 
+            I_C = V * omega * C
+            I = math.sqrt(I_R**2 + (I_C - I_L)**2)
+
+            impedance.append(1.0 / V / I if I > eps else 1e15)
+        current.append(I)
     # ========== HALF-POWER POINT ANALYSIS ==========
     # Find f1 and f2 numerically by identifying extreme current value
     # and computing half-power threshold
@@ -196,6 +185,7 @@ def compute_lcr_response(circuit_type, R, L, C, f_min, f_max, points=200, V=1.0)
         "circuit_type": circuit_type,
         "resonant_frequency": fr,
         "bandwidth": bandwidth,
+        "impedance": impedance,
         "f1": f1,
         "f2": f2,
         "quality_factor_theoretical": Q_theoretical,
