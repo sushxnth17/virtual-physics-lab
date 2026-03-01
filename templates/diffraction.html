@@ -35,7 +35,10 @@
 	<section class="experiment-section">
 		<h3><u>RAY DIAGRAM</u></h3>
 		<div class="ray-diagram-container" style="border: 1px dashed #666; padding: 40px; text-align: center; background-color: #f9f9f9; margin: 15px 0;">
-			<p>[Image placeholder: Laser source → Grating → Screen showing central maxima and I, II order diffractions]</p>
+			<img src="/static/js/images/diffraction.png" alt="Lab Manual Ray Diagram - Diffraction Grating Setup" style="max-width: 400px; width: 100%; height: auto; border: 1px solid #999; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); border-radius: 4px; display: block; margin: 0 auto;">
+			<p style="margin-top: 15px; font-size: 12px; color: #555; font-style: italic;">
+				<strong>Figure:</strong> Diffraction pattern showing central maximum and higher orders (Manual Observation)
+			</p>
 		</div>
 	</section>
 
@@ -61,6 +64,30 @@
 			</ul>
 		</div>
 	</section>
+
+	<div style="margin-top:40px; text-align:center;">
+    	<h3>Interactive Setup Simulation</h3>
+    		<canvas id="simulationCanvas" width="900" height="400" style="border:1px solid #000;"></canvas>
+	</div>
+
+	<!-- Screen Distance Control -->
+	<div style="margin-top:20px; text-align:center;">
+		<label><strong>Screen Distance S (m): </strong></label>
+		<input type="range" id="screenSlider" min="0.5" max="2.0" step="0.05" value="1.0" style="width:300px;">
+		<span id="screenValue">1.00</span> m
+	</div>
+
+	<!-- Measurement Tool Display -->
+	<div style="margin-top:25px; padding:15px; background-color:#f0f8ff; border:2px solid #4682b4; border-radius:8px; text-align:center;">
+		<p style="font-size:14px; margin:5px 0; color:#333;">
+			<strong>📏 Measurement Tool</strong> - Click on any diffraction spot to measure x<sub>m</sub>
+		</p>
+		<p id="selectedOrderDisplay" style="font-size:16px; font-weight:bold; margin:8px 0; color:#1e4d7b;">
+			Click on a diffraction spot to measure
+		</p>
+		<p id="xmDisplay" style="font-size:18px; font-weight:bold; margin:8px 0; color:#d35400;">
+		</p>
+	</div>
 
 	<!-- TABULAR COLUMN SECTION -->
 	<section class="experiment-section">
@@ -219,4 +246,5 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/diffraction.js') }}"></script>
+<script src="{{ url_for('static', filename='js/experiments/diffraction_sim.js') }}"></script>
 {% endblock %}
