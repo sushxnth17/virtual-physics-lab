@@ -73,6 +73,28 @@ function calculateFromTableData() {
         ? extremeCurrent / Math.sqrt(2) 
         : extremeCurrent * Math.sqrt(2);
     
+    // make sure we actually can reach half-power level with the measured data
+    const maxCurrent = Math.max(...sortedCurrent);
+    const minCurrent = Math.min(...sortedCurrent);
+
+    if (circuitType === 'parallel' && maxCurrent < halfPowerCurrent) {
+        alert('Measured parallel data never reach the half-power current (' +
+              halfPowerCurrent.toFixed(2) + ' mA). ' +
+              'Cannot determine bandwidth or Q factor; please include higher-current points.');
+        // clear any previous summary for this circuit and plot raw data
+        clearSummaryRow(circuitType);
+        plotTableGraph(sortedFreq, sortedCurrent, circuitType, resonantFrequency);
+        return;
+    }
+    if (circuitType === 'series' && minCurrent > halfPowerCurrent) {
+        alert('Measured series data never fall to the half-power current (' +
+              halfPowerCurrent.toFixed(2) + ' mA). ' +
+              'Cannot determine bandwidth or Q factor; please include lower-current points.');
+        clearSummaryRow(circuitType);
+        plotTableGraph(sortedFreq, sortedCurrent, circuitType, resonantFrequency);
+        return;
+    }
+    
     // Find half-power frequencies (f1 and f2)
     let f1 = null, f2 = null;
     
@@ -242,8 +264,10 @@ function clearSummaryRow(circuitType) {
 
 
 function plotTableGraph(frequencies, currents, circuitType, resonantFrequency) {
-    // Convert currents from A to mA for display
-    const currentsInmA = currents.map(c => c * 1000);
+    // Currents entered in the table are already in mA, so we
+    // can use them directly for plotting. (Previous code multiplied
+    // by 1000 which caused confusing values.)
+    const currentsInmA = currents;
     
     const labelText = circuitType === 'series' 
         ? 'Current (mA) - Series LCR (Peak at Resonance)'
