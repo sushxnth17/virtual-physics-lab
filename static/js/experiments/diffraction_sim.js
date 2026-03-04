@@ -431,20 +431,28 @@ function drawDiffractionRays() {
     const gratingCenterX = gratingX;
     const gratingCenterY = centerY;
     
-    // Central maximum ray (m=0, solid horizontal line)
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 2.5;
+    // ===== CENTRAL MAXIMUM RAY (m=0, slightly brighter) =====
+    // Reset line dash for smooth continuous lines
     ctx.setLineDash([]);
+    
+    // Outer glow for central ray (brighter)
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.2)';
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
     ctx.beginPath();
     ctx.moveTo(gratingCenterX, gratingCenterY);
     ctx.lineTo(screenX, gratingCenterY);
     ctx.stroke();
     
-    // Diffraction order rays (dashed lines)
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([5, 5]);
-    ctx.strokeStyle = '#000000';
+    // Inner bright beam for central ray
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(gratingCenterX, gratingCenterY);
+    ctx.lineTo(screenX, gratingCenterY);
+    ctx.stroke();
     
+    // ===== DIFFRACTION ORDER RAYS (faint glowing beams) =====
     // Draw rays for orders 1 through MAX_ORDER
     for (let order = 1; order <= MAX_ORDER; order++) {
         const angle = calculateDiffractionAngle(order);
@@ -457,20 +465,8 @@ function drawDiffractionRays() {
         const offsetMeters = calculateScreenOffset(angle);
         const offsetPixels = offsetMeters * pixelScale;
         
-        // Positive order (upper ray)
         const screenY_positive = centerY - offsetPixels;
-        ctx.beginPath();
-        ctx.moveTo(gratingCenterX, gratingCenterY);
-        ctx.lineTo(screenX, screenY_positive);
-        ctx.stroke();
-        
-        // Negative order (lower ray, symmetric)
         const screenY_negative = centerY + offsetPixels;
-        ctx.beginPath();
-        ctx.moveTo(gratingCenterX, gratingCenterY);
-        ctx.lineTo(screenX, screenY_negative);
-        ctx.stroke();
-
 
         // Skip drawing if outside canvas
         if (
@@ -481,10 +477,48 @@ function drawDiffractionRays() {
         ) {
             continue;
         }
+        
+        // Reduce brightness slightly for higher orders to simulate intensity loss
+        const brightnessMultiplier = Math.max(0.6, 1 - order * 0.08);
+        const glowAlpha = Math.round(15 * brightnessMultiplier);
+        const beamAlpha = Math.round(60 * brightnessMultiplier);
+        
+        // ===== POSITIVE ORDER RAY (upper) =====
+        // Faint outer glow
+        ctx.strokeStyle = `rgba(255, 0, 0, ${glowAlpha / 255})`;
+        ctx.lineWidth = 6;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(gratingCenterX, gratingCenterY);
+        ctx.lineTo(screenX, screenY_positive);
+        ctx.stroke();
+        
+        // Bright inner beam
+        ctx.strokeStyle = `rgba(255, 0, 0, ${beamAlpha / 255})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(gratingCenterX, gratingCenterY);
+        ctx.lineTo(screenX, screenY_positive);
+        ctx.stroke();
+        
+        // ===== NEGATIVE ORDER RAY (lower, symmetric) =====
+        // Faint outer glow
+        ctx.strokeStyle = `rgba(255, 0, 0, ${glowAlpha / 255})`;
+        ctx.lineWidth = 6;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(gratingCenterX, gratingCenterY);
+        ctx.lineTo(screenX, screenY_negative);
+        ctx.stroke();
+        
+        // Bright inner beam
+        ctx.strokeStyle = `rgba(255, 0, 0, ${beamAlpha / 255})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(gratingCenterX, gratingCenterY);
+        ctx.lineTo(screenX, screenY_negative);
+        ctx.stroke();
     }
-    
-    // Reset line dash
-    ctx.setLineDash([]);
 }
 
 /**
@@ -496,25 +530,37 @@ function drawDiffractionSpots() {
     
     // Central maximum (m=0, largest and brightest)
     const centralRadius = 12;
+    const centralGlowRadius = centralRadius * 2.8;
     
-    // Radial gradient for central maximum glow
-    const centralGradient = ctx.createRadialGradient(screenX_pos, centerY, 0, screenX_pos, centerY, centralRadius + 8);
-    centralGradient.addColorStop(0, 'rgba(255, 255, 150, 0.8)');
-    centralGradient.addColorStop(0.4, 'rgba(255, 255, 100, 0.4)');
-    centralGradient.addColorStop(1, 'rgba(255, 255, 0, 0)');
+    // Radial gradient for central maximum glow - enhanced with more realistic light falloff
+    const centralGradient = ctx.createRadialGradient(screenX_pos, centerY, 0, screenX_pos, centerY, centralGlowRadius);
+    centralGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');      // Bright white center
+    centralGradient.addColorStop(0.2, 'rgba(255, 255, 200, 0.8)');    // Light yellow transition
+    centralGradient.addColorStop(0.4, 'rgba(255, 255, 100, 0.5)');    // Yellow glow
+    centralGradient.addColorStop(0.7, 'rgba(255, 200, 0, 0.2)');      // Orange/amber fade
+    centralGradient.addColorStop(1, 'rgba(255, 200, 0, 0)');          // Transparent edge
     
     ctx.fillStyle = centralGradient;
     ctx.beginPath();
-    ctx.arc(screenX_pos, centerY, centralRadius + 8, 0, 2 * Math.PI);
+    ctx.arc(screenX_pos, centerY, centralGlowRadius, 0, 2 * Math.PI);
     ctx.fill();
     
-    // Central bright core
-    ctx.fillStyle = '#FFFF00';
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 1.5;
+    // Central bright core - white center fading to yellow
+    const coreCoreGradient = ctx.createRadialGradient(screenX_pos, centerY, 0, screenX_pos, centerY, centralRadius);
+    coreCoreGradient.addColorStop(0, '#FFFFFF');       // Pure white center
+    coreCoreGradient.addColorStop(0.7, '#FFFF99');     // Light yellow
+    coreCoreGradient.addColorStop(1, '#FFFF00');       // Bright yellow edge
+    
+    ctx.fillStyle = coreCoreGradient;
     ctx.beginPath();
     ctx.arc(screenX_pos, centerY, centralRadius, 0, 2 * Math.PI);
     ctx.fill();
+    
+    // Central core outline
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(screenX_pos, centerY, centralRadius, 0, 2 * Math.PI);
     ctx.stroke();
     
     // Label central maximum
@@ -549,48 +595,71 @@ function drawDiffractionSpots() {
         
         // Spot size decreases with order (higher orders are dimmer)
         const baseRadius = Math.max(2.5, 10 - order * 0.8);
-        const glowRadius = baseRadius + 5;
+        const glowRadius = baseRadius * 2.5;  // Proportional glow radius
         
-        // Color intensity decreases with order
+        // Color intensity decreases with order to simulate diffraction effects
         const brightness = 255 - order * 25;
-        const colorInt = Math.max(120, brightness);
-        const rgbColor = `rgb(255, 255, ${colorInt})`;
+        const colorIntBr = Math.max(120, brightness);
+        const colorIntGr = Math.max(80, brightness - 40);
         
-        // Draw positive order spot with glow
+        // ===== POSITIVE ORDER SPOT =====
+        // Draw glow halo with smooth gradient
         const gradientPos = ctx.createRadialGradient(screenX_pos, screenY_positive, 0, screenX_pos, screenY_positive, glowRadius);
-        gradientPos.addColorStop(0, `rgba(255, 255, ${colorInt}, 0.6)`);
-        gradientPos.addColorStop(0.5, `rgba(255, 255, ${colorInt}, 0.25)`);
-        gradientPos.addColorStop(1, `rgba(255, 255, ${colorInt}, 0)`);
+        gradientPos.addColorStop(0, `rgba(255, 255, ${colorIntBr}, 0.7)`);       // Bright yellow/white center
+        gradientPos.addColorStop(0.25, `rgba(255, 255, ${colorIntGr}, 0.5)`);    // Yellow middle
+        gradientPos.addColorStop(0.6, `rgba(255, ${150 + order * 10}, 0, 0.2)`); // Orange fade
+        gradientPos.addColorStop(1, `rgba(255, 200, 0, 0)`);                     // Transparent edge
         
         ctx.fillStyle = gradientPos;
         ctx.beginPath();
         ctx.arc(screenX_pos, screenY_positive, glowRadius, 0, 2 * Math.PI);
         ctx.fill();
         
-        // Positive order bright spot
-        ctx.fillStyle = rgbColor;
+        // Draw bright core with gradient from white to yellow
+        const coreGradientPos = ctx.createRadialGradient(screenX_pos, screenY_positive, 0, screenX_pos, screenY_positive, baseRadius);
+        coreGradientPos.addColorStop(0, `rgb(255, 255, ${Math.min(255, colorIntBr + 30)})`);  // White center
+        coreGradientPos.addColorStop(0.8, `rgb(255, 255, ${colorIntBr})`);                     // Yellow edge
+        
+        ctx.fillStyle = coreGradientPos;
+        ctx.beginPath();
+        ctx.arc(screenX_pos, screenY_positive, baseRadius, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Core outline
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 0.8;
         ctx.beginPath();
         ctx.arc(screenX_pos, screenY_positive, baseRadius, 0, 2 * Math.PI);
-        ctx.fill();
         ctx.stroke();
         
-        // Draw negative order spot (symmetric lower)
+        // ===== NEGATIVE ORDER SPOT (symmetric lower) =====
+        // Draw glow halo
         const gradientNeg = ctx.createRadialGradient(screenX_pos, screenY_negative, 0, screenX_pos, screenY_negative, glowRadius);
-        gradientNeg.addColorStop(0, `rgba(255, 255, ${colorInt}, 0.6)`);
-        gradientNeg.addColorStop(0.5, `rgba(255, 255, ${colorInt}, 0.25)`);
-        gradientNeg.addColorStop(1, `rgba(255, 255, ${colorInt}, 0)`);
+        gradientNeg.addColorStop(0, `rgba(255, 255, ${colorIntBr}, 0.7)`);
+        gradientNeg.addColorStop(0.25, `rgba(255, 255, ${colorIntGr}, 0.5)`);
+        gradientNeg.addColorStop(0.6, `rgba(255, ${150 + order * 10}, 0, 0.2)`);
+        gradientNeg.addColorStop(1, `rgba(255, 200, 0, 0)`);
         
         ctx.fillStyle = gradientNeg;
         ctx.beginPath();
         ctx.arc(screenX_pos, screenY_negative, glowRadius, 0, 2 * Math.PI);
         ctx.fill();
         
-        ctx.fillStyle = rgbColor;
+        // Draw bright core
+        const coreGradientNeg = ctx.createRadialGradient(screenX_pos, screenY_negative, 0, screenX_pos, screenY_negative, baseRadius);
+        coreGradientNeg.addColorStop(0, `rgb(255, 255, ${Math.min(255, colorIntBr + 30)})`);
+        coreGradientNeg.addColorStop(0.8, `rgb(255, 255, ${colorIntBr})`);
+        
+        ctx.fillStyle = coreGradientNeg;
         ctx.beginPath();
         ctx.arc(screenX_pos, screenY_negative, baseRadius, 0, 2 * Math.PI);
         ctx.fill();
+        
+        // Core outline
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.arc(screenX_pos, screenY_negative, baseRadius, 0, 2 * Math.PI);
         ctx.stroke();
         
         // Label (shown only for first few orders to avoid clutter)
@@ -991,6 +1060,50 @@ function renderMeasurementOverlay() {
 // ============================================================================
 
 /**
+ * Draw enhanced laser beam from laser aperture to grating
+ * Features improved styling with glow effects
+ */
+function drawLaserBeam() {
+    // Calculate beam start and end points
+    const laserApertureX = laserX + laserWidth - laserWidth * 0.15;
+    const laserApertureY = centerY;
+    const gratingCenterX = gratingX;
+    const gratingCenterY = centerY;
+    
+    // Draw glow effect (wider semi-transparent line behind main beam)
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.3)';
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.moveTo(laserApertureX, laserApertureY);
+    ctx.lineTo(gratingCenterX, gratingCenterY);
+    ctx.stroke();
+    
+    // Draw secondary glow (medium width)
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(laserApertureX, laserApertureY);
+    ctx.lineTo(gratingCenterX, gratingCenterY);
+    ctx.stroke();
+    
+    // Draw main bright red beam
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.9)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(laserApertureX, laserApertureY);
+    ctx.lineTo(gratingCenterX, gratingCenterY);
+    ctx.stroke();
+    
+    // Draw inner core (brightest)
+    ctx.strokeStyle = 'rgba(255, 100, 100, 1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(laserApertureX, laserApertureY);
+    ctx.lineTo(gratingCenterX, gratingCenterY);
+    ctx.stroke();
+}
+
+/**
  * Draw the complete experimental setup
  * Recalculates physics parameters and renders all components
  */
@@ -1025,25 +1138,28 @@ function drawSetup() {
     }
     
     // Draw all components in optimized rendering order
-    // 1. Laser and beam (background element)
+    // 1. Laser housing (background element)
     drawLaser();
     
-    // 2. Grating (central element)
+    // 2. Enhanced laser beam with glow effects
+    drawLaserBeam();
+    
+    // 3. Grating (central element)
     drawGrating();
     
-    // 3. Diffraction rays (behind spots)
+    // 4. Diffraction rays (behind spots)
     drawDiffractionRays();
     
-    // 4. Screen (structure)
+    // 5. Screen (structure)
     drawScreen();
     
-    // 5. Distance arrow (dimension line)
+    // 6. Distance arrow (dimension line)
     drawDistanceArrow();
     
-    // 6. Diffraction spots (bright elements on top)
+    // 7. Diffraction spots (bright elements on top)
     drawDiffractionSpots();
     
-    // 7. Measurement overlay if spot is selected (topmost)
+    // 8. Measurement overlay if spot is selected (topmost)
     renderMeasurementOverlay();
 }
 

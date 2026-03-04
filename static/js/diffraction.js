@@ -305,13 +305,94 @@ async function computeDiffraction() {
 }
 
 /**
+ * Reset experiment to initial state
+ */
+function resetExperiment() {
+	// Clear selected diffraction order and xm measurement (from simulation)
+	if (typeof selectedOrder !== 'undefined') {
+		selectedOrder = null;
+	}
+	if (typeof selectedXm !== 'undefined') {
+		selectedXm = null;
+	}
+
+	// Clear all table input fields
+	document.querySelectorAll('.two-xm-input').forEach(input => {
+		input.value = '';
+	});
+
+	// Clear all calculated table cells
+	document.querySelectorAll('.xm-value, .theta-value, .sin-theta-value, .lambda-value').forEach(cell => {
+		cell.textContent = '';
+	});
+
+	// Clear average wavelength display
+	const avgWavelengthElement = document.getElementById('average-wavelength');
+	if (avgWavelengthElement) {
+		avgWavelengthElement.textContent = '';
+	}
+
+	// Clear final wavelength display
+	const finalWavelengthElement = document.getElementById('final-wavelength');
+	if (finalWavelengthElement) {
+		finalWavelengthElement.textContent = '';
+	}
+
+	// Reset the graph (destroy existing chart if needed)
+	if (diffractionChart) {
+		diffractionChart.destroy();
+		diffractionChart = null;
+	}
+
+	// Reset measurement display text (from simulation)
+	if (typeof updateMeasurementDisplay !== 'undefined') {
+		updateMeasurementDisplay();
+	}
+
+	// Reset the screen distance slider to default value (1.0 meters)
+	const screenSlider = document.getElementById('screenSlider');
+	const screenValueDisplay = document.getElementById('screenValue');
+	if (screenSlider) {
+		screenSlider.value = 1.0;
+		
+		// Update screenDistance variable in simulation if available
+		if (typeof screenDistance !== 'undefined') {
+			screenDistance = 1.0;
+		}
+		
+		// Update the display text
+		if (screenValueDisplay) {
+			screenValueDisplay.textContent = '1.00';
+		}
+	}
+
+	// Reset screen distance input field
+	const screenDistanceInput = document.getElementById('screen-distance');
+	if (screenDistanceInput) {
+		screenDistanceInput.value = '100'; // Default 100 cm = 1.0 m
+	}
+
+	// Redraw the simulation canvas (from simulation)
+	if (typeof updateSimulation !== 'undefined') {
+		updateSimulation();
+	}
+
+	console.log('Experiment reset to initial state');
+}
+
+/**
  * Initialize event listeners
  */
 function initializeEventListeners() {
 	const computeBtn = document.getElementById('compute-btn');
+	const resetBtn = document.getElementById('resetExperimentBtn');
 
 	if (computeBtn) {
 		computeBtn.addEventListener('click', computeDiffraction);
+	}
+
+	if (resetBtn) {
+		resetBtn.addEventListener('click', resetExperiment);
 	}
 }
 

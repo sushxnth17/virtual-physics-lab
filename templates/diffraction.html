@@ -89,6 +89,23 @@
 		</p>
 	</div>
 
+	<!-- Reset Experiment Button -->
+	<div style="margin-top:20px; text-align:center;">
+		<button id="resetExperimentBtn" style="
+			padding:10px 20px;
+			font-size:14px;
+			font-weight:bold;
+			background-color:#e74c3c;
+			color:white;
+			border:none;
+			border-radius:6px;
+			cursor:pointer;
+			box-shadow:0 2px 6px rgba(0,0,0,0.2);
+		">
+			Reset Experiment
+		</button>
+	</div>
+
 	<!-- TABULAR COLUMN SECTION -->
 	<section class="experiment-section">
 		<h3><u>TABULAR COLUMN</u></h3>
@@ -199,7 +216,9 @@
 				</tbody>
 				<tfoot>
 					<tr>
-						<td><span id="average-wavelength"></span> nm</td>
+						<td colspan="6">
+							Average λ = <span id="average-wavelength"></span> nm
+						</td>
 					</tr>
 				</tfoot>
 			</table>
