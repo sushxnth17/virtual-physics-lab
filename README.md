@@ -1,6 +1,6 @@
-Virtual Physics Lab Simulator
+# Virtual Physics Lab Simulator
 
-Project Overview
+## Project Overview
 
 The Virtual Physics Lab Simulator is a web-based platform designed to help students perform common undergraduate physics experiments in a virtual environment.
 
@@ -23,7 +23,7 @@ This project replicates the workflow of a real physics laboratory where students
 
 ---
 
-Objectives
+## Objectives
 
 - Provide an interactive environment for practicing laboratory experiments
 - Help students visualize physical concepts through simulations
@@ -33,13 +33,13 @@ Objectives
 
 ---
 
-Completed Experiments
+## Completed Experiments
 
-1. LCR Circuits-Forced Oscillations in Electrical Circuit
+### 1. LCR Circuits-Forced Oscillations in Electrical Circuit
 
 This experiment studies the frequency response of Series and Parallel LCR circuits.
 
-Features
+### Features
 
 - Adjustable frequency input using an interactive slider
 - Automatic current measurement generation
@@ -52,7 +52,7 @@ Features
   - Inductance
 - Supports both Series LCR and Parallel LCR analysis
 
-Learning Outcomes
+### Learning Outcomes
 
 Students can observe:
 
@@ -62,11 +62,11 @@ Students can observe:
 
 ---
 
-2. Diffraction Grating Experiment
+### 2. Diffraction Grating Experiment
 
 This experiment demonstrates the diffraction of light through a grating to calculate the wavelength of light.
 
-Features
+### Features
 
 - Interactive simulation of a diffraction setup
 - Movable diagram that changes the distance S
@@ -76,7 +76,7 @@ Features
 - Includes instrument noise simulation so each student obtains slightly different readings (similar to real laboratory measurements)
 
 
-Learning Outcomes
+### Learning Outcomes
 
 Students can understand:
 
@@ -86,7 +86,7 @@ Students can understand:
 
 ---
 
-Technologies Used
+## Technologies Used
 
 - Python (Flask) – Backend experiment computation
 - JavaScript – Interactive simulation logic
@@ -96,37 +96,7 @@ Technologies Used
 
 ---
 
-Project Structure
-
-virtual-physics-lab/
-│
-├── experiments/
-│   ├── lcr.py
-│   ├── diffraction.py
-│
-├── static/
-|   |__ css/
-|   |
-│   ├── js/
-|   |   |__ experiments/
-|   |   |   |__ diffraction_sim.js
-|   |   |   |__ lcr_sim.js
-|   |   |
-│   │   ├── lcr.js
-│   │   ├── diffraction.js
-│
-├── templates/
-│   ├── lcr.html
-│   ├── diffraction.html
-|   |__ base.html
-|   |__ experiments.html
-│
-├── app.py
-└── README.md
-
----
-
-Upcoming Experiments
+## Upcoming Experiments
 
 The following experiments are planned for future development:
 
@@ -144,7 +114,7 @@ More experiments will be added incrementally to expand the virtual laboratory.
 
 ---
 
-Future Improvements
+## Future Improvements
 
 - More experiments simulations
 - Data export for lab reports
@@ -153,7 +123,7 @@ Future Improvements
 
 ---
 
-Contribution
+## Contribution
 
 This project is currently under active development as part of a collaborative effort to build a complete virtual physics laboratory platform.
 
@@ -161,6 +131,6 @@ This project is currently under active development as part of a collaborative ef
 
 ---
 
-License
+## License
 
 This project is intended for educational and academic use.
