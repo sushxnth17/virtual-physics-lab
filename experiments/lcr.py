@@ -58,10 +58,10 @@ def compute_lcr_response(circuit_type, R, L, C, f_min, f_max, points=200, V=1.0)
         raise ValueError("Capacitance C must be positive")
     if f_min <= 0:
         raise ValueError("Minimum frequency f_min must be positive")
-    if f_max <= f_min:
-        raise ValueError("Maximum frequency f_max must be greater than f_min")
-    if points < 2:
-        raise ValueError("Number of points must be at least 2")
+    if f_max < f_min:
+        raise ValueError("Maximum frequency f_max must be greater than or equal to f_min")
+    if points < 1:
+        raise ValueError("Number of points must be at least 1")
     if V <= 0:
         raise ValueError("Voltage V must be positive")
     
@@ -143,16 +143,16 @@ def compute_lcr_response(circuit_type, R, L, C, f_min, f_max, points=200, V=1.0)
     
     else:  # parallel
         # Parallel: current reaches minimum at resonance (anti-resonance)
-        I_extremum = min(current) if current else 1.0
+        I_min = min(current) if current else 1.0
         # Half-power: I_half = I_min * √2
-        I_half = I_extremum * math.sqrt(2)
+        I_half = I_min * math.sqrt(2)
         
         # Find f1 (first crossing) and f2 (second crossing) of half-power threshold
         # Looking for indices where current <= I_half
         f1 = None
         f2 = None
         for i in range(len(current)):
-            if current[i] <= I_half:
+            if current[i] >= I_half:
                 if f1 is None:
                     f1 = frequency[i]
                 f2 = frequency[i]

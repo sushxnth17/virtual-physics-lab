@@ -64,13 +64,13 @@
 		<h3><u>CIRCUIT DIAGRAM</u></h3>
 		
 		<h4 style="margin-top: 20px; margin-bottom: 10px;"><strong>Series LCR Circuit:</strong></h4>
-		<div class="diagram-container" style="border: 1px dashed #666; padding: 40px; text-align: center; background-color: #f9f9f9; margin: 15px 0;">
-			<p>[Image placeholder: Series LCR circuit with Signal Generator, Ammeter (m), Inductor (L), Capacitor (C), Resistor (330Ω)]</p>
+		<div class="diagram-container" style="border: 1px solid #cfcfcf; padding: 20px; text-align: center; background-color: #f9f9f9; margin: 15px 0;">
+			<img src="{{ url_for('static', filename='js/images/series_lcr_circuit.svg') }}" alt="Series LCR circuit diagram" style="max-width: 100%; height: auto;">
 		</div>
 
 		<h4 style="margin-top: 20px; margin-bottom: 10px;"><strong>Parallel LCR Circuit:</strong></h4>
-		<div class="diagram-container" style="border: 1px dashed #666; padding: 40px; text-align: center; background-color: #f9f9f9; margin: 15px 0;">
-			<p>[Image placeholder: Parallel LCR circuit with Signal Generator, Ammeter (mA), Inductor (L), Capacitor (C), Resistor (330Ω)]</p>
+		<div class="diagram-container" style="border: 1px solid #cfcfcf; padding: 20px; text-align: center; background-color: #f9f9f9; margin: 15px 0;">
+			<img src="{{ url_for('static', filename='js/images/parallel_lcr_circuit.svg') }}" alt="Parallel LCR circuit diagram" style="max-width: 100%; height: auto;">
 		</div>
 	</section>
 
@@ -104,6 +104,14 @@
 		<h3><u>TABULAR COLUMN</u></h3>
 		
 		<h4 style="margin-top: 20px; margin-bottom: 15px;"><strong>Series LCR Circuit</strong></h4>
+				<!-- FREQUENCY SLIDER CONTROL -->
+				<div class="frequency-control" style="margin:20px 0; padding: 15px; background-color: #f0f8ff; border-radius: 4px;">
+					<label for="frequencySlider"><b>Frequency (Hz):</b></label>
+					<input type="range" id="frequencySlider" min="1000" max="10000" step="100" value="1000" style="width: 100%; max-width: 400px; vertical-align: middle;">
+					<span id="freqValue">1000</span> Hz
+					<p style="font-size: 12px; color: #666; margin: 10px 0 0 0;">Move the slider to select a frequency. The matching row will be highlighted, and the current value will be automatically calculated and filled in.</p>
+				</div>
+		
 		<div class="table-container">
 			<table class="observation-table">
 				<thead>
@@ -251,6 +259,10 @@
 		
 		<!-- styled table for results -->
 		<style>
+			.active-frequency-row {
+				background-color: #fff3cd;
+				transition: background 0.3s ease;
+			}
 			.result-section-table, .result-section-table th, .result-section-table td {
 				border: 1px solid #000;
 				border-collapse: collapse;

@@ -75,34 +75,59 @@ function calculateFromTableData() {
     
     // Find half-power frequencies (f1 and f2)
     let f1 = null, f2 = null;
-    
-    for (let i = 0; i < sortedCurrent.length; i++) {
-        const current = sortedCurrent[i];
-        const freq = sortedFreq[i];
-        
-        if (circuitType === 'series') {
-            // For series: find closest values to half-power current on either side
-            if (freq < resonantFrequency && current >= halfPowerCurrent * 0.95 && current <= halfPowerCurrent * 1.05) {
-                f1 = freq;
-            }
-            if (freq > resonantFrequency && current >= halfPowerCurrent * 0.95 && current <= halfPowerCurrent * 1.05) {
-                f2 = freq;
-            }
-        } else {
-            // For parallel: find closest values to half-power current on either side
-            if (freq < resonantFrequency && current <= halfPowerCurrent * 1.05 && current >= halfPowerCurrent * 0.95) {
-                f1 = freq;
-            }
-            if (freq > resonantFrequency && current <= halfPowerCurrent * 1.05 && current >= halfPowerCurrent * 0.95) {
-                f2 = freq;
+
+    if (circuitType === 'series') {
+        // Series logic is unchanged: use the first and last points above half-power.
+        for (let i = 0; i < sortedCurrent.length; i++) {
+            if (sortedCurrent[i] >= halfPowerCurrent) {
+                if (f1 === null) f1 = sortedFreq[i];
+                f2 = sortedFreq[i];
             }
         }
+
+        // If measured points are too sparse around half-power, interpolate.
+        if (f1 === null || f2 === null || f1 === f2) {
+            f1 = findHalfPowerFrequency(sortedFreq, sortedCurrent, resonantFrequency, halfPowerCurrent, 'lower', circuitType);
+            f2 = findHalfPowerFrequency(sortedFreq, sortedCurrent, resonantFrequency, halfPowerCurrent, 'upper', circuitType);
+        }
+    } else {
+        // Match Python logic for parallel: use first and last points at/above I_half.
+        for (let i = 0; i < sortedCurrent.length; i++) {
+            if (sortedCurrent[i] >= halfPowerCurrent) {
+                if (f1 === null) f1 = sortedFreq[i];
+                f2 = sortedFreq[i];
+            }
+        }
+
+        // If measured data do not span both half-power points, estimate from theoretical Q.
+        if (f1 === null || f2 === null || f1 === f2) {
+            const capInput = document.getElementById('capacitanceInput');
+            const resInput = document.getElementById('resistanceInput');
+            const Cmicro = Number.parseFloat(capInput ? capInput.value : '');
+            const Rtot = Number.parseFloat(resInput ? resInput.value : '');
+
+            let estimatedQ = 0;
+            if (!Number.isNaN(Cmicro) && Cmicro > 0 && !Number.isNaN(Rtot) && Rtot > 0 && resonantFrequency > 0) {
+                const C = Cmicro * 1e-6;
+                const L = 1 / (4 * Math.PI * Math.PI * resonantFrequency * resonantFrequency * C);
+                estimatedQ = Rtot * Math.sqrt(C / L);
+            }
+
+            if (!(estimatedQ > 0)) {
+                estimatedQ = 3;
+            }
+
+            const estimatedBandwidth = resonantFrequency / estimatedQ;
+            f1 = Math.max(sortedFreq[0], resonantFrequency - estimatedBandwidth / 2);
+            f2 = Math.min(sortedFreq[sortedFreq.length - 1], resonantFrequency + estimatedBandwidth / 2);
+        }
     }
-    
-    // If exact half-power points not found, use linear interpolation
-    if (!f1 || !f2) {
-        f1 = findHalfPowerFrequency(sortedFreq, sortedCurrent, resonantFrequency, halfPowerCurrent, 'lower', circuitType);
-        f2 = findHalfPowerFrequency(sortedFreq, sortedCurrent, resonantFrequency, halfPowerCurrent, 'upper', circuitType);
+
+    if (!(f2 > f1)) {
+        alert('Unable to determine valid half-power frequencies from the entered data. Please enter additional readings around resonance.');
+        clearSummaryRow(circuitType);
+        plotTableGraph(sortedFreq, sortedCurrent, circuitType, resonantFrequency);
+        return;
     }
     
     const bandwidth = f2 - f1;
@@ -191,8 +216,13 @@ function updateSummaryResults(circuitType, fr, bandwidth, qGraph) {
     if (!isNaN(Cmicro) && Cmicro > 0 && !isNaN(Rtot) && Rtot > 0 && fr > 0 && bandwidth > 0) {
         const C = Cmicro * 1e-6; // convert µF to F
         Lval = 1 / (4 * Math.PI * Math.PI * fr * fr * C);
-        // use theoretical quality factor formula Q = (1/R) * sqrt(L/C)
-        qCalcVal = (1 / Rtot) * Math.sqrt(Lval / C);
+        if (circuitType === 'series') {
+            // Series theoretical Q = (1/R) * sqrt(L/C)
+            qCalcVal = (1 / Rtot) * Math.sqrt(Lval / C);
+        } else {
+            // Parallel theoretical Q = R * sqrt(C/L)
+            qCalcVal = Rtot * Math.sqrt(C / Lval);
+        }
     }
 
     // Update DOM elements
@@ -242,8 +272,10 @@ function clearSummaryRow(circuitType) {
 
 
 function plotTableGraph(frequencies, currents, circuitType, resonantFrequency) {
-    // Convert currents from A to mA for display
-    const currentsInmA = currents.map(c => c * 1000);
+    // Currents entered in the table are already in mA, so we
+    // can use them directly for plotting. (Previous code multiplied
+    // by 1000 which caused confusing values.)
+    const currentsInmA = currents;
     
     const labelText = circuitType === 'series' 
         ? 'Current (mA) - Series LCR (Peak at Resonance)'
@@ -303,10 +335,183 @@ function plotTableGraph(frequencies, currents, circuitType, resonantFrequency) {
     });
 }
 
+// ========== FREQUENCY SLIDER CONTROL ==========
+
+function getSelectedCircuitType() {
+    const select = document.getElementById('circuit_type_select');
+    return select ? select.value : 'series';
+}
+
+function getAvailableFrequencies(circuitType) {
+    const className = circuitType === 'series' ? 'series-current' : 'parallel-current';
+    const inputs = document.querySelectorAll(`input.${className}[data-frequency]`);
+    return Array.from(inputs)
+        .map(input => Number.parseFloat(input.getAttribute('data-frequency')))
+        .filter(value => !Number.isNaN(value))
+        .sort((a, b) => a - b);
+}
+
+function snapToNearestFrequency(frequency) {
+    const circuitType = getSelectedCircuitType();
+    const available = getAvailableFrequencies(circuitType);
+    if (available.length === 0) {
+        return frequency;
+    }
+
+    let nearest = available[0];
+    let nearestDiff = Math.abs(available[0] - frequency);
+    for (let i = 1; i < available.length; i++) {
+        const diff = Math.abs(available[i] - frequency);
+        if (diff < nearestDiff) {
+            nearest = available[i];
+            nearestDiff = diff;
+        }
+    }
+    return nearest;
+}
+
+function updateFrequencyDisplay(frequency) {
+    const freqValue = document.getElementById('freqValue');
+    if (freqValue) {
+        freqValue.textContent = String(frequency);
+    }
+}
+
+function highlightActiveRow(frequency) {
+    const circuitType = getSelectedCircuitType();
+    const className = circuitType === 'series' ? 'series-current' : 'parallel-current';
+
+    document.querySelectorAll('.active-frequency-row').forEach(row => {
+        row.classList.remove('active-frequency-row');
+    });
+
+    const input = document.querySelector(`input.${className}[data-frequency="${frequency}"]`);
+    if (input) {
+        const row = input.closest('tr');
+        if (row) row.classList.add('active-frequency-row');
+    }
+}
+
+function getInductanceValue(circuitType) {
+    const resultEl = document.getElementById(`inductance_${circuitType}`);
+    if (resultEl && resultEl.textContent && resultEl.textContent.trim() !== '-') {
+        const parsed = Number.parseFloat(resultEl.textContent);
+        if (!Number.isNaN(parsed) && parsed > 0) {
+            return parsed;
+        }
+    }
+
+    // Fallback used by existing simulation behavior in this project.
+    return 0.1;
+}
+
+async function fetchCurrentForFrequency(frequency) {
+    const circuitType = getSelectedCircuitType();
+    const capacitanceInput = document.getElementById('capacitanceInput');
+    const resistanceInput = document.getElementById('resistanceInput');
+
+    const CmicroRaw = Number.parseFloat(capacitanceInput ? capacitanceInput.value : '');
+    const Rraw = Number.parseFloat(resistanceInput ? resistanceInput.value : '');
+
+    // Use defaults if user has not filled inputs yet, so slider still behaves like an instrument.
+    const Cmicro = (!Number.isNaN(CmicroRaw) && CmicroRaw > 0) ? CmicroRaw : 0.047;
+    const R = (!Number.isNaN(Rraw) && Rraw > 0) ? Rraw : 330;
+
+    const payload = {
+        circuit_type: circuitType,
+        R: R,
+        L: getInductanceValue(circuitType),
+        C: Cmicro * 1e-6,
+        f_min: frequency,
+        f_max: frequency,
+        points: 1
+    };
+
+    const response = await fetch('/api/lcr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        throw new Error(`API error ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!data.current || !Array.isArray(data.current) || data.current.length === 0) {
+        return null;
+    }
+
+    return data.current[0];
+}
+
+function fillCurrentValue(frequency, currentAmp) {
+    const circuitType = getSelectedCircuitType();
+    const className = circuitType === 'series' ? 'series-current' : 'parallel-current';
+    const input = document.querySelector(`input.${className}[data-frequency="${frequency}"]`);
+
+    if (!input) return;
+
+    const currentMilliAmp = currentAmp * 1000;
+    input.value = currentMilliAmp.toFixed(3);
+}
+
+async function handleSliderFrequencyChange(frequency) {
+    const snappedFrequency = snapToNearestFrequency(frequency);
+    const slider = document.getElementById('frequencySlider');
+    if (slider) {
+        slider.value = String(snappedFrequency);
+    }
+
+    updateFrequencyDisplay(snappedFrequency);
+    highlightActiveRow(snappedFrequency);
+
+    try {
+        const currentAmp = await fetchCurrentForFrequency(snappedFrequency);
+        if (currentAmp !== null) {
+            fillCurrentValue(snappedFrequency, currentAmp);
+        }
+    } catch (error) {
+        console.error('Failed to fetch LCR current for slider frequency:', error);
+    }
+}
+
+function initSliderControl() {
+    const slider = document.getElementById('frequencySlider');
+    if (!slider) return;
+
+    slider.addEventListener('input', event => {
+        const frequency = Number.parseFloat(event.target.value);
+        if (!Number.isNaN(frequency)) {
+            handleSliderFrequencyChange(frequency);
+        }
+    });
+
+    const circuitTypeSelect = document.getElementById('circuit_type_select');
+    if (circuitTypeSelect) {
+        circuitTypeSelect.addEventListener('change', () => {
+            const frequency = Number.parseFloat(slider.value);
+            if (!Number.isNaN(frequency)) {
+                handleSliderFrequencyChange(frequency);
+            }
+        });
+    }
+
+    const initialFrequency = Number.parseFloat(slider.value);
+    if (!Number.isNaN(initialFrequency)) {
+        updateFrequencyDisplay(initialFrequency);
+        highlightActiveRow(initialFrequency);
+    }
+}
+
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', () => {
+        init();
+        initSliderControl();
+    });
 } else {
     init();
+    initSliderControl();
 }
 
