@@ -29,6 +29,12 @@ let canvasWidth;
 let canvasHeight;
 let centerY;
 
+const BASE_CANVAS_HEIGHT = 560;
+const MIN_ORDER_LABEL_SPACING = 24;
+const CANVAS_VERTICAL_MARGIN = 60;
+const DIFFRACTION_ERROR_KEY = 'diffraction_error_seed';
+const DIFFRACTION_EXPERIMENT_KEY = 'diffraction_experiment_data';
+
 // Physical scale: distance from grating to right canvas edge represents this distance
 const MAX_PHYSICAL_DISTANCE = 2.0;  // 2 meters
 
@@ -75,6 +81,10 @@ let screenHeight;
 
 let screenDistance = 1.0;  // Current physical distance from grating to screen (meters)
 let pixelScale;  // Scaling factor for vertical diffraction pattern display
+let measurementErrorFactor = 0; // Persistent student-specific xm variation (-3% to +3%)
+let persistedXmValues = {}; // Stored measured xm values by order
+let hasPersistedExperiment = false;
+let persistedScreenDistance = null;
 
 // Dragging state
 let isDraggingScreen = false;
@@ -101,6 +111,11 @@ let ctx;
 function initializeLayout() {
     canvas = document.getElementById('simulationCanvas');
     ctx = canvas.getContext('2d');
+
+    const requiredCanvasHeight = calculateRequiredCanvasHeight();
+    if (canvas.height !== requiredCanvasHeight) {
+        canvas.height = requiredCanvasHeight;
+    }
     
     canvasWidth = canvas.width;
     canvasHeight = canvas.height;
@@ -152,6 +167,96 @@ function computeScreenPosition(distance) {
 }
 
 /**
+ * Load previously stored experiment data for this user.
+ *
+ * @returns {object|null} Parsed experiment object or null when unavailable/invalid
+ */
+function loadStoredExperiment() {
+    try {
+        const raw = localStorage.getItem(DIFFRACTION_EXPERIMENT_KEY);
+        if (!raw) return null;
+
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') return null;
+
+        const xmValues = (parsed.xmValues && typeof parsed.xmValues === 'object') ? parsed.xmValues : {};
+        const hasXmData = Object.keys(xmValues).length > 0;
+        if (!hasXmData) return null;
+
+        return {
+            errorSeed: typeof parsed.errorSeed === 'number' ? parsed.errorSeed : null,
+            screenDistance: typeof parsed.screenDistance === 'number' ? parsed.screenDistance : null,
+            xmValues: xmValues
+        };
+    } catch (error) {
+        return null;
+    }
+}
+
+/**
+ * Save current user experiment data.
+ */
+function persistExperiment() {
+    try {
+        localStorage.setItem(
+            DIFFRACTION_EXPERIMENT_KEY,
+            JSON.stringify({
+                errorSeed: measurementErrorFactor,
+                screenDistance: screenDistance,
+                xmValues: persistedXmValues
+            })
+        );
+        localStorage.setItem(DIFFRACTION_ERROR_KEY, measurementErrorFactor.toString());
+    } catch (error) {
+        // Ignore storage errors to keep simulation running.
+    }
+}
+
+/**
+ * Initialize persistent measurement error factor.
+ * Reuses stored value per student/session, else creates a random factor in [-3%, +3%].
+ */
+function initializeMeasurementErrorFactor() {
+    try {
+        const storedExperiment = loadStoredExperiment();
+        if (storedExperiment) {
+            hasPersistedExperiment = true;
+            persistedXmValues = storedExperiment.xmValues;
+            persistedScreenDistance = storedExperiment.screenDistance;
+
+            if (
+                typeof storedExperiment.errorSeed === 'number' &&
+                storedExperiment.errorSeed >= -0.03 &&
+                storedExperiment.errorSeed <= 0.03
+            ) {
+                measurementErrorFactor = storedExperiment.errorSeed;
+                localStorage.setItem(DIFFRACTION_ERROR_KEY, measurementErrorFactor.toString());
+                return;
+            }
+        }
+
+        const savedValue = localStorage.getItem(DIFFRACTION_ERROR_KEY);
+        const parsedValue = savedValue !== null ? parseFloat(savedValue) : NaN;
+
+        if (!isNaN(parsedValue) && parsedValue >= -0.03 && parsedValue <= 0.03) {
+            measurementErrorFactor = parsedValue;
+            return;
+        }
+
+        if (hasPersistedExperiment) {
+            measurementErrorFactor = 0;
+            return;
+        }
+
+        measurementErrorFactor = (Math.random() * 0.06) - 0.03;
+        localStorage.setItem(DIFFRACTION_ERROR_KEY, measurementErrorFactor.toString());
+    } catch (error) {
+        // Fallback for environments where localStorage is unavailable.
+        measurementErrorFactor = 0;
+    }
+}
+
+/**
  * Calculate diffraction angle for a given order
  * Using grating equation: d sinθ = mλ → sinθ = mλ / d
  * 
@@ -182,22 +287,62 @@ function calculateScreenOffset(angle) {
 }
 
 /**
+ * Ideal displacement from diffraction relation without experimental error.
+ *
+ * @param {number} order - Diffraction order (m)
+ * @returns {number} Vertical displacement in meters
+ */
+function calculateIdealOrderDisplacement(order) {
+    return (Math.abs(order) * wavelength * screenDistance) / GRATING_CONSTANT;
+}
+
+/**
+ * Calculate vertical diffraction displacement using the lab relation x_m = m * λ * S / d.
+ * This keeps the rendered spot spacing directly tied to the observation-table formula.
+ *
+ * @param {number} order - Diffraction order (m)
+ * @returns {number} Vertical displacement in meters
+ */
+function calculateOrderDisplacement(order) {
+    const trueXm = calculateIdealOrderDisplacement(order);
+    return trueXm * (1 + measurementErrorFactor);
+}
+
+/**
+ * Compute a canvas height that keeps all orders through ±MAX_ORDER visible and readable.
+ *
+ * @returns {number} Required canvas height in pixels
+ */
+function calculateRequiredCanvasHeight() {
+    const firstOrderDisplacement = calculateIdealOrderDisplacement(1);
+    const highestOrderDisplacement = calculateIdealOrderDisplacement(MAX_ORDER);
+
+    if (firstOrderDisplacement <= 0 || highestOrderDisplacement <= 0) {
+        return BASE_CANVAS_HEIGHT;
+    }
+
+    const minimumPixelScale = MIN_ORDER_LABEL_SPACING / firstOrderDisplacement;
+    const requiredHalfHeight = highestOrderDisplacement * minimumPixelScale + CANVAS_VERTICAL_MARGIN;
+
+    return Math.max(BASE_CANVAS_HEIGHT, Math.ceil(requiredHalfHeight * 2));
+}
+
+/**
  * Calculate dynamic pixel scale for rendering diffraction pattern
  * Ensures highest visible order fits within 40% of canvas height
  * 
  * @returns {number} Pixel scale factor
  */
 function calculatePixelScale() {
-    // Try orders from highest to lowest to find maximum physical offset
-    for (let order = MAX_ORDER; order >= 1; order--) {
-        const angle = calculateDiffractionAngle(order);
-        if (angle !== null) {
-            const offsetMeters = calculateScreenOffset(angle);
-            if (offsetMeters !== null) {
-                const allowedPixelHeight = canvasHeight * 0.45;
-                return allowedPixelHeight / Math.abs(offsetMeters);
-            }
-        }
+    const highestOrderDisplacement = calculateIdealOrderDisplacement(MAX_ORDER);
+    const firstOrderDisplacement = calculateIdealOrderDisplacement(1);
+
+    if (highestOrderDisplacement > 0 && firstOrderDisplacement > 0) {
+        const allowedPixelHeight = Math.max(0, canvasHeight / 2 - CANVAS_VERTICAL_MARGIN);
+        const fitScale = allowedPixelHeight / highestOrderDisplacement;
+        const spacingScale = MIN_ORDER_LABEL_SPACING / firstOrderDisplacement;
+
+        return Math.max(fitScale, spacingScale);
     }
     
     // Fallback: default scaling
@@ -455,14 +600,7 @@ function drawDiffractionRays() {
     // ===== DIFFRACTION ORDER RAYS (faint glowing beams) =====
     // Draw rays for orders 1 through MAX_ORDER
     for (let order = 1; order <= MAX_ORDER; order++) {
-        const angle = calculateDiffractionAngle(order);
-        
-        if (angle === null) {
-            // Skip physically impossible orders
-            continue;
-        }
-        
-        const offsetMeters = calculateScreenOffset(angle);
+        const offsetMeters = calculateOrderDisplacement(order);
         const offsetPixels = offsetMeters * pixelScale;
         
         const screenY_positive = centerY - offsetPixels;
@@ -527,6 +665,7 @@ function drawDiffractionRays() {
  */
 function drawDiffractionSpots() {
     const screenX_pos = screenX;
+    const labelX = screenX_pos + 22;
     
     // Central maximum (m=0, largest and brightest)
     const centralRadius = 12;
@@ -565,20 +704,13 @@ function drawDiffractionSpots() {
     
     // Label central maximum
     ctx.fillStyle = '#000000';
-    ctx.font = '11px Arial';
+    ctx.font = '10px Arial';
     ctx.textAlign = 'left';
-    ctx.fillText('m=0', screenX_pos + 18, centerY + 4);
+    ctx.fillText('m = 0', labelX, centerY + 4);
     
     // Draw spots for diffraction orders 1 through MAX_ORDER
     for (let order = 1; order <= MAX_ORDER; order++) {
-        const angle = calculateDiffractionAngle(order);
-        
-        if (angle === null) {
-            // Skip physically impossible orders
-            continue;
-        }
-        
-        const offsetMeters = calculateScreenOffset(angle);
+        const offsetMeters = calculateOrderDisplacement(order);
         const offsetPixels = offsetMeters * pixelScale;
         const screenY_positive = centerY - offsetPixels;
         const screenY_negative = centerY + offsetPixels;
@@ -662,13 +794,12 @@ function drawDiffractionSpots() {
         ctx.arc(screenX_pos, screenY_negative, baseRadius, 0, 2 * Math.PI);
         ctx.stroke();
         
-        // Label (shown only for first few orders to avoid clutter)
-        if (order <= 3) {
-            ctx.fillStyle = '#000000';
-            ctx.font = '9px Arial';
-            ctx.textAlign = 'left';
-            ctx.fillText(`±${order}`, screenX_pos + 18, screenY_positive + 3);
-        }
+        // Labels for every visible order so the screen matches the observation table range.
+        ctx.fillStyle = '#000000';
+        ctx.font = '9px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText(`m = +${order}`, labelX, screenY_positive + 3);
+        ctx.fillText(`m = -${order}`, labelX, screenY_negative + 3);
     }
 }
 
@@ -764,12 +895,8 @@ function updateScreenFromSlider(distance) {
  */
 function computeXm(order) {
     if (order < 1) return null;
-    
-    const angle = calculateDiffractionAngle(order);
-    if (angle === null) return null;
-    
-    const offsetMeters = calculateScreenOffset(angle);
-    return Math.abs(offsetMeters);  // xm is always positive (distance magnitude)
+
+    return calculateOrderDisplacement(order);  // xm is always positive (distance magnitude)
 }
 
 /**
@@ -780,10 +907,7 @@ function getSpotPositions() {
     const spots = [];
     
     for (let order = 1; order <= MAX_ORDER; order++) {
-        const angle = calculateDiffractionAngle(order);
-        if (angle === null) continue;
-        
-        const offsetMeters = calculateScreenOffset(angle);
+        const offsetMeters = calculateOrderDisplacement(order);
         const offsetPixels = offsetMeters * pixelScale;
         
         // Positive order (upper)
@@ -961,6 +1085,10 @@ function recordObservation(order, xmMeters, SMeters) {
     
     // Calculate and update average wavelength
     calculateAverageWavelength();
+
+    // Persist measured xm for stable refresh behavior.
+    persistedXmValues[String(order)] = xmMeters;
+    persistExperiment();
 }
 
 /**
@@ -1026,11 +1154,8 @@ function recalculateAllObservations() {
  */
 function renderMeasurementOverlay() {
     if (selectedOrder === null) return;
-    
-    const angle = calculateDiffractionAngle(selectedOrder);
-    if (angle === null) return;
-    
-    const offsetMeters = calculateScreenOffset(angle);
+
+    const offsetMeters = calculateOrderDisplacement(selectedOrder);
     const offsetPixels = offsetMeters * pixelScale;
     
     // Highlight both positive and negative orders
@@ -1179,15 +1304,45 @@ function updateSimulation() {
  * Initialize event handlers and start simulation
  */
 document.addEventListener('DOMContentLoaded', function() {
+    initializeMeasurementErrorFactor();
     initializeLayout();
-    drawSetup();
-    
-    // Initialize measurement display
-    updateMeasurementDisplay();
-    
+
     // Get UI elements
     const screenSlider = document.getElementById('screenSlider');
     const screenValueDisplay = document.getElementById('screenValue');
+
+    // Restore prior experiment state before first render when available.
+    if (
+        hasPersistedExperiment &&
+        typeof persistedScreenDistance === 'number' &&
+        persistedScreenDistance >= SCREEN_MIN_DISTANCE_FROM_GRATING &&
+        persistedScreenDistance <= SCREEN_MAX_DISTANCE_FROM_GRATING
+    ) {
+        updateScreenFromSlider(persistedScreenDistance);
+    }
+
+    drawSetup();
+
+    // Initialize measurement display
+    updateMeasurementDisplay();
+
+    if (screenSlider) {
+        screenSlider.value = screenDistance;
+    }
+    if (screenValueDisplay) {
+        screenValueDisplay.textContent = screenDistance.toFixed(2);
+    }
+
+    if (hasPersistedExperiment) {
+        const orderedEntries = Object.entries(persistedXmValues)
+            .map(([key, value]) => [parseInt(key, 10), value])
+            .filter(([order, value]) => Number.isInteger(order) && order >= 1 && order <= MAX_ORDER && typeof value === 'number' && value > 0)
+            .sort((a, b) => a[0] - b[0]);
+
+        orderedEntries.forEach(([order, xmMeters]) => {
+            recordObservation(order, xmMeters, screenDistance);
+        });
+    }
     
     // ========================================================================
     // SLIDER CONTROL
@@ -1213,6 +1368,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Recalculate existing observations with new distance
             recalculateAllObservations();
+            persistExperiment();
         });
     }
     
@@ -1303,6 +1459,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Redraw simulation in real time
         updateSimulation();
+        persistExperiment();
     });
     
     /**
@@ -1325,6 +1482,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isMouseOverScreen(pos.x, pos.y)) {
                 canvas.style.cursor = 'default';
             }
+
+            persistExperiment();
         }
     });
     
@@ -1391,5 +1550,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         updateSimulation();
+        persistExperiment();
     };
 });

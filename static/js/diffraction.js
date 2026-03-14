@@ -8,6 +8,21 @@ const GRATING_LPI = 500; // Lines per inch
 const LPI_TO_LPM = 1 / 0.0254; // Conversion factor: lines per inch to lines per meter
 
 /**
+ * Calculate and display grating spacing constant d.
+ * Displays d in meters (scientific notation) and nanometers.
+ */
+function displayGratingConstant() {
+	const N = GRATING_LPI * LPI_TO_LPM;
+	const d = 1 / N;
+	const d_nm = d * 1e9;
+
+	const gratingConstantElement = document.getElementById('grating-constant');
+	if (gratingConstantElement) {
+		gratingConstantElement.textContent = `${d.toExponential(2)} m = ${d_nm.toFixed(0)} nm`;
+	}
+}
+
+/**
  * Get screen distance S from input (convert cm to meters)
  * @returns {number|null} Screen distance in meters, or null if invalid
  */
@@ -400,6 +415,7 @@ function initializeEventListeners() {
  * Initialize on page load
  */
 document.addEventListener('DOMContentLoaded', () => {
+	displayGratingConstant();
 	initializeEventListeners();
 	console.log('Diffraction experiment initialized');
 });
