@@ -4,6 +4,39 @@
 
 let currentChart = null;
 
+// ========== PER-STUDENT INSTRUMENT NOISE ==========
+// Each student browser gets a unique seed stored in localStorage.
+// The seed produces a consistent but unique ±1.5% ammeter offset per
+// frequency point, simulating real inter-student instrument variation.
+
+function getStudentSeed() {
+    const KEY = 'lcr_student_seed';
+    let seed = localStorage.getItem(KEY);
+    if (!seed) {
+        seed = String(Math.floor(Math.random() * 2147483647) + 1);
+        localStorage.setItem(KEY, seed);
+    }
+    return Number(seed);
+}
+
+/**
+ * Deterministic noise factor in [1-0.015, 1+0.015] for a given
+ * (studentSeed, frequency) pair using a fast integer hash.
+ * Same student + same frequency always yields the same reading.
+ */
+function instrumentNoiseFactor(studentSeed, frequency) {
+    const MAX_FRACTION = 0.004; // ±0.4 % maximum deviation – small enough to keep the curve smooth
+    let h = (studentSeed * 1664525 + 1013904223) ^ (Math.round(frequency) * 22695477);
+    h = h >>> 0;
+    h = (h ^ (h >>> 16)) * 0x45d9f3b;
+    h = h >>> 0;
+    h = h ^ (h >>> 16);
+    const normalized = (h / 0xFFFFFFFF) * 2.0 - 1.0; // map to [-1, 1]
+    return 1.0 + normalized * MAX_FRACTION;
+}
+
+const _studentSeed = getStudentSeed();
+
 function init() {
     const calculateBtn = document.getElementById('calculateBtn');
     if (calculateBtn) {
@@ -452,7 +485,10 @@ function fillCurrentValue(frequency, currentAmp) {
 
     if (!input) return;
 
-    const currentMilliAmp = currentAmp * 1000;
+    // Apply per-student deterministic noise so each student's ammeter
+    // readings differ slightly (≤ ±1.5 %) from the ideal simulated value.
+    const noiseFactor = instrumentNoiseFactor(_studentSeed, frequency);
+    const currentMilliAmp = currentAmp * 1000 * noiseFactor;
     input.value = currentMilliAmp.toFixed(3);
 }
 
