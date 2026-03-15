@@ -9,6 +9,21 @@ function init() {
     if (calculateBtn) {
         calculateBtn.addEventListener('click', calculateFromTableData);
     }
+
+    const resetBtn = document.getElementById('resetBtn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function () {
+            document.querySelectorAll('.current-input').forEach(input => {
+                input.value = '';
+            });
+            document.querySelectorAll('.active-frequency-row').forEach(row => {
+                row.classList.remove('active-frequency-row');
+            });
+            document.querySelectorAll('.result-value').forEach(el => {
+                el.textContent = '-';
+            });
+        });
+    }
 }
 
 function getTableData(circuitType) {
