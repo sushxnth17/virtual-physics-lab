@@ -99,122 +99,6 @@
 		</div>
 	</section>
 
-	<!-- TABULAR COLUMN SECTION -->
-	<section class="experiment-section">
-		<h3><u>TABULAR COLUMN</u></h3>
-		
-		<h4 style="margin-top: 20px; margin-bottom: 15px;"><strong>Series LCR Circuit</strong></h4>
-				<!-- FREQUENCY SLIDER CONTROL -->
-				<div class="frequency-control" style="margin:20px 0; padding: 15px; background-color: #f0f8ff; border-radius: 4px;">
-					<label for="frequencySlider"><b>Frequency (Hz):</b></label>
-					<input type="range" id="frequencySlider" min="1000" max="10000" step="100" value="1000" style="width: 100%; max-width: 400px; vertical-align: middle;">
-					<span id="freqValue">1000</span> Hz
-					<p style="font-size: 12px; color: #666; margin: 10px 0 0 0;">Move the slider to select a frequency. The matching row will be highlighted, and the current value will be automatically calculated and filled in.</p>
-				</div>
-		
-		<div class="table-container">
-			<table class="observation-table">
-				<thead>
-					<tr>
-						<th>Frequency (f) (Hz)</th>
-						<th>Current (I) (mA)</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr><td>1000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="1000"></td></tr>
-					<tr><td>1500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="1500"></td></tr>
-					<tr><td>2000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="2000"></td></tr>
-					<tr><td>2500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="2500"></td></tr>
-					<tr><td>3000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="3000"></td></tr>
-					<tr><td>3500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="3500"></td></tr>
-					<tr><td>4000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4000"></td></tr>
-					<tr><td>4100</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4100"></td></tr>
-					<tr><td>4200</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4200"></td></tr>
-					<tr><td>4300</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4300"></td></tr>
-					<tr><td>4400</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4400"></td></tr>
-					<tr><td>4500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4500"></td></tr>
-					<tr><td>4600</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4600"></td></tr>
-					<tr><td>4700</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4700"></td></tr>
-					<tr><td>4800</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4800"></td></tr>
-					<tr><td>4900</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4900"></td></tr>
-					<tr><td>5000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5000"></td></tr>
-					<tr><td>5100</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5100"></td></tr>
-					<tr><td>5200</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5200"></td></tr>
-					<tr><td>5300</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5300"></td></tr>
-					<tr><td>5400</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5400"></td></tr>
-					<tr><td>5500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5500"></td></tr>
-					<tr><td>6000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="6000"></td></tr>
-					<tr><td>6500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="6500"></td></tr>
-					<tr><td>7000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="7000"></td></tr>
-					<tr><td>7500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="7500"></td></tr>
-					<tr><td>8000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="8000"></td></tr>
-					<tr><td>8500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="8500"></td></tr>
-					<tr><td>9000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="9000"></td></tr>
-					<tr><td>9500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="9500"></td></tr>
-					<tr><td>10000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="10000"></td></tr>
-				</tbody>
-			</table>
-		</div>
-
-		<h4 style="margin-top: 30px; margin-bottom: 15px;"><strong>Parallel LCR Circuit</strong></h4>
-		<div class="table-container">
-			<table class="observation-table">
-				<thead>
-					<tr>
-						<th>Frequency (f) (Hz)</th>
-						<th>Current (I) (mA)</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr><td>1000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="1000"></td></tr>
-					<tr><td>1500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="1500"></td></tr>
-					<tr><td>2000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="2000"></td></tr>
-					<tr><td>2500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="2500"></td></tr>
-					<tr><td>3000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="3000"></td></tr>
-					<tr><td>3500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="3500"></td></tr>
-					<tr><td>4000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4000"></td></tr>
-					<tr><td>4100</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4100"></td></tr>
-					<tr><td>4200</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4200"></td></tr>
-					<tr><td>4300</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4300"></td></tr>
-					<tr><td>4400</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4400"></td></tr>
-					<tr><td>4500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4500"></td></tr>
-					<tr><td>4600</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4600"></td></tr>
-					<tr><td>4700</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4700"></td></tr>
-					<tr><td>4800</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4800"></td></tr>
-					<tr><td>4900</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4900"></td></tr>
-					<tr><td>5000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5000"></td></tr>
-					<tr><td>5100</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5100"></td></tr>
-					<tr><td>5200</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5200"></td></tr>
-					<tr><td>5300</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5300"></td></tr>
-					<tr><td>5400</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5400"></td></tr>
-					<tr><td>5500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5500"></td></tr>
-					<tr><td>6000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="6000"></td></tr>
-					<tr><td>6500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="6500"></td></tr>
-					<tr><td>7000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="7000"></td></tr>
-					<tr><td>7500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="7500"></td></tr>
-					<tr><td>8000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="8000"></td></tr>
-					<tr><td>8500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="8500"></td></tr>
-					<tr><td>9000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="9000"></td></tr>
-					<tr><td>9500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="9500"></td></tr>
-					<tr><td>10000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="10000"></td></tr>
-				</tbody>
-			</table>
-		</div>
-	</section>
-
-	<!-- PROCEDURE SECTION -->
-	<section class="experiment-section">
-		<h3><u>PROCEDURE</u></h3>
-		<ol class="procedure-list">
-			<li>The connections for series LCR circuit are made as shown in the circuit diagram.</li>
-			<li>The frequency of ac signal is increased in the steps given and corresponding current readings are tabulated.</li>
-			<li>A plot of frequency vs current is drawn.</li>
-			<li>From the graph, the resonant frequency (f<sub>r</sub>) and bandwidth are calculated.</li>
-			<li>The Quality factor (Q) and inductance (L) are calculated using the given formulae.</li>
-			<li>The same procedure is repeated for parallel LCR circuit as well.</li>
-		</ol>
-	</section>
-
 	<!-- DATA CALCULATION SECTION -->
 	<section class="experiment-section" style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #666;">
 		<h3><u>ANALYSIS AND CALCULATION</u></h3>
@@ -240,6 +124,130 @@
 				<button type="button" id="calculateBtn" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Calculate Results from Table Data</button>
 			</div>
 		</div>
+	</section>
+
+	<!-- TABULAR COLUMN SECTION -->
+	<section class="experiment-section">
+		<h3><u>TABULAR COLUMN</u></h3>
+
+		<!-- FREQUENCY SLIDER CONTROL -->
+		<div class="frequency-control" style="margin:20px 0; padding: 15px; background-color: #f0f8ff; border-radius: 4px;">
+			<label for="frequencySlider"><b>Frequency (Hz):</b></label>
+			<input type="range" id="frequencySlider" min="1000" max="10000" step="100" value="1000" style="width: 100%; max-width: 400px; vertical-align: middle;">
+			<span id="freqValue">1000</span> Hz
+			<p style="font-size: 12px; color: #666; margin: 10px 0 0 0;">Move the slider to select a frequency. The matching row will be highlighted, and the current value will be automatically calculated and filled in.</p>
+		</div>
+
+		<div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+			<!-- Series Table -->
+			<div style="flex: 1; min-width: 260px;">
+				<h4 style="margin-top: 0; margin-bottom: 15px;"><strong>Series LCR Circuit</strong></h4>
+				<div class="table-container">
+					<table class="observation-table">
+						<thead>
+							<tr>
+								<th>Frequency (f) (Hz)</th>
+								<th>Current (I) (mA)</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr><td>1000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="1000"></td></tr>
+							<tr><td>1500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="1500"></td></tr>
+							<tr><td>2000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="2000"></td></tr>
+							<tr><td>2500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="2500"></td></tr>
+							<tr><td>3000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="3000"></td></tr>
+							<tr><td>3500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="3500"></td></tr>
+							<tr><td>4000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4000"></td></tr>
+							<tr><td>4100</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4100"></td></tr>
+							<tr><td>4200</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4200"></td></tr>
+							<tr><td>4300</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4300"></td></tr>
+							<tr><td>4400</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4400"></td></tr>
+							<tr><td>4500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4500"></td></tr>
+							<tr><td>4600</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4600"></td></tr>
+							<tr><td>4700</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4700"></td></tr>
+							<tr><td>4800</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4800"></td></tr>
+							<tr><td>4900</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="4900"></td></tr>
+							<tr><td>5000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5000"></td></tr>
+							<tr><td>5100</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5100"></td></tr>
+							<tr><td>5200</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5200"></td></tr>
+							<tr><td>5300</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5300"></td></tr>
+							<tr><td>5400</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5400"></td></tr>
+							<tr><td>5500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="5500"></td></tr>
+							<tr><td>6000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="6000"></td></tr>
+							<tr><td>6500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="6500"></td></tr>
+							<tr><td>7000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="7000"></td></tr>
+							<tr><td>7500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="7500"></td></tr>
+							<tr><td>8000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="8000"></td></tr>
+							<tr><td>8500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="8500"></td></tr>
+							<tr><td>9000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="9000"></td></tr>
+							<tr><td>9500</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="9500"></td></tr>
+							<tr><td>10000</td><td><input type="number" step="0.01" class="current-input series-current" data-frequency="10000"></td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Parallel Table -->
+			<div style="flex: 1; min-width: 260px;">
+				<h4 style="margin-top: 0; margin-bottom: 15px;"><strong>Parallel LCR Circuit</strong></h4>
+				<div class="table-container">
+					<table class="observation-table">
+						<thead>
+							<tr>
+								<th>Frequency (f) (Hz)</th>
+								<th>Current (I) (mA)</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr><td>1000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="1000"></td></tr>
+							<tr><td>1500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="1500"></td></tr>
+							<tr><td>2000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="2000"></td></tr>
+							<tr><td>2500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="2500"></td></tr>
+							<tr><td>3000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="3000"></td></tr>
+							<tr><td>3500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="3500"></td></tr>
+							<tr><td>4000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4000"></td></tr>
+							<tr><td>4100</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4100"></td></tr>
+							<tr><td>4200</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4200"></td></tr>
+							<tr><td>4300</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4300"></td></tr>
+							<tr><td>4400</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4400"></td></tr>
+							<tr><td>4500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4500"></td></tr>
+							<tr><td>4600</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4600"></td></tr>
+							<tr><td>4700</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4700"></td></tr>
+							<tr><td>4800</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4800"></td></tr>
+							<tr><td>4900</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="4900"></td></tr>
+							<tr><td>5000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5000"></td></tr>
+							<tr><td>5100</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5100"></td></tr>
+							<tr><td>5200</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5200"></td></tr>
+							<tr><td>5300</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5300"></td></tr>
+							<tr><td>5400</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5400"></td></tr>
+							<tr><td>5500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="5500"></td></tr>
+							<tr><td>6000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="6000"></td></tr>
+							<tr><td>6500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="6500"></td></tr>
+							<tr><td>7000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="7000"></td></tr>
+							<tr><td>7500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="7500"></td></tr>
+							<tr><td>8000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="8000"></td></tr>
+							<tr><td>8500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="8500"></td></tr>
+							<tr><td>9000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="9000"></td></tr>
+							<tr><td>9500</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="9500"></td></tr>
+							<tr><td>10000</td><td><input type="number" step="0.01" class="current-input parallel-current" data-frequency="10000"></td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- PROCEDURE SECTION -->
+	<section class="experiment-section">
+		<h3><u>PROCEDURE</u></h3>
+		<ol class="procedure-list">
+			<li>The connections for series LCR circuit are made as shown in the circuit diagram.</li>
+			<li>The frequency of ac signal is increased in the steps given and corresponding current readings are tabulated.</li>
+			<li>A plot of frequency vs current is drawn.</li>
+			<li>From the graph, the resonant frequency (f<sub>r</sub>) and bandwidth are calculated.</li>
+			<li>The Quality factor (Q) and inductance (L) are calculated using the given formulae.</li>
+			<li>The same procedure is repeated for parallel LCR circuit as well.</li>
+		</ol>
 	</section>
 
 	<!-- GRAPH SECTION -->
