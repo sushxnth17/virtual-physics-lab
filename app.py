@@ -11,7 +11,7 @@ def home():
 @app.route('/experiments')
 def experiments():
     # Static list of available experiments (can be made dynamic later)
-    experiment_list = ['lcr','diffraction']  # Add more experiment names as they are developed
+    experiment_list = ['lcr','diffraction','fermi']  # Add more experiment names as they are developed
     return render_template('experiments.html', experiments=experiment_list)
 
 @app.route('/experiments/<experiment_name>')
