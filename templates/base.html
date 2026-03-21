@@ -3,24 +3,41 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Virtual Physics Lab</title>
-	<link rel="stylesheet" href="/static/css/main.css">
+	<title>{% block title %}Virtual Physics Lab{% endblock %}</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-	<nav class="navbar">
-		<div class="container">
-			<a href="/" class="nav-logo">Virtual Physics Lab</a>
-			<ul class="nav-links">
-				<li><a href="/">Home</a></li>
-				<li><a href="/experiments">Experiments</a></li>
-			</ul>
+	<header class="site-header">
+		<div class="container header-top">
+			<div class="logo-placeholder" aria-label="VTU logo placeholder">VTU LOGO</div>
+			<div class="portal-title-wrap">
+				<p class="portal-subtitle">VTU Curriculum | CMRIT Physics Laboratory</p>
+				<h1 class="portal-title">Virtual Physics Lab Portal</h1>
+			</div>
+			<div class="logo-placeholder" aria-label="CMRIT logo placeholder">CMRIT LOGO</div>
 		</div>
-	</nav>
-	<main class="main-content">
+		<nav class="portal-nav" aria-label="Primary navigation">
+			<div class="container">
+				<ul class="nav-links">
+					<li><a href="/">Home</a></li>
+					<li><a href="/experiments">Experiments</a></li>
+				</ul>
+			</div>
+		</nav>
+	</header>
+
+	<main class="main-content container">
 		{% block content %}{% endblock %}
 	</main>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% block scripts %}{% endblock %}
+
+	<footer class="site-footer">
+		<div class="container">
+			<p>Virtual Physics Lab | Engineering Physics Experiments</p>
+		</div>
+	</footer>
+
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	{% block scripts %}{% endblock %}
 </body>
 </html>
 

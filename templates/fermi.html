@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="experiment-container">
+
+	<div class="experiment-header">
+		<p>Experiment: 3</p>
+		<h2>DETERMINATION OF FERMI ENERGY</h2>
+	</div>
+
+	<section class="experiment-section">
+		<h3><u>AIM</u></h3>
+		<p>To determine the Fermi energy and Fermi temperature of a metal wire.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>APPARATUS</u></h3>
+		<p>Heating setup, copper wire, thermometer, and multimeter.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>INTRODUCTION</u></h3>
+		<p>In a metal, electrons are free to move inside the material and are responsible for electrical conduction. Even at very low temperatures, these electrons occupy energy levels up to a highest filled level called the Fermi energy. This energy gives important information about how electrons behave in the metal.</p>
+		<p>When the temperature of a metal wire changes, its resistance also changes. By measuring resistance at different temperatures, we can estimate how strongly the electron system responds to temperature variation. This allows us to calculate the slope of resistance with respect to temperature, which is used in the Fermi energy formula.</p>
+		<p>Once Fermi energy is known, we can find the Fermi temperature. Fermi temperature is a theoretical temperature scale associated with the electron energy distribution in the metal. Together, these values help us understand the microscopic electronic properties of conducting materials.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>CIRCUIT DIAGRAM</u></h3>
+		<div class="diagram-placeholder-box">
+			<p>[Circuit diagram: heating coil, thermometer, power supply]</p>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>FORMULAE</u></h3>
+		<div>
+			<p><strong>E<sub>F</sub> = C (T / R)<sup>2</sup> (dR/dT)<sup>2</sup></strong></p>
+			<p><strong>T<sub>F</sub> = E<sub>F</sub> / k</strong></p>
+			<p><strong>Slope = &Delta;R / &Delta;T</strong></p>
+		</div>
+		<div class="u-mt-4">
+			<p><strong>C = 11.22 &times; 10<sup>-19</sup></strong></p>
+			<p><strong>k = 1.38 &times; 10<sup>-23</sup></strong></p>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>TABULAR COLUMN</u></h3>
+		<div class="table-container">
+			<table class="observation-table">
+				<thead>
+					<tr>
+						<th>Temperature (&deg;C)</th>
+						<th>Temperature (K)</th>
+						<th>Resistance (&Omega;)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>85</td>
+						<td class="temp-k"></td>
+						<td><input type="number" step="any" class="resistance-input"></td>
+					</tr>
+					<tr>
+						<td>80</td>
+						<td class="temp-k"></td>
+						<td><input type="number" step="any" class="resistance-input"></td>
+					</tr>
+					<tr>
+						<td>75</td>
+						<td class="temp-k"></td>
+						<td><input type="number" step="any" class="resistance-input"></td>
+					</tr>
+					<tr>
+						<td>70</td>
+						<td class="temp-k"></td>
+						<td><input type="number" step="any" class="resistance-input"></td>
+					</tr>
+					<tr>
+						<td>65</td>
+						<td class="temp-k"></td>
+						<td><input type="number" step="any" class="resistance-input"></td>
+					</tr>
+					<tr>
+						<td>60</td>
+						<td class="temp-k"></td>
+						<td><input type="number" step="any" class="resistance-input"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="u-mt-4 u-text-center">
+			<button id="compute-btn" class="btn btn-primary">Calculate</button>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>RESULT</u></h3>
+		<p>Fermi Energy: <span id="fermi-energy">&mdash;</span></p>
+		<p>Fermi Temperature: <span id="fermi-temp">&mdash;</span></p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>GRAPH</u></h3>
+		<p><strong>Graph: Resistance vs Temperature</strong></p>
+		<div class="chart-frame chart-frame-wide">
+			<canvas id="fermiChart"></canvas>
+		</div>
+	</section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/fermi.js') }}"></script>
+{% endblock %}
