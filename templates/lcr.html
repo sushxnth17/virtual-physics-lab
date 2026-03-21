@@ -4,9 +4,9 @@
 <div class="experiment-container">
 	
 	<!-- EXPERIMENT TITLE -->
-	<div class="experiment-header" style="text-align: center; border: 3px solid #000; padding: 20px; margin-bottom: 30px;">
-		<p style="font-size: 14px; margin: 0 0 10px 0;">Experiment: 6</p>
-		<h2 style="font-weight: bold; font-size: 24px; margin: 0; letter-spacing: 2px;">LCR CIRCUITS - FORCED OSCILLATIONS IN ELECTRICAL CIRCUIT</h2>
+	<div class="experiment-header">
+		<p>Experiment: 6</p>
+		<h2>LCR CIRCUITS - FORCED OSCILLATIONS IN ELECTRICAL CIRCUIT</h2>
 	</div>
 
 	<!-- AIM SECTION -->
@@ -37,13 +37,13 @@
 		<p>The resonance of a series RLC circuit occurs when the inductive and capacitive reactance are equal in magnitude but cancel each other because they are 180 degrees apart in phase. The sharp minimum in impedance which occurs is useful in tuning applications.</p>
 		
 		<p>In a circuit containing R, L and C connected in series the impedance is given by:</p>
-		<p style="text-align: center; margin: 15px 0;"><strong>|Z| = √[R² + (ωL − 1/ωC)²]</strong></p>
+		<p class="equation-line"><strong>|Z| = √[R² + (ωL − 1/ωC)²]</strong></p>
 		
 		<p>At resonant frequency</p>
-		<p style="text-align: center; margin: 15px 0;"><strong>f<sub>r</sub> = 1 / (2π√LC)  Hz</strong></p>
+		<p class="equation-line"><strong>f<sub>r</sub> = 1 / (2π√LC)  Hz</strong></p>
 
 		<p>The quality factor of LCR circuit is defined as the ratio of energy stored to the energy dissipated across resistance:</p>
-		<p style="text-align: center; margin: 15px 0;"><strong>Q = (2πf<sub>r</sub>L) / R = (1/R)√(L/C) = f<sub>r</sub> / (f<sub>2</sub> − f<sub>1</sub>)</strong></p>
+		<p class="equation-line"><strong>Q = (2πf<sub>r</sub>L) / R = (1/R)√(L/C) = f<sub>r</sub> / (f<sub>2</sub> − f<sub>1</sub>)</strong></p>
 	</section>
 
 	<!-- PARALLEL RESONANCE CIRCUIT SECTION -->
@@ -51,10 +51,10 @@
 		<h3><u>PARALLEL RESONANCE CIRCUIT</u></h3>
 		<p>Here a coil (L) and capacitor (C) are connected in parallel with an AC power supply. When X<sub>L</sub> equals X<sub>C</sub>, the reactive branch currents are equal and opposite. Hence they cancel out each other to give minimum current in the main line. Since total current is minimum, in this state the total impedance is maximum. The resonant frequency of a parallel LCR circuit is given by:</p>
 		
-		<p style="text-align: center; margin: 15px 0;"><strong>f<sub>r</sub> = 1 / (2π√[LC − R²L²])</strong></p>
+		<p class="equation-line"><strong>f<sub>r</sub> = 1 / (2π√[LC − R²L²])</strong></p>
 
 		<p>If (R/L)² is negligible in comparison to (1/LC) then:</p>
-		<p style="text-align: center; margin: 15px 0;"><strong>f<sub>r</sub> = 1 / (2π√LC)  Hz</strong></p>
+		<p class="equation-line"><strong>f<sub>r</sub> = 1 / (2π√LC)  Hz</strong></p>
 
 		<p>This is same as for series circuit. For parallel LCR circuits, the current at resonance is minimum. There are many applications for this circuit. An important property of this circuit is its ability to resonate at a specific frequency, the resonance frequency. They are used in many different types of oscillator circuit. Another important application is for tuning, such as in radio receivers and television sets, where they are used to select a narrow range of frequencies from the ambient radio waves. An RLC circuit can be used as a band-pass filter or a band-stop filter.</p>
 	</section>
@@ -63,14 +63,14 @@
 	<section class="experiment-section">
 		<h3><u>CIRCUIT DIAGRAM</u></h3>
 		
-		<h4 style="margin-top: 20px; margin-bottom: 10px;"><strong>Series LCR Circuit:</strong></h4>
-		<div class="diagram-container" style="border: 1px solid #cfcfcf; padding: 20px; text-align: center; background-color: #f9f9f9; margin: 15px 0;">
-			<img src="{{ url_for('static', filename='js/images/series_lcr_circuit.svg') }}" alt="Series LCR circuit diagram" style="max-width: 100%; height: auto;">
+		<h4 class="section-subtitle"><strong>Series LCR Circuit:</strong></h4>
+		<div class="diagram-container">
+			<img src="{{ url_for('static', filename='js/images/series_lcr_circuit.svg') }}" alt="Series LCR circuit diagram">
 		</div>
 
-		<h4 style="margin-top: 20px; margin-bottom: 10px;"><strong>Parallel LCR Circuit:</strong></h4>
-		<div class="diagram-container" style="border: 1px solid #cfcfcf; padding: 20px; text-align: center; background-color: #f9f9f9; margin: 15px 0;">
-			<img src="{{ url_for('static', filename='js/images/parallel_lcr_circuit.svg') }}" alt="Parallel LCR circuit diagram" style="max-width: 100%; height: auto;">
+		<h4 class="section-subtitle"><strong>Parallel LCR Circuit:</strong></h4>
+		<div class="diagram-container">
+			<img src="{{ url_for('static', filename='js/images/parallel_lcr_circuit.svg') }}" alt="Parallel LCR circuit diagram">
 		</div>
 	</section>
 
@@ -84,7 +84,7 @@
 			<p><strong>4. Quality factor (Experimental) = Q = f<sub>r</sub> / (f₂ − f₁)</strong></p>
 		</div>
 		
-		<div class="formulae-definitions" style="margin-top: 20px;">
+		<div class="formulae-definitions">
 			<p><strong>Where:</strong></p>
 			<ul>
 				<li><strong>C</strong> is the capacitance of the capacitor in F</li>
@@ -100,11 +100,11 @@
 	</section>
 
 	<!-- DATA CALCULATION SECTION -->
-	<section class="experiment-section" style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #666;">
+	<section class="experiment-section analysis-section">
 		<h3><u>ANALYSIS AND CALCULATION</u></h3>
 		<p><strong>Instructions:</strong> Fill in the current values in the tables above for each frequency. Then select the circuit type and click the appropriate button to calculate results.</p>
 		
-		<div class="input-section" style="margin-top: 20px;">
+		<div class="input-section u-mt-4">
 			<div class="input-group">
 				<label for="circuit_type_select">Select Circuit Type for Analysis:</label>
 				<select id="circuit_type_select" name="circuit_type_select">
@@ -112,17 +112,17 @@
 					<option value="parallel">Parallel LCR</option>
 				</select>
 			</div>
-			<div class="input-group" style="margin-top: 10px;">
+			<div class="input-group u-mt-2">
 				<label for="capacitanceInput">Capacitance C (µF):</label>
 				<input type="number" id="capacitanceInput" step="0.0001" placeholder="e.g. 0.047">
 			</div>
-			<div class="input-group" style="margin-top: 10px;">
+			<div class="input-group u-mt-2">
 				<label for="resistanceInput">Total resistance R + r (Ω):</label>
 				<input type="number" id="resistanceInput" step="0.1" placeholder="e.g. 330">
 			</div>
-			<div style="margin-top: 15px; display: flex; gap: 12px; flex-wrap: wrap;">
-				<button type="button" id="calculateBtn" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Calculate Results from Table Data</button>
-				<button type="button" id="resetBtn" style="padding: 10px 20px; background-color: #e53935; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Reset Table Values</button>
+			<div class="u-mt-4 u-flex u-wrap u-gap-3">
+				<button type="button" id="calculateBtn">Calculate Results from Table Data</button>
+				<button type="button" id="resetBtn">Reset Table Values</button>
 			</div>
 		</div>
 	</section>
@@ -132,17 +132,17 @@
 		<h3><u>TABULAR COLUMN</u></h3>
 
 		<!-- FREQUENCY SLIDER CONTROL -->
-		<div class="frequency-control" style="margin:20px 0; padding: 15px; background-color: #f0f8ff; border-radius: 4px;">
+		<div class="frequency-control">
 			<label for="frequencySlider"><b>Frequency (Hz):</b></label>
-			<input type="range" id="frequencySlider" min="1000" max="10000" step="100" value="1000" style="width: 100%; max-width: 400px; vertical-align: middle;">
+			<input type="range" id="frequencySlider" min="1000" max="10000" step="100" value="1000">
 			<span id="freqValue">1000</span> Hz
-			<p style="font-size: 12px; color: #666; margin: 10px 0 0 0;">Move the slider to select a frequency. The matching row will be highlighted, and the current value will be automatically calculated and filled in.</p>
+			<p class="helper-text">Move the slider to select a frequency. The matching row will be highlighted, and the current value will be automatically calculated and filled in.</p>
 		</div>
 
-		<div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+		<div class="split-columns">
 			<!-- Series Table -->
-			<div style="flex: 1; min-width: 260px;">
-				<h4 style="margin-top: 0; margin-bottom: 15px;"><strong>Series LCR Circuit</strong></h4>
+			<div class="column-panel">
+				<h4 class="section-subtitle"><strong>Series LCR Circuit</strong></h4>
 				<div class="table-container">
 					<table class="observation-table">
 						<thead>
@@ -189,8 +189,8 @@
 			</div>
 
 			<!-- Parallel Table -->
-			<div style="flex: 1; min-width: 260px;">
-				<h4 style="margin-top: 0; margin-bottom: 15px;"><strong>Parallel LCR Circuit</strong></h4>
+			<div class="column-panel">
+				<h4 class="section-subtitle"><strong>Parallel LCR Circuit</strong></h4>
 				<div class="table-container">
 					<table class="observation-table">
 						<thead>
@@ -265,24 +265,9 @@
 	<section class="experiment-section">
 		<h3><u>RESULT</u></h3>
 		<p>The frequency response of series and parallel LCR circuits is studied.</p>
-		
-		<!-- styled table for results -->
-		<style>
-			.active-frequency-row {
-				background-color: #fff3cd;
-				transition: background 0.3s ease;
-			}
-			.result-section-table, .result-section-table th, .result-section-table td {
-				border: 1px solid #000;
-				border-collapse: collapse;
-				padding: 6px 8px;
-			}
-			.result-section-table th {
-				background-color: #f0f0f0;
-			}
-		</style>
-		<div class="table-container" style="margin-top: 20px;">
-			<table class="observation-table result-section-table" style="width:100%;">
+
+		<div class="table-container u-mt-4">
+			<table class="observation-table result-section-table">
 				<thead>
 					<tr>
 						<th></th>

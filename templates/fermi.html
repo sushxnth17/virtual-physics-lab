@@ -3,9 +3,9 @@
 {% block content %}
 <div class="experiment-container">
 
-	<div class="experiment-header" style="text-align: center; border: 3px solid #000; padding: 20px; margin-bottom: 30px;">
-		<p style="font-size: 14px; margin: 0 0 10px 0;">Experiment: 3</p>
-		<h2 style="font-weight: bold; font-size: 24px; margin: 0; letter-spacing: 1.5px;">DETERMINATION OF FERMI ENERGY</h2>
+	<div class="experiment-header">
+		<p>Experiment: 3</p>
+		<h2>DETERMINATION OF FERMI ENERGY</h2>
 	</div>
 
 	<section class="experiment-section">
@@ -27,8 +27,8 @@
 
 	<section class="experiment-section">
 		<h3><u>CIRCUIT DIAGRAM</u></h3>
-		<div style="border: 2px dashed #666; padding: 36px; text-align: center; background: #f9f9f9; margin-top: 12px;">
-			<p style="margin: 0; color: #444;">[Circuit diagram: heating coil, thermometer, power supply]</p>
+		<div class="diagram-placeholder-box">
+			<p>[Circuit diagram: heating coil, thermometer, power supply]</p>
 		</div>
 	</section>
 
@@ -39,7 +39,7 @@
 			<p><strong>T<sub>F</sub> = E<sub>F</sub> / k</strong></p>
 			<p><strong>Slope = &Delta;R / &Delta;T</strong></p>
 		</div>
-		<div style="margin-top: 10px;">
+		<div class="u-mt-4">
 			<p><strong>C = 11.22 &times; 10<sup>-19</sup></strong></p>
 			<p><strong>k = 1.38 &times; 10<sup>-23</sup></strong></p>
 		</div>
@@ -48,49 +48,49 @@
 	<section class="experiment-section">
 		<h3><u>TABULAR COLUMN</u></h3>
 		<div class="table-container">
-			<table class="observation-table" style="border-collapse: collapse; width: 100%; text-align: center;">
+			<table class="observation-table">
 				<thead>
 					<tr>
-						<th style="border: 1px solid #000; padding: 8px;">Temperature (&deg;C)</th>
-						<th style="border: 1px solid #000; padding: 8px;">Temperature (K)</th>
-						<th style="border: 1px solid #000; padding: 8px;">Resistance (&Omega;)</th>
+						<th>Temperature (&deg;C)</th>
+						<th>Temperature (K)</th>
+						<th>Resistance (&Omega;)</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
-						<td style="border: 1px solid #000; padding: 8px;">85</td>
-						<td class="temp-k" style="border: 1px solid #000; padding: 8px;"></td>
-						<td style="border: 1px solid #000; padding: 8px;"><input type="number" step="any" class="resistance-input" style="width: 120px; text-align: center;"></td>
+						<td>85</td>
+						<td class="temp-k"></td>
+						<td><input type="number" step="any" class="resistance-input"></td>
 					</tr>
 					<tr>
-						<td style="border: 1px solid #000; padding: 8px;">80</td>
-						<td class="temp-k" style="border: 1px solid #000; padding: 8px;"></td>
-						<td style="border: 1px solid #000; padding: 8px;"><input type="number" step="any" class="resistance-input" style="width: 120px; text-align: center;"></td>
+						<td>80</td>
+						<td class="temp-k"></td>
+						<td><input type="number" step="any" class="resistance-input"></td>
 					</tr>
 					<tr>
-						<td style="border: 1px solid #000; padding: 8px;">75</td>
-						<td class="temp-k" style="border: 1px solid #000; padding: 8px;"></td>
-						<td style="border: 1px solid #000; padding: 8px;"><input type="number" step="any" class="resistance-input" style="width: 120px; text-align: center;"></td>
+						<td>75</td>
+						<td class="temp-k"></td>
+						<td><input type="number" step="any" class="resistance-input"></td>
 					</tr>
 					<tr>
-						<td style="border: 1px solid #000; padding: 8px;">70</td>
-						<td class="temp-k" style="border: 1px solid #000; padding: 8px;"></td>
-						<td style="border: 1px solid #000; padding: 8px;"><input type="number" step="any" class="resistance-input" style="width: 120px; text-align: center;"></td>
+						<td>70</td>
+						<td class="temp-k"></td>
+						<td><input type="number" step="any" class="resistance-input"></td>
 					</tr>
 					<tr>
-						<td style="border: 1px solid #000; padding: 8px;">65</td>
-						<td class="temp-k" style="border: 1px solid #000; padding: 8px;"></td>
-						<td style="border: 1px solid #000; padding: 8px;"><input type="number" step="any" class="resistance-input" style="width: 120px; text-align: center;"></td>
+						<td>65</td>
+						<td class="temp-k"></td>
+						<td><input type="number" step="any" class="resistance-input"></td>
 					</tr>
 					<tr>
-						<td style="border: 1px solid #000; padding: 8px;">60</td>
-						<td class="temp-k" style="border: 1px solid #000; padding: 8px;"></td>
-						<td style="border: 1px solid #000; padding: 8px;"><input type="number" step="any" class="resistance-input" style="width: 120px; text-align: center;"></td>
+						<td>60</td>
+						<td class="temp-k"></td>
+						<td><input type="number" step="any" class="resistance-input"></td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
-		<div style="margin-top: 18px; text-align: center;">
+		<div class="u-mt-4 u-text-center">
 			<button id="compute-btn" class="btn btn-primary">Calculate</button>
 		</div>
 	</section>
@@ -104,8 +104,8 @@
 	<section class="experiment-section">
 		<h3><u>GRAPH</u></h3>
 		<p><strong>Graph: Resistance vs Temperature</strong></p>
-		<div style="position: relative; width: 100%; max-width: 850px; height: 420px; border: 1px solid #ccc;">
-			<canvas id="fermiChart" style="width: 100%; height: 100%;"></canvas>
+		<div class="chart-frame chart-frame-wide">
+			<canvas id="fermiChart"></canvas>
 		</div>
 	</section>
 
