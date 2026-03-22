@@ -610,6 +610,18 @@ div:has(> canvas#diffractionChart) {
   margin-top: var(--space-4);
 }
 
+.laser-control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.laser-control select {
+  width: min(100%, 260px);
+}
+
 .action-row {
   margin-top: var(--space-4);
 }

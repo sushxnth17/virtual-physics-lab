@@ -17,6 +17,20 @@ const GRATING_CONSTANT = 1 / N;  // d in meters (≈ 50.8e-6 m or 50.8 μm)
 // Wavelength (adjustable)
 let wavelength = 650e-9;  // 650 nm in meters (default red laser)
 
+const WAVELENGTH_MAP = {
+    red: 650e-9,
+    green: 532e-9,
+    blue: 450e-9,
+    violet: 405e-9
+};
+
+const LASER_WAVELENGTH_RANGES_NM = {
+    red: { min: 630, max: 680, label: 'Red' },
+    green: { min: 520, max: 550, label: 'Green' },
+    blue: { min: 440, max: 480, label: 'Blue' },
+    violet: { min: 380, max: 420, label: 'Violet' }
+};
+
 // Maximum diffraction order to display
 const MAX_ORDER = 8;
 
@@ -30,6 +44,7 @@ let canvasHeight;
 let centerY;
 
 const BASE_CANVAS_HEIGHT = 560;
+const MIN_CANVAS_WIDTH = 720;
 const MIN_ORDER_LABEL_SPACING = 24;
 const CANVAS_VERTICAL_MARGIN = 60;
 const DIFFRACTION_ERROR_KEY = 'diffraction_error_seed';
@@ -44,7 +59,8 @@ let PIXELS_PER_METER;
 // Component positions (fixed)
 const LASER_X_RATIO = 0.1;      // Laser at 10% from left
 const GRATING_X_RATIO = 0.4;    // Grating at 40% from left
-const SCREEN_X_INITIAL_RATIO = 0.85;  // Screen initial position at 85% from left
+const SCREEN_X_INITIAL_RATIO = 0.75;  // Screen initial position at 75% from left
+const ORDER_LABEL_OFFSET_RATIO = 0.02;
 
 // Component dimensions (as ratios of canvas size)
 const LASER_WIDTH_RATIO = 0.15;   // Increased for better visibility
@@ -81,7 +97,7 @@ let screenHeight;
 
 let screenDistance = 1.0;  // Current physical distance from grating to screen (meters)
 let pixelScale;  // Scaling factor for vertical diffraction pattern display
-let measurementErrorFactor = 0; // Persistent student-specific xm variation (-3% to +3%)
+let measurementErrorFactor = 0; // Experimental error disabled for stable results
 let persistedXmValues = {}; // Stored measured xm values by order
 let hasPersistedExperiment = false;
 let persistedScreenDistance = null;
@@ -96,6 +112,9 @@ let hasDragged = false;  // Track if actual dragging occurred vs just click
 let selectedOrder = null;  // Currently selected diffraction order for measurement
 let selectedXm = null;     // Measured xm value in meters
 let highlightTimeout = null;  // Timeout for highlight effect
+let hoveredSpot = null;
+let hoverMouseX = 0;
+let hoverMouseY = 0;
 
 // Canvas context
 let canvas;
@@ -108,9 +127,15 @@ let ctx;
 /**
  * Initialize canvas dimensions and calculate layout parameters
  */
-function initializeLayout() {
+function initializeLayout(preserveCurrentDistance = false) {
     canvas = document.getElementById('simulationCanvas');
     ctx = canvas.getContext('2d');
+
+    const previousDistance = screenDistance;
+    const responsiveWidth = Math.max(MIN_CANVAS_WIDTH, Math.round(canvas.clientWidth || canvas.width));
+    if (canvas.width !== responsiveWidth) {
+        canvas.width = responsiveWidth;
+    }
 
     const requiredCanvasHeight = calculateRequiredCanvasHeight();
     if (canvas.height !== requiredCanvasHeight) {
@@ -129,7 +154,6 @@ function initializeLayout() {
     // Fixed component positions
     laserX = canvasWidth * LASER_X_RATIO;
     gratingX = canvasWidth * GRATING_X_RATIO;
-    screenX = canvasWidth * SCREEN_X_INITIAL_RATIO;
     
     // Component dimensions
     laserWidth = canvasWidth * LASER_WIDTH_RATIO;
@@ -138,9 +162,16 @@ function initializeLayout() {
     gratingHeight = canvasHeight * GRATING_HEIGHT_RATIO;
     screenWidth = canvasWidth * SCREEN_WIDTH_RATIO;
     screenHeight = canvasHeight * SCREEN_HEIGHT_RATIO;
-    
-    // Calculate initial screen distance
-    screenDistance = computeScreenDistance(screenX);
+
+    const defaultScreenX = canvasWidth * SCREEN_X_INITIAL_RATIO;
+    const defaultScreenDistance = computeScreenDistance(defaultScreenX);
+    const targetDistance = preserveCurrentDistance ? previousDistance : defaultScreenDistance;
+
+    screenDistance = Math.max(
+        SCREEN_MIN_DISTANCE_FROM_GRATING,
+        Math.min(SCREEN_MAX_DISTANCE_FROM_GRATING, targetDistance)
+    );
+    screenX = computeScreenPosition(screenDistance);
 }
 
 // ============================================================================
@@ -184,7 +215,8 @@ function loadStoredExperiment() {
         if (!hasXmData) return null;
 
         return {
-            errorSeed: typeof parsed.errorSeed === 'number' ? parsed.errorSeed : null,
+            // Experimental error disabled for stable results
+            // errorSeed: typeof parsed.errorSeed === 'number' ? parsed.errorSeed : null,
             screenDistance: typeof parsed.screenDistance === 'number' ? parsed.screenDistance : null,
             xmValues: xmValues
         };
@@ -201,12 +233,14 @@ function persistExperiment() {
         localStorage.setItem(
             DIFFRACTION_EXPERIMENT_KEY,
             JSON.stringify({
-                errorSeed: measurementErrorFactor,
+                // Experimental error disabled for stable results
+                // errorSeed: measurementErrorFactor,
                 screenDistance: screenDistance,
                 xmValues: persistedXmValues
             })
         );
-        localStorage.setItem(DIFFRACTION_ERROR_KEY, measurementErrorFactor.toString());
+        // Experimental error disabled for stable results
+        // localStorage.setItem(DIFFRACTION_ERROR_KEY, measurementErrorFactor.toString());
     } catch (error) {
         // Ignore storage errors to keep simulation running.
     }
@@ -223,33 +257,22 @@ function initializeMeasurementErrorFactor() {
             hasPersistedExperiment = true;
             persistedXmValues = storedExperiment.xmValues;
             persistedScreenDistance = storedExperiment.screenDistance;
-
-            if (
-                typeof storedExperiment.errorSeed === 'number' &&
-                storedExperiment.errorSeed >= -0.03 &&
-                storedExperiment.errorSeed <= 0.03
-            ) {
-                measurementErrorFactor = storedExperiment.errorSeed;
-                localStorage.setItem(DIFFRACTION_ERROR_KEY, measurementErrorFactor.toString());
-                return;
-            }
         }
 
-        const savedValue = localStorage.getItem(DIFFRACTION_ERROR_KEY);
-        const parsedValue = savedValue !== null ? parseFloat(savedValue) : NaN;
-
-        if (!isNaN(parsedValue) && parsedValue >= -0.03 && parsedValue <= 0.03) {
-            measurementErrorFactor = parsedValue;
-            return;
-        }
-
-        if (hasPersistedExperiment) {
-            measurementErrorFactor = 0;
-            return;
-        }
-
-        measurementErrorFactor = (Math.random() * 0.06) - 0.03;
-        localStorage.setItem(DIFFRACTION_ERROR_KEY, measurementErrorFactor.toString());
+        // Experimental error disabled for stable results
+        // const savedValue = localStorage.getItem(DIFFRACTION_ERROR_KEY);
+        // const parsedValue = savedValue !== null ? parseFloat(savedValue) : NaN;
+        // if (!isNaN(parsedValue) && parsedValue >= -0.03 && parsedValue <= 0.03) {
+        //     measurementErrorFactor = parsedValue;
+        //     return;
+        // }
+        // if (hasPersistedExperiment) {
+        //     measurementErrorFactor = 0;
+        //     return;
+        // }
+        // measurementErrorFactor = (Math.random() * 0.06) - 0.03;
+        // localStorage.setItem(DIFFRACTION_ERROR_KEY, measurementErrorFactor.toString());
+        measurementErrorFactor = 0;
     } catch (error) {
         // Fallback for environments where localStorage is unavailable.
         measurementErrorFactor = 0;
@@ -305,7 +328,9 @@ function calculateIdealOrderDisplacement(order) {
  */
 function calculateOrderDisplacement(order) {
     const trueXm = calculateIdealOrderDisplacement(order);
-    return trueXm * (1 + measurementErrorFactor);
+    // Experimental error disabled for stable results
+    // return trueXm * (1 + measurementErrorFactor);
+    return trueXm;
 }
 
 /**
@@ -325,6 +350,91 @@ function calculateRequiredCanvasHeight() {
     const requiredHalfHeight = highestOrderDisplacement * minimumPixelScale + CANVAS_VERTICAL_MARGIN;
 
     return Math.max(BASE_CANVAS_HEIGHT, Math.ceil(requiredHalfHeight * 2));
+}
+
+/**
+ * Convert selected laser key to wavelength in meters.
+ *
+ * @param {string} colorKey - red/green/blue/violet
+ * @returns {number} Wavelength in meters
+ */
+function getWavelengthForLaser(colorKey) {
+    return WAVELENGTH_MAP[colorKey] || WAVELENGTH_MAP.red;
+}
+
+/**
+ * Return the current laser color key from wavelength.
+ *
+ * @returns {string} red/green/blue/violet
+ */
+function getLaserColor() {
+    const tolerance = 1e-12;
+
+    if (Math.abs(wavelength - WAVELENGTH_MAP.green) < tolerance) return 'green';
+    if (Math.abs(wavelength - WAVELENGTH_MAP.blue) < tolerance) return 'blue';
+    if (Math.abs(wavelength - WAVELENGTH_MAP.violet) < tolerance) return 'violet';
+
+    return 'red';
+}
+
+/**
+ * RGB tuple for current laser color.
+ *
+ * @returns {{r:number,g:number,b:number}}
+ */
+function getLaserRgb() {
+    const color = getLaserColor();
+
+    switch (color) {
+        case 'green':
+            return { r: 68, g: 200, b: 90 };
+        case 'blue':
+            return { r: 70, g: 130, b: 255 };
+        case 'violet':
+            return { r: 145, g: 92, b: 220 };
+        case 'red':
+        default:
+            return { r: 255, g: 70, b: 70 };
+    }
+}
+
+/**
+ * Build rgba() CSS color string from RGB components.
+ *
+ * @param {{r:number,g:number,b:number}} rgb - Color components
+ * @param {number} alpha - Alpha from 0 to 1
+ * @returns {string} CSS rgba color string
+ */
+function toRgba(rgb, alpha) {
+    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+}
+
+/**
+ * Update wavelength guidance note based on currently selected laser color.
+ */
+function updateWavelengthNote() {
+    const noteElement = document.getElementById('wavelengthNoteText');
+    if (!noteElement) return;
+
+    const laserSelector = document.getElementById('laserSelector');
+    const selectedLaser = laserSelector ? laserSelector.value : getLaserColor();
+    const range = LASER_WAVELENGTH_RANGES_NM[selectedLaser] || LASER_WAVELENGTH_RANGES_NM.red;
+
+    noteElement.innerHTML = `Typical acceptable range for ${range.label} laser: <strong>${range.min} nm &ndash; ${range.max} nm</strong>`;
+}
+
+/**
+ * Update RESULT sentence with currently selected laser color.
+ */
+function updateSelectedLaserResultText() {
+    const resultColorElement = document.getElementById('selected-laser-color');
+    if (!resultColorElement) return;
+
+    const laserSelector = document.getElementById('laserSelector');
+    const selectedLaser = laserSelector ? laserSelector.value : getLaserColor();
+    const range = LASER_WAVELENGTH_RANGES_NM[selectedLaser] || LASER_WAVELENGTH_RANGES_NM.red;
+
+    resultColorElement.textContent = range.label;
 }
 
 /**
@@ -384,44 +494,21 @@ function drawLaser() {
     ctx.fill();
     ctx.stroke();
     
-    // Laser emission aperture (bright red circle)
+    const laserRgb = getLaserRgb();
+
+    // Laser emission aperture (color-matched to selected wavelength)
     const apertureX = x + width - width * 0.15;
     const apertureY = y + height / 2;
     
-    ctx.fillStyle = '#FF4444';
+    ctx.fillStyle = toRgba(laserRgb, 1);
     ctx.beginPath();
     ctx.arc(apertureX, apertureY, width * 0.08, 0, 2 * Math.PI);
     ctx.fill();
     
-    ctx.fillStyle = '#FFAAAA';
+    ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
     ctx.arc(apertureX, apertureY, width * 0.05, 0, 2 * Math.PI);
     ctx.fill();
-    
-    // Draw laser beam from laser to grating
-    const beamStartX = apertureX;
-    const beamEndX = gratingX - gratingWidth / 2;
-    
-    // Beam glow (outer)
-    const beamGradient = ctx.createLinearGradient(beamStartX, apertureY, beamEndX, apertureY);
-    beamGradient.addColorStop(0, 'rgba(255, 100, 100, 0.4)');
-    beamGradient.addColorStop(0.5, 'rgba(255, 80, 80, 0.2)');
-    beamGradient.addColorStop(1, 'rgba(255, 60, 60, 0.1)');
-    
-    ctx.strokeStyle = beamGradient;
-    ctx.lineWidth = 12;
-    ctx.beginPath();
-    ctx.moveTo(beamStartX, apertureY);
-    ctx.lineTo(beamEndX, apertureY);
-    ctx.stroke();
-    
-    // Beam core (bright red)
-    ctx.strokeStyle = '#FF3333';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(beamStartX, apertureY);
-    ctx.lineTo(beamEndX, apertureY);
-    ctx.stroke();
     
     // Label
     ctx.fillStyle = '#000000';
@@ -575,13 +662,14 @@ function drawDistanceArrow() {
 function drawDiffractionRays() {
     const gratingCenterX = gratingX;
     const gratingCenterY = centerY;
+    const laserRgb = getLaserRgb();
     
     // ===== CENTRAL MAXIMUM RAY (m=0, slightly brighter) =====
     // Reset line dash for smooth continuous lines
     ctx.setLineDash([]);
     
     // Outer glow for central ray (brighter)
-    ctx.strokeStyle = 'rgba(255, 0, 0, 0.2)';
+    ctx.strokeStyle = toRgba(laserRgb, 0.2);
     ctx.lineWidth = 6;
     ctx.lineCap = 'round';
     ctx.beginPath();
@@ -590,7 +678,7 @@ function drawDiffractionRays() {
     ctx.stroke();
     
     // Inner bright beam for central ray
-    ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+    ctx.strokeStyle = toRgba(laserRgb, 0.8);
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.moveTo(gratingCenterX, gratingCenterY);
@@ -623,7 +711,7 @@ function drawDiffractionRays() {
         
         // ===== POSITIVE ORDER RAY (upper) =====
         // Faint outer glow
-        ctx.strokeStyle = `rgba(255, 0, 0, ${glowAlpha / 255})`;
+        ctx.strokeStyle = toRgba(laserRgb, glowAlpha / 255);
         ctx.lineWidth = 6;
         ctx.lineCap = 'round';
         ctx.beginPath();
@@ -632,7 +720,7 @@ function drawDiffractionRays() {
         ctx.stroke();
         
         // Bright inner beam
-        ctx.strokeStyle = `rgba(255, 0, 0, ${beamAlpha / 255})`;
+        ctx.strokeStyle = toRgba(laserRgb, beamAlpha / 255);
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(gratingCenterX, gratingCenterY);
@@ -641,7 +729,7 @@ function drawDiffractionRays() {
         
         // ===== NEGATIVE ORDER RAY (lower, symmetric) =====
         // Faint outer glow
-        ctx.strokeStyle = `rgba(255, 0, 0, ${glowAlpha / 255})`;
+        ctx.strokeStyle = toRgba(laserRgb, glowAlpha / 255);
         ctx.lineWidth = 6;
         ctx.lineCap = 'round';
         ctx.beginPath();
@@ -650,7 +738,7 @@ function drawDiffractionRays() {
         ctx.stroke();
         
         // Bright inner beam
-        ctx.strokeStyle = `rgba(255, 0, 0, ${beamAlpha / 255})`;
+        ctx.strokeStyle = toRgba(laserRgb, beamAlpha / 255);
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(gratingCenterX, gratingCenterY);
@@ -665,7 +753,8 @@ function drawDiffractionRays() {
  */
 function drawDiffractionSpots() {
     const screenX_pos = screenX;
-    const labelX = screenX_pos + 22;
+    const labelX = screenX_pos + screenWidth / 2 + Math.max(12, canvasWidth * ORDER_LABEL_OFFSET_RATIO);
+    const laserRgb = getLaserRgb();
     
     // Central maximum (m=0, largest and brightest)
     const centralRadius = 12;
@@ -673,11 +762,10 @@ function drawDiffractionSpots() {
     
     // Radial gradient for central maximum glow - enhanced with more realistic light falloff
     const centralGradient = ctx.createRadialGradient(screenX_pos, centerY, 0, screenX_pos, centerY, centralGlowRadius);
-    centralGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');      // Bright white center
-    centralGradient.addColorStop(0.2, 'rgba(255, 255, 200, 0.8)');    // Light yellow transition
-    centralGradient.addColorStop(0.4, 'rgba(255, 255, 100, 0.5)');    // Yellow glow
-    centralGradient.addColorStop(0.7, 'rgba(255, 200, 0, 0.2)');      // Orange/amber fade
-    centralGradient.addColorStop(1, 'rgba(255, 200, 0, 0)');          // Transparent edge
+    centralGradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+    centralGradient.addColorStop(0.25, toRgba(laserRgb, 0.72));
+    centralGradient.addColorStop(0.65, toRgba(laserRgb, 0.28));
+    centralGradient.addColorStop(1, toRgba(laserRgb, 0));
     
     ctx.fillStyle = centralGradient;
     ctx.beginPath();
@@ -686,9 +774,9 @@ function drawDiffractionSpots() {
     
     // Central bright core - white center fading to yellow
     const coreCoreGradient = ctx.createRadialGradient(screenX_pos, centerY, 0, screenX_pos, centerY, centralRadius);
-    coreCoreGradient.addColorStop(0, '#FFFFFF');       // Pure white center
-    coreCoreGradient.addColorStop(0.7, '#FFFF99');     // Light yellow
-    coreCoreGradient.addColorStop(1, '#FFFF00');       // Bright yellow edge
+    coreCoreGradient.addColorStop(0, '#FFFFFF');
+    coreCoreGradient.addColorStop(0.7, toRgba(laserRgb, 0.92));
+    coreCoreGradient.addColorStop(1, toRgba(laserRgb, 1));
     
     ctx.fillStyle = coreCoreGradient;
     ctx.beginPath();
@@ -730,17 +818,21 @@ function drawDiffractionSpots() {
         const glowRadius = baseRadius * 2.5;  // Proportional glow radius
         
         // Color intensity decreases with order to simulate diffraction effects
-        const brightness = 255 - order * 25;
-        const colorIntBr = Math.max(120, brightness);
-        const colorIntGr = Math.max(80, brightness - 40);
+        const intensity = Math.max(0.38, 1 - order * 0.09);
+        const coreR = Math.round(laserRgb.r * intensity);
+        const coreG = Math.round(laserRgb.g * intensity);
+        const coreB = Math.round(laserRgb.b * intensity);
+        const edgeR = Math.round(coreR + (255 - coreR) * 0.35);
+        const edgeG = Math.round(coreG + (255 - coreG) * 0.35);
+        const edgeB = Math.round(coreB + (255 - coreB) * 0.35);
         
         // ===== POSITIVE ORDER SPOT =====
         // Draw glow halo with smooth gradient
         const gradientPos = ctx.createRadialGradient(screenX_pos, screenY_positive, 0, screenX_pos, screenY_positive, glowRadius);
-        gradientPos.addColorStop(0, `rgba(255, 255, ${colorIntBr}, 0.7)`);       // Bright yellow/white center
-        gradientPos.addColorStop(0.25, `rgba(255, 255, ${colorIntGr}, 0.5)`);    // Yellow middle
-        gradientPos.addColorStop(0.6, `rgba(255, ${150 + order * 10}, 0, 0.2)`); // Orange fade
-        gradientPos.addColorStop(1, `rgba(255, 200, 0, 0)`);                     // Transparent edge
+        gradientPos.addColorStop(0, 'rgba(255, 255, 255, 0.75)');
+        gradientPos.addColorStop(0.3, `rgba(${edgeR}, ${edgeG}, ${edgeB}, 0.52)`);
+        gradientPos.addColorStop(0.65, `rgba(${coreR}, ${coreG}, ${coreB}, 0.24)`);
+        gradientPos.addColorStop(1, `rgba(${coreR}, ${coreG}, ${coreB}, 0)`);
         
         ctx.fillStyle = gradientPos;
         ctx.beginPath();
@@ -749,8 +841,9 @@ function drawDiffractionSpots() {
         
         // Draw bright core with gradient from white to yellow
         const coreGradientPos = ctx.createRadialGradient(screenX_pos, screenY_positive, 0, screenX_pos, screenY_positive, baseRadius);
-        coreGradientPos.addColorStop(0, `rgb(255, 255, ${Math.min(255, colorIntBr + 30)})`);  // White center
-        coreGradientPos.addColorStop(0.8, `rgb(255, 255, ${colorIntBr})`);                     // Yellow edge
+        coreGradientPos.addColorStop(0, '#FFFFFF');
+        coreGradientPos.addColorStop(0.8, `rgb(${edgeR}, ${edgeG}, ${edgeB})`);
+        coreGradientPos.addColorStop(1, `rgb(${coreR}, ${coreG}, ${coreB})`);
         
         ctx.fillStyle = coreGradientPos;
         ctx.beginPath();
@@ -767,10 +860,10 @@ function drawDiffractionSpots() {
         // ===== NEGATIVE ORDER SPOT (symmetric lower) =====
         // Draw glow halo
         const gradientNeg = ctx.createRadialGradient(screenX_pos, screenY_negative, 0, screenX_pos, screenY_negative, glowRadius);
-        gradientNeg.addColorStop(0, `rgba(255, 255, ${colorIntBr}, 0.7)`);
-        gradientNeg.addColorStop(0.25, `rgba(255, 255, ${colorIntGr}, 0.5)`);
-        gradientNeg.addColorStop(0.6, `rgba(255, ${150 + order * 10}, 0, 0.2)`);
-        gradientNeg.addColorStop(1, `rgba(255, 200, 0, 0)`);
+        gradientNeg.addColorStop(0, 'rgba(255, 255, 255, 0.75)');
+        gradientNeg.addColorStop(0.3, `rgba(${edgeR}, ${edgeG}, ${edgeB}, 0.52)`);
+        gradientNeg.addColorStop(0.65, `rgba(${coreR}, ${coreG}, ${coreB}, 0.24)`);
+        gradientNeg.addColorStop(1, `rgba(${coreR}, ${coreG}, ${coreB}, 0)`);
         
         ctx.fillStyle = gradientNeg;
         ctx.beginPath();
@@ -779,8 +872,9 @@ function drawDiffractionSpots() {
         
         // Draw bright core
         const coreGradientNeg = ctx.createRadialGradient(screenX_pos, screenY_negative, 0, screenX_pos, screenY_negative, baseRadius);
-        coreGradientNeg.addColorStop(0, `rgb(255, 255, ${Math.min(255, colorIntBr + 30)})`);
-        coreGradientNeg.addColorStop(0.8, `rgb(255, 255, ${colorIntBr})`);
+        coreGradientNeg.addColorStop(0, '#FFFFFF');
+        coreGradientNeg.addColorStop(0.8, `rgb(${edgeR}, ${edgeG}, ${edgeB})`);
+        coreGradientNeg.addColorStop(1, `rgb(${coreR}, ${coreG}, ${coreB})`);
         
         ctx.fillStyle = coreGradientNeg;
         ctx.beginPath();
@@ -852,6 +946,31 @@ function updateScreenFromSlider(distance) {
     screenX = computeScreenPosition(screenDistance);
 }
 
+/**
+ * Keep the table S input synchronized with simulation screen distance.
+ *
+ * @param {number} distanceMeters - Distance S in meters
+ */
+function syncScreenDistanceInput(distanceMeters) {
+    const screenDistanceInput = document.getElementById('screen-distance');
+    if (!screenDistanceInput) return;
+
+    const safeDistance = Number.isFinite(distanceMeters) ? distanceMeters : screenDistance;
+    const distanceCm = safeDistance * 100;
+    screenDistanceInput.value = distanceCm.toFixed(1);
+}
+
+/**
+ * Prevent manual conflicts by locking table S input as display-only.
+ */
+function lockScreenDistanceInput() {
+    const screenDistanceInput = document.getElementById('screen-distance');
+    if (!screenDistanceInput) return;
+
+    screenDistanceInput.readOnly = true;
+    screenDistanceInput.setAttribute('aria-readonly', 'true');
+}
+
 // ============================================================================
 // MEASUREMENT TOOL FUNCTIONS
 // ============================================================================
@@ -913,6 +1032,7 @@ function getSpotPositions() {
         // Positive order (upper)
         spots.push({
             order: order,
+            pixelX: screenX,
             pixelY: centerY - offsetPixels,
             isPositive: true
         });
@@ -920,12 +1040,49 @@ function getSpotPositions() {
         // Negative order (lower, symmetric)
         spots.push({
             order: order,
+            pixelX: screenX,
             pixelY: centerY + offsetPixels,
             isPositive: false
         });
     }
     
     return spots;
+}
+
+/**
+ * Update hover state for diffraction spot tooltip.
+ *
+ * @param {number} mouseX - Mouse x-coordinate (canvas-relative)
+ * @param {number} mouseY - Mouse y-coordinate (canvas-relative)
+ * @returns {boolean} True when tooltip display should be redrawn
+ */
+function updateSpotHoverState(mouseX, mouseY) {
+    const spots = getSpotPositions();
+    let nearestSpot = null;
+    let nearestDistance = Infinity;
+    const hoverTolerance = 10;
+
+    for (const spot of spots) {
+        const distance = Math.hypot(mouseX - spot.pixelX, mouseY - spot.pixelY);
+        if (distance < hoverTolerance && distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestSpot = spot;
+        }
+    }
+
+    if (nearestSpot) {
+        hoveredSpot = nearestSpot;
+        hoverMouseX = mouseX;
+        hoverMouseY = mouseY;
+        return true;
+    }
+
+    if (hoveredSpot !== null) {
+        hoveredSpot = null;
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -1077,11 +1234,8 @@ function recordObservation(order, xmMeters, SMeters) {
     if (sinThetaCell) sinThetaCell.textContent = params.sinTheta.toFixed(6);
     if (lambdaCell) lambdaCell.textContent = params.lambdaNm.toFixed(2);
     
-    // Update screen distance in table header
-    const screenDistanceInput = document.getElementById('screen-distance');
-    if (screenDistanceInput) {
-        screenDistanceInput.value = params.SCm.toFixed(1);
-    }
+    // Ensure S in table stays tied to simulation value.
+    syncScreenDistanceInput(SMeters);
     
     // Calculate and update average wavelength
     calculateAverageWavelength();
@@ -1180,6 +1334,48 @@ function renderMeasurementOverlay() {
     ctx.setLineDash([]);
 }
 
+/**
+ * Draw tooltip near cursor when hovering a diffraction spot.
+ */
+function renderSpotTooltip() {
+    if (!hoveredSpot) return;
+
+    const orderSign = hoveredSpot.isPositive ? '+' : '-';
+    const line1 = `Order m = ${orderSign}${hoveredSpot.order}`;
+    const line2 = 'Click to measure';
+
+    ctx.save();
+    ctx.font = '12px Arial';
+    const textWidth = Math.max(ctx.measureText(line1).width, ctx.measureText(line2).width);
+    const padding = 8;
+    const lineHeight = 16;
+    const boxWidth = textWidth + padding * 2;
+    const boxHeight = lineHeight * 2 + padding * 2;
+
+    let boxX = hoverMouseX + 12;
+    let boxY = hoverMouseY - boxHeight - 12;
+
+    if (boxX + boxWidth > canvasWidth - 6) {
+        boxX = hoverMouseX - boxWidth - 12;
+    }
+    if (boxY < 6) {
+        boxY = hoverMouseY + 12;
+    }
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#D3D3D3';
+    ctx.lineWidth = 1;
+    ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+    ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+
+    ctx.fillStyle = '#000000';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(line1, boxX + padding, boxY + padding);
+    ctx.fillText(line2, boxX + padding, boxY + padding + lineHeight);
+    ctx.restore();
+}
+
 // ============================================================================
 // MASTER RENDERING FUNCTION
 // ============================================================================
@@ -1194,9 +1390,13 @@ function drawLaserBeam() {
     const laserApertureY = centerY;
     const gratingCenterX = gratingX;
     const gratingCenterY = centerY;
+    const laserRgb = getLaserRgb();
+
+    ctx.save();
+    ctx.globalAlpha = 0.6;
     
     // Draw glow effect (wider semi-transparent line behind main beam)
-    ctx.strokeStyle = 'rgba(255, 0, 0, 0.3)';
+    ctx.strokeStyle = toRgba(laserRgb, 0.35);
     ctx.lineWidth = 8;
     ctx.beginPath();
     ctx.moveTo(laserApertureX, laserApertureY);
@@ -1204,7 +1404,7 @@ function drawLaserBeam() {
     ctx.stroke();
     
     // Draw secondary glow (medium width)
-    ctx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
+    ctx.strokeStyle = toRgba(laserRgb, 0.62);
     ctx.lineWidth = 5;
     ctx.beginPath();
     ctx.moveTo(laserApertureX, laserApertureY);
@@ -1212,7 +1412,7 @@ function drawLaserBeam() {
     ctx.stroke();
     
     // Draw main bright red beam
-    ctx.strokeStyle = 'rgba(255, 0, 0, 0.9)';
+    ctx.strokeStyle = toRgba(laserRgb, 0.9);
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(laserApertureX, laserApertureY);
@@ -1220,12 +1420,15 @@ function drawLaserBeam() {
     ctx.stroke();
     
     // Draw inner core (brightest)
-    ctx.strokeStyle = 'rgba(255, 100, 100, 1)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(laserApertureX, laserApertureY);
     ctx.lineTo(gratingCenterX, gratingCenterY);
     ctx.stroke();
+
+    // Ensure subsequent drawing uses normal alpha.
+    ctx.restore();
 }
 
 /**
@@ -1268,7 +1471,7 @@ function drawSetup() {
     
     // 2. Enhanced laser beam with glow effects
     drawLaserBeam();
-    
+
     // 3. Grating (central element)
     drawGrating();
     
@@ -1286,6 +1489,9 @@ function drawSetup() {
     
     // 8. Measurement overlay if spot is selected (topmost)
     renderMeasurementOverlay();
+
+    // 9. Spot hover tooltip
+    renderSpotTooltip();
 }
 
 /**
@@ -1305,11 +1511,20 @@ function updateSimulation() {
  */
 document.addEventListener('DOMContentLoaded', function() {
     initializeMeasurementErrorFactor();
-    initializeLayout();
+    initializeLayout(false);
 
     // Get UI elements
     const screenSlider = document.getElementById('screenSlider');
     const screenValueDisplay = document.getElementById('screenValue');
+    const laserSelector = document.getElementById('laserSelector');
+
+    lockScreenDistanceInput();
+
+    if (laserSelector) {
+        laserSelector.value = getLaserColor();
+    }
+    updateWavelengthNote();
+    updateSelectedLaserResultText();
 
     // Restore prior experiment state before first render when available.
     if (
@@ -1332,6 +1547,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (screenValueDisplay) {
         screenValueDisplay.textContent = screenDistance.toFixed(2);
     }
+    syncScreenDistanceInput(screenDistance);
 
     if (hasPersistedExperiment) {
         const orderedEntries = Object.entries(persistedXmValues)
@@ -1341,6 +1557,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         orderedEntries.forEach(([order, xmMeters]) => {
             recordObservation(order, xmMeters, screenDistance);
+        });
+    }
+
+    if (laserSelector) {
+        laserSelector.addEventListener('change', function() {
+            wavelength = getWavelengthForLaser(this.value);
+            updateSimulation();
+            recalculateAllObservations();
+            updateWavelengthNote();
+            updateSelectedLaserResultText();
         });
     }
     
@@ -1362,6 +1588,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (screenValueDisplay) {
                 screenValueDisplay.textContent = screenDistance.toFixed(2);
             }
+            syncScreenDistanceInput(screenDistance);
             
             // Redraw simulation
             updateSimulation();
@@ -1394,11 +1621,28 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isDraggingScreen) return; // Handled by window listener during drag
         
         const pos = getCanvasMousePosition(event);
+        const shouldRedrawTooltip = updateSpotHoverState(pos.x, pos.y);
         
         // Update cursor based on hover state
         if (isMouseOverScreen(pos.x, pos.y)) {
             canvas.style.cursor = 'ew-resize';
+        } else if (hoveredSpot) {
+            canvas.style.cursor = 'pointer';
         } else {
+            canvas.style.cursor = 'default';
+        }
+
+        if (shouldRedrawTooltip) {
+            drawSetup();
+        }
+    });
+
+    canvas.addEventListener('mouseleave', function() {
+        if (hoveredSpot) {
+            hoveredSpot = null;
+            drawSetup();
+        }
+        if (!isDraggingScreen) {
             canvas.style.cursor = 'default';
         }
     });
@@ -1412,9 +1656,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isMouseOverScreen(pos.x, pos.y)) {
             isDraggingScreen = true;
             hasDragged = false;  // Reset drag flag
+            hoveredSpot = null;
             dragStartMouseX = event.clientX;
             dragStartScreenX = screenX;
             canvas.style.cursor = 'ew-resize';
+            drawSetup();
             event.preventDefault();
         }
     });
@@ -1456,6 +1702,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 screenValueDisplay.textContent = screenDistance.toFixed(2);
             }
         }
+        syncScreenDistanceInput(screenDistance);
         
         // Redraw simulation in real time
         updateSimulation();
@@ -1492,7 +1739,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ========================================================================
     
     window.addEventListener('resize', function() {
-        initializeLayout();
+        initializeLayout(true);
         drawSetup();
     });
     
@@ -1532,10 +1779,16 @@ document.addEventListener('DOMContentLoaded', function() {
     window.updateDiffractionSimulation = function(newWavelength, newScreenDistance) {
         if (typeof newWavelength === 'number') {
             wavelength = newWavelength;
+            if (laserSelector) {
+                laserSelector.value = getLaserColor();
+            }
+            updateWavelengthNote();
+            updateSelectedLaserResultText();
         }
         
         if (typeof newScreenDistance === 'number') {
             updateScreenFromSlider(newScreenDistance);
+            syncScreenDistanceInput(screenDistance);
             
             // Sync slider
             if (screenSlider) {

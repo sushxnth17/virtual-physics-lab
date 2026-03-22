@@ -228,12 +228,12 @@ function plotGraph(apiResponse) {
         data: {
             labels: orders,
             datasets: [{
-                label: 'sinθ',
+				label: 'sinθ',
                 data: sinTheta,
                 borderWidth: 2,
                 fill: false,
                 tension: 0,
-                pointRadius: 4
+				pointRadius: 4
             }]
         },
         options: {
@@ -255,8 +255,8 @@ function plotGraph(apiResponse) {
                     title: {
                         display: true,
                         text: 'sinθ'
-                    },
-                    beginAtZero: true
+					},
+					beginAtZero: true
                 }
             }
         }

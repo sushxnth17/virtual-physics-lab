@@ -84,6 +84,15 @@
 
 	<div class="simulation-wrap">
     	<h3>Interactive Setup Simulation</h3>
+		<div class="control-strip laser-control">
+			<label for="laserSelector"><strong>Laser Color / Wavelength: </strong></label>
+			<select id="laserSelector" aria-label="Laser Color / Wavelength">
+				<option value="red" selected>Red (650 nm)</option>
+				<option value="green">Green (532 nm)</option>
+				<option value="blue">Blue (450 nm)</option>
+				<option value="violet">Violet (405 nm)</option>
+			</select>
+		</div>
 	    		<canvas id="simulationCanvas" width="900" height="400"></canvas>
 	</div>
 
@@ -264,12 +273,12 @@
 	<!-- RESULT SECTION -->
 	<section class="experiment-section">
 		<h3><u>RESULT</u></h3>
-		<p>The wavelength of the given laser source is <span id="final-wavelength" class="result-blank"></span> nm</p>
+		<p>The wavelength of the selected <span id="selected-laser-color">Red</span> laser source is <span id="final-wavelength" class="result-blank"></span> nm</p>
 	</section>
 
 	<div class="note-box">
 		<strong>Note:</strong> Due to experimental errors and measurement uncertainty, the calculated wavelength may vary slightly.
-		Typical acceptable range for a red diode laser: <strong>630 nm &ndash; 680 nm</strong>.
+		<span id="wavelengthNoteText">Typical acceptable range for Red laser: <strong>630 nm &ndash; 680 nm</strong></span>.
 	</div>
 
 	<div class="note-box">
