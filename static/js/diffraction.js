@@ -358,6 +358,9 @@ function resetExperiment() {
 		diffractionChart.destroy();
 		diffractionChart = null;
 	}
+	if (typeof window.clearDiffractionGraph === 'function') {
+		window.clearDiffractionGraph();
+	}
 
 	// Reset measurement display text (from simulation)
 	if (typeof updateMeasurementDisplay !== 'undefined') {
@@ -403,7 +406,9 @@ function initializeEventListeners() {
 	const resetBtn = document.getElementById('resetExperimentBtn');
 
 	if (computeBtn) {
-		computeBtn.addEventListener('click', computeDiffraction);
+		if (typeof window.calculateWavelength !== 'function') {
+			computeBtn.addEventListener('click', computeDiffraction);
+		}
 	}
 
 	if (resetBtn) {

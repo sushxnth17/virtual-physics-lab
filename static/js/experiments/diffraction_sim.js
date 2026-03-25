@@ -115,6 +115,7 @@ let highlightTimeout = null;  // Timeout for highlight effect
 let hoveredSpot = null;
 let hoverMouseX = 0;
 let hoverMouseY = 0;
+let diffractionGraphInstance = null;
 
 // Canvas context
 let canvas;
@@ -1086,11 +1087,11 @@ function updateSpotHoverState(mouseX, mouseY) {
 }
 
 /**
- * Handle click on diffraction spot for measurement
+ * Handle click on diffraction canvas and detect selected order.
  * @param {number} mouseX - Mouse x-coordinate (canvas-relative)
  * @param {number} mouseY - Mouse y-coordinate (canvas-relative)
  */
-function handleSpotClick(mouseX, mouseY) {
+function handleSpotCanvasClick(mouseX, mouseY) {
     // Check if click is near screen
     if (Math.abs(mouseX - screenX) > 30) return;
     
@@ -1119,15 +1120,8 @@ function handleSpotClick(mouseX, mouseY) {
     }
     
     if (closestSpot) {
-        // Set selected order and calculate xm
-        selectedOrder = closestSpot.order;
-        selectedXm = computeXm(closestSpot.order);
-        
-        // Update measurement display
-        updateMeasurementDisplay();
-        
-        // Record observation into tabular column
-        recordObservation(selectedOrder, selectedXm, screenDistance);
+        const measuredXm = computeXm(closestSpot.order);
+        handleSpotClick(closestSpot.order, measuredXm);
         
         // Trigger highlight and redraw
         clearTimeout(highlightTimeout);
@@ -1204,104 +1198,257 @@ function calculateObservationParameters(order, xmMeters, SMeters) {
 }
 
 /**
- * Record observation into the tabular column
- * @param {number} order - Diffraction order
- * @param {number} xmMeters - xm in meters
- * @param {number} SMeters - Screen distance S in meters
+ * Clear theta/sin(theta)/lambda cells for a row.
+ *
+ * @param {HTMLTableRowElement|null} row - Table row element
  */
-function recordObservation(order, xmMeters, SMeters) {
-    // Calculate all parameters
-    const params = calculateObservationParameters(order, xmMeters, SMeters);
-    
-    // Find the row for this order
-    const input = document.querySelector(`.two-xm-input[data-order="${order}"]`);
-    if (!input) return;
-    
-    const row = input.closest('tr');
+function clearComputedColumnsForRow(row) {
     if (!row) return;
-    
-    // Update 2xm input field
-    input.value = params.twoXmCm.toFixed(2);
-    
-    // Update calculated value cells
-    const xmCell = row.querySelector('.xm-value');
+
     const thetaCell = row.querySelector('.theta-value');
     const sinThetaCell = row.querySelector('.sin-theta-value');
     const lambdaCell = row.querySelector('.lambda-value');
-    
-    if (xmCell) xmCell.textContent = params.xmCm.toFixed(2);
-    if (thetaCell) thetaCell.textContent = params.thetaDegrees.toFixed(4);
-    if (sinThetaCell) sinThetaCell.textContent = params.sinTheta.toFixed(6);
-    if (lambdaCell) lambdaCell.textContent = params.lambdaNm.toFixed(2);
-    
-    // Ensure S in table stays tied to simulation value.
-    syncScreenDistanceInput(SMeters);
-    
-    // Calculate and update average wavelength
-    calculateAverageWavelength();
 
-    // Persist measured xm for stable refresh behavior.
+    if (thetaCell) thetaCell.textContent = '';
+    if (sinThetaCell) sinThetaCell.textContent = '';
+    if (lambdaCell) lambdaCell.textContent = '';
+}
+
+/**
+ * Clear aggregate wavelength outputs.
+ */
+function clearWavelengthSummary() {
+    const avgDisplay = document.getElementById('average-wavelength');
+    const finalDisplay = document.getElementById('final-wavelength');
+
+    if (avgDisplay) {
+        avgDisplay.textContent = '';
+    }
+    if (finalDisplay) {
+        finalDisplay.textContent = '';
+    }
+}
+
+/**
+ * Clear rendered diffraction graph.
+ */
+function clearDiffractionGraph() {
+    if (diffractionGraphInstance) {
+        diffractionGraphInstance.destroy();
+        diffractionGraphInstance = null;
+    }
+}
+
+/**
+ * Render sin(theta) vs order graph from calculated rows.
+ *
+ * @param {number[]} orders - Valid diffraction orders
+ * @param {number[]} sinThetaValues - Matching sin(theta) values
+ */
+function renderDiffractionGraph(orders, sinThetaValues) {
+    clearDiffractionGraph();
+
+    if (!Array.isArray(orders) || !Array.isArray(sinThetaValues) || orders.length === 0 || sinThetaValues.length === 0) {
+        return;
+    }
+
+    if (typeof Chart === 'undefined') {
+        return;
+    }
+
+    const chartCanvas = document.getElementById('diffractionChart');
+    if (!chartCanvas) {
+        return;
+    }
+
+    diffractionGraphInstance = new Chart(chartCanvas, {
+        type: 'line',
+        data: {
+            labels: orders,
+            datasets: [{
+                label: 'sinθ',
+                data: sinThetaValues,
+                borderWidth: 2,
+                fill: false,
+                tension: 0,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Order (m)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'sinθ'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Keep computed columns empty until Calculate Wavelength is clicked.
+ */
+function clearAllComputedColumns() {
+    document.querySelectorAll('.two-xm-input').forEach(input => {
+        const row = input.closest('tr');
+        clearComputedColumnsForRow(row);
+    });
+    clearWavelengthSummary();
+    clearDiffractionGraph();
+}
+
+/**
+ * Handle measured spot selection and update only 2xm/xm fields.
+ *
+ * @param {number} order - Diffraction order m
+ * @param {number} xValue - Measured xm in meters
+ */
+function handleSpotClick(order, xValue) {
+    if (!Number.isInteger(order) || order < 1 || !Number.isFinite(xValue) || xValue <= 0) return;
+
+    selectedOrder = order;
+    selectedXm = xValue;
+    updateMeasurementDisplay();
+
+    const input = document.querySelector(`.two-xm-input[data-order="${order}"]`);
+    if (!input) return;
+
+    const row = input.closest('tr');
+    const xmCell = row ? row.querySelector('.xm-value') : null;
+    const xmCm = xValue * 100;
+    const twoXmCm = xmCm * 2;
+
+    input.value = twoXmCm.toFixed(2);
+    if (xmCell) {
+        xmCell.textContent = xmCm.toFixed(2);
+    }
+
+    clearComputedColumnsForRow(row);
+    clearWavelengthSummary();
+
+    persistedXmValues[String(order)] = xValue;
+    persistExperiment();
+}
+
+/**
+ * Handle manual 2xm input and update only xm column.
+ */
+function handleInputChange() {
+    const order = parseInt(this.dataset.order, 10);
+    const twoXmCm = parseFloat(this.value);
+    const row = this.closest('tr');
+    const xmCell = row ? row.querySelector('.xm-value') : null;
+
+    if (!Number.isInteger(order) || order < 1) return;
+
+    if (!Number.isFinite(twoXmCm) || twoXmCm <= 0) {
+        if (xmCell) {
+            xmCell.textContent = '';
+        }
+        clearComputedColumnsForRow(row);
+        clearWavelengthSummary();
+        delete persistedXmValues[String(order)];
+        persistExperiment();
+        return;
+    }
+
+    const xmCm = twoXmCm / 2;
+    const xmMeters = xmCm / 100;
+
+    if (xmCell) {
+        xmCell.textContent = xmCm.toFixed(2);
+    }
+
+    clearComputedColumnsForRow(row);
+    clearWavelengthSummary();
+
     persistedXmValues[String(order)] = xmMeters;
     persistExperiment();
 }
 
 /**
- * Calculate average wavelength from all filled rows
+ * Calculate wavelength table values for valid rows only.
  */
-function calculateAverageWavelength() {
-    const lambdaCells = document.querySelectorAll('.lambda-value');
-    let sum = 0;
-    let count = 0;
-    
-    lambdaCells.forEach(cell => {
-        const value = parseFloat(cell.textContent);
-        if (!isNaN(value) && value > 0) {
-            sum += value;
-            count++;
+function calculateWavelength() {
+    const rows = document.querySelectorAll('.two-xm-input');
+    const SInput = document.getElementById('screen-distance');
+    const SCm = SInput ? parseFloat(SInput.value) : NaN;
+    const SMeters = Number.isFinite(SCm) && SCm > 0 ? SCm / 100 : screenDistance;
+
+    let wavelengthSum = 0;
+    let validCount = 0;
+    const plottedOrders = [];
+    const plottedSinTheta = [];
+
+    rows.forEach(input => {
+        const order = parseInt(input.dataset.order, 10);
+        const row = input.closest('tr');
+        if (!row || !Number.isInteger(order) || order < 1) return;
+
+        const xmCell = row.querySelector('.xm-value');
+        const thetaCell = row.querySelector('.theta-value');
+        const sinThetaCell = row.querySelector('.sin-theta-value');
+        const lambdaCell = row.querySelector('.lambda-value');
+
+        const xmCm = xmCell ? parseFloat(xmCell.textContent) : NaN;
+        if (!Number.isFinite(xmCm) || xmCm <= 0) {
+            clearComputedColumnsForRow(row);
+            return;
         }
+
+        const xmMeters = xmCm / 100;
+        const params = calculateObservationParameters(order, xmMeters, SMeters);
+
+        if (thetaCell) thetaCell.textContent = params.thetaDegrees.toFixed(4);
+        if (sinThetaCell) sinThetaCell.textContent = params.sinTheta.toFixed(6);
+        if (lambdaCell) lambdaCell.textContent = params.lambdaNm.toFixed(2);
+
+        plottedOrders.push(order);
+        plottedSinTheta.push(params.sinTheta);
+        wavelengthSum += params.lambdaNm;
+        validCount++;
     });
-    
+
+    if (validCount === 0) {
+        clearWavelengthSummary();
+        clearDiffractionGraph();
+        alert('Please enter or measure values before calculating');
+        return;
+    }
+
+    const average = wavelengthSum / validCount;
     const avgDisplay = document.getElementById('average-wavelength');
     const finalDisplay = document.getElementById('final-wavelength');
-    
-    if (count > 0) {
-        const average = sum / count;
-        if (avgDisplay) {
-            avgDisplay.textContent = `Average λ = ${average.toFixed(2)}`;
-        }
-        if (finalDisplay) {
-            finalDisplay.textContent = average.toFixed(2);
-        }
-    } else {
-        if (avgDisplay) {
-            avgDisplay.textContent = '';
-        }
-        if (finalDisplay) {
-            finalDisplay.textContent = '';
-        }
+
+    if (avgDisplay) {
+        avgDisplay.textContent = average.toFixed(2);
     }
+    if (finalDisplay) {
+        finalDisplay.textContent = average.toFixed(2);
+    }
+
+    renderDiffractionGraph(plottedOrders, plottedSinTheta);
 }
 
-/**
- * Recalculate all existing observations when screen distance changes
- * This ensures all values remain consistent with current S
- */
-function recalculateAllObservations() {
-    const twoXmInputs = document.querySelectorAll('.two-xm-input');
-    
-    twoXmInputs.forEach(input => {
-        const twoXmCm = parseFloat(input.value);
-        
-        if (!isNaN(twoXmCm) && twoXmCm > 0) {
-            const order = parseInt(input.dataset.order);
-            const xmCm = twoXmCm / 2;
-            const xmMeters = xmCm / 100;
-            
-            // Recalculate with current screen distance
-            recordObservation(order, xmMeters, screenDistance);
-        }
-    });
-}
+// Expose calculate action for shared button handlers.
+window.calculateWavelength = calculateWavelength;
+window.clearDiffractionGraph = clearDiffractionGraph;
 
 /**
  * Render measurement overlay (highlight selected spot)
@@ -1549,22 +1696,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     syncScreenDistanceInput(screenDistance);
 
-    if (hasPersistedExperiment) {
-        const orderedEntries = Object.entries(persistedXmValues)
-            .map(([key, value]) => [parseInt(key, 10), value])
-            .filter(([order, value]) => Number.isInteger(order) && order >= 1 && order <= MAX_ORDER && typeof value === 'number' && value > 0)
-            .sort((a, b) => a[0] - b[0]);
-
-        orderedEntries.forEach(([order, xmMeters]) => {
-            recordObservation(order, xmMeters, screenDistance);
-        });
-    }
+    // Strict lab flow: keep observation table empty until user measures/enters values.
+    clearAllComputedColumns();
 
     if (laserSelector) {
         laserSelector.addEventListener('change', function() {
             wavelength = getWavelengthForLaser(this.value);
             updateSimulation();
-            recalculateAllObservations();
+            clearAllComputedColumns();
             updateWavelengthNote();
             updateSelectedLaserResultText();
         });
@@ -1592,9 +1731,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Redraw simulation
             updateSimulation();
-            
-            // Recalculate existing observations with new distance
-            recalculateAllObservations();
+
+            // Keep computed values blank until manual calculate action.
+            clearAllComputedColumns();
             persistExperiment();
         });
     }
@@ -1672,7 +1811,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Only handle click if we weren't dragging the screen
         if (!hasDragged) {
             const pos = getCanvasMousePosition(event);
-            handleSpotClick(pos.x, pos.y);
+            handleSpotCanvasClick(pos.x, pos.y);
         }
     });
     
@@ -1715,9 +1854,9 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('mouseup', function(event) {
         if (isDraggingScreen) {
             isDraggingScreen = false;
-            
-            // Recalculate existing observations with new screen distance
-            recalculateAllObservations();
+
+            // Keep computed values blank until manual calculate action.
+            clearAllComputedColumns();
             
             // Reset cursor if no longer over screen
             const rect = canvas.getBoundingClientRect();
@@ -1752,20 +1891,13 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     const twoXmInputs = document.querySelectorAll('.two-xm-input');
     twoXmInputs.forEach(input => {
-        input.addEventListener('input', function() {
-            const order = parseInt(this.dataset.order);
-            const twoXmCm = parseFloat(this.value);
-            
-            if (!isNaN(twoXmCm) && twoXmCm > 0) {
-                // Calculate xm from 2xm
-                const xmCm = twoXmCm / 2;
-                const xmMeters = xmCm / 100;
-                
-                // Record observation with manually entered value
-                recordObservation(order, xmMeters, screenDistance);
-            }
-        });
+        input.addEventListener('input', handleInputChange);
     });
+
+    const computeBtn = document.getElementById('compute-btn');
+    if (computeBtn) {
+        computeBtn.addEventListener('click', calculateWavelength);
+    }
     
     // ========================================================================
     // GLOBAL API
@@ -1782,6 +1914,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (laserSelector) {
                 laserSelector.value = getLaserColor();
             }
+            clearAllComputedColumns();
             updateWavelengthNote();
             updateSelectedLaserResultText();
         }
@@ -1798,11 +1931,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // Recalculate existing observations with new parameters
-            recalculateAllObservations();
+            clearAllComputedColumns();
         }
         
         updateSimulation();
         persistExperiment();
     };
+
 });
