@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="experiment-container">
+	<div class="experiment-header">
+		<p>Experiment: 9</p>
+		<h2>DETERMINATION OF PLANCK'S CONSTANT</h2>
+	</div>
+
+	<section class="experiment-section">
+		<h3><u>AIM</u></h3>
+		<p>To determine the Planck's constant using known LEDs.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>APPARATUS</u></h3>
+		<p>Variable power supply (0 - 10V), DC voltmeter, Different LEDs</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>INTRODUCTION</u></h3>
+		<p>
+			Max Planck's quantum theory and Albert Einstein's theory of relativity have forced man to
+			change some of his most cherished philosophical beliefs. Max Planck in his paper published in
+			1900 announced his derivations based on his revolutionary idea that the energy emitted by a
+			resonator (black body radiator) is in discrete values or in quanta.
+		</p>
+		<p>The packet of energy is given by</p>
+		<p class="equation-line"><strong>E = h&nu; = hc / &lambda;</strong></p>
+
+		<p><strong>Where</strong></p>
+		<p>c is the velocity of light</p>
+		<p>&lambda; is the wavelength of the light emitted</p>
+		<p>h is Planck's constant</p>
+
+		<h4 class="section-subtitle"><strong>Light Emitting Diode (LED)</strong></h4>
+		<p>
+			LED is a two terminal solid-state lamp, which emits light with very low voltage and current.
+			If V is the forward voltage applied across the LED terminals that makes it emit light then the
+			energy given to the LED is given by
+		</p>
+		<p class="equation-line"><strong>E = eV</strong></p>
+		<p><strong>Where</strong> e is electronic charge</p>
+
+		<p>
+			LEDs are very high efficiency diodes and hence this entire electrical energy is converted into
+			light energy, then equating the above equations,
+		</p>
+		<p class="equation-line"><strong>eV = hc / &lambda;</strong></p>
+		<p>From which Planck's constant is given by</p>
+		<p class="equation-line"><strong>h = eV&lambda; / c</strong></p>
+
+		<h4 class="section-subtitle"><strong>LED knee voltage</strong></h4>
+		<p>
+			Knee voltage of diode is the potential applied across the pn junction, that is self-sufficient to
+			overcome barrier potential and a constant current flow is maintained through the diode.
+		</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>CIRCUIT DIAGRAM</u></h3>
+		<div class="diagram-placeholder-box">
+			<p>[Circuit diagram placeholder]</p>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>NATURE OF GRAPH</u></h3>
+		<div class="diagram-placeholder-box">
+			<p>[Nature of graph placeholder: V vs 1/&lambda;]</p>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>FORMULA</u></h3>
+		<p class="equation-line"><strong>h = eV&lambda; / c</strong></p>
+
+		<p><strong>Where</strong></p>
+		<p>h is Planck's constant in Js</p>
+		<p>e is charge of electron in C</p>
+		<p>V is corrected knee voltage of LED in V</p>
+		<p>c is velocity of light in m/s</p>
+		<p>&lambda; is wavelength of photon in m</p>
+
+		<p><strong>Therefore, h = (e/c) X slope of graph of V v/s 1/&lambda;</strong></p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>PROCEDURE</u></h3>
+		<ol class="procedure-list">
+			<li>The circuit is rigged as shown in the circuit diagram.</li>
+			<li>The knee voltage is measured for given color LED light.</li>
+			<li>The trial is repeated for various LEDs.</li>
+			<li>Multiply the knee voltage with crest factor to get the corrected knee voltage (V).</li>
+			<li>Plot corrected knee voltage V vs 1/&lambda; and calculate the slope.</li>
+			<li>Planck's constant is calculated using the given formula.</li>
+		</ol>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>TABULAR COLUMN</u></h3>
+		<div class="table-container">
+			<table class="observation-table">
+				<thead>
+					<tr>
+						<th>Colour</th>
+						<th>Wavelength (A<sup>0</sup>)</th>
+						<th>Knee voltage (V')</th>
+						<th>Corrected Knee voltage V<br>[crest factor correction (1.11 x V')]</th>
+						<th>1/&lambda; (m<sup>-1</sup>)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Red</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Yellow</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Green 1</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Green 2</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Blue</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>RESULT</u></h3>
+		<p>The Planck's constant is found to be .......................................... Js</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>NOTE</u></h3>
+		<p>
+			Planck's constant determined using DC power supply is less compared to that obtained by using
+			AC source. The difference ratio is 1.16 which represents the crest factor (1.11). Hence the knee
+			voltage measured through DC meters has to be multiplied by 1.11.
+		</p>
+	</section>
+</div>
+
+{% endblock %}
