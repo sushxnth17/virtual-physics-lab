@@ -799,3 +799,70 @@ div:has(> canvas#diffractionChart) {
     gap: var(--space-4);
   }
 }
+
+/* =============================
+   12) Planck LED Simulation
+================================ */
+.planck-led-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.planck-led {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid rgba(20, 20, 20, 0.2);
+  opacity: 0.2;
+  transition: opacity 0.25s ease, box-shadow 0.25s ease;
+}
+
+.planck-led-red {
+  background: #d92626;
+}
+
+.planck-led-yellow {
+  background: #dfb508;
+}
+
+.planck-led-green {
+  background: #20a94b;
+}
+
+.planck-led-blue {
+  background: #2f71e0;
+}
+
+.planck-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 220px;
+}
+
+.planck-slider-wrap input[type="range"] {
+  width: 150px;
+}
+
+.slider-value {
+  min-width: 54px;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+.record-btn[disabled] {
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+}
+
+.planck-recorded-row {
+  background: #e9f9ee !important;
+}
+
+#recordedCount {
+  font-weight: 600;
+  color: #1f4e78;
+}
