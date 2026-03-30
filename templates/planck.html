@@ -101,60 +101,154 @@
 	<section class="experiment-section">
 		<h3><u>TABULAR COLUMN</u></h3>
 		<div class="table-container">
-			<table class="observation-table">
+			<table class="observation-table" id="ledTable">
 				<thead>
 					<tr>
-						<th>Colour</th>
+						<th>LED</th>
 						<th>Wavelength (A<sup>0</sup>)</th>
+						<th>Voltage Control (0 - 3V)</th>
+						<th>Record</th>
 						<th>Knee voltage (V')</th>
-						<th>Corrected Knee voltage V<br>[crest factor correction (1.11 x V')]</th>
+						<th>Corrected Voltage (1.11V')</th>
 						<th>1/&lambda; (m<sup>-1</sup>)</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td>Red</td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
+					<tr data-led-row data-color="red" data-wavelength="6500" data-threshold="1.8">
+						<td>
+							<div class="planck-led-cell">
+								<span class="planck-led planck-led-red" data-led-indicator></span>
+								<span>Red</span>
+							</div>
+						</td>
+						<td>6500</td>
+						<td>
+							<div class="planck-slider-wrap">
+								<input type="range" min="0" max="3" step="0.01" value="0" class="voltage-slider" data-voltage-slider>
+								<span class="slider-value" data-voltage-display>0.00 V</span>
+							</div>
+						</td>
+						<td><button type="button" class="btn record-btn" data-record-btn>Record</button></td>
+						<td data-knee-voltage>-</td>
+						<td data-corrected-voltage>-</td>
+						<td data-inverse-lambda>-</td>
 					</tr>
-					<tr>
-						<td>Yellow</td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
+					<tr data-led-row data-color="yellow" data-wavelength="5900" data-threshold="2.0">
+						<td>
+							<div class="planck-led-cell">
+								<span class="planck-led planck-led-yellow" data-led-indicator></span>
+								<span>Yellow</span>
+							</div>
+						</td>
+						<td>5900</td>
+						<td>
+							<div class="planck-slider-wrap">
+								<input type="range" min="0" max="3" step="0.01" value="0" class="voltage-slider" data-voltage-slider>
+								<span class="slider-value" data-voltage-display>0.00 V</span>
+							</div>
+						</td>
+						<td><button type="button" class="btn record-btn" data-record-btn>Record</button></td>
+						<td data-knee-voltage>-</td>
+						<td data-corrected-voltage>-</td>
+						<td data-inverse-lambda>-</td>
 					</tr>
-					<tr>
-						<td>Green 1</td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
+					<tr data-led-row data-color="green" data-wavelength="5300" data-threshold="2.2">
+						<td>
+							<div class="planck-led-cell">
+								<span class="planck-led planck-led-green" data-led-indicator></span>
+								<span>Green 1</span>
+							</div>
+						</td>
+						<td>5300</td>
+						<td>
+							<div class="planck-slider-wrap">
+								<input type="range" min="0" max="3" step="0.01" value="0" class="voltage-slider" data-voltage-slider>
+								<span class="slider-value" data-voltage-display>0.00 V</span>
+							</div>
+						</td>
+						<td><button type="button" class="btn record-btn" data-record-btn>Record</button></td>
+						<td data-knee-voltage>-</td>
+						<td data-corrected-voltage>-</td>
+						<td data-inverse-lambda>-</td>
 					</tr>
-					<tr>
-						<td>Green 2</td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
+					<tr data-led-row data-color="green" data-wavelength="5100" data-threshold="2.2">
+						<td>
+							<div class="planck-led-cell">
+								<span class="planck-led planck-led-green" data-led-indicator></span>
+								<span>Green 2</span>
+							</div>
+						</td>
+						<td>5100</td>
+						<td>
+							<div class="planck-slider-wrap">
+								<input type="range" min="0" max="3" step="0.01" value="0" class="voltage-slider" data-voltage-slider>
+								<span class="slider-value" data-voltage-display>0.00 V</span>
+							</div>
+						</td>
+						<td><button type="button" class="btn record-btn" data-record-btn>Record</button></td>
+						<td data-knee-voltage>-</td>
+						<td data-corrected-voltage>-</td>
+						<td data-inverse-lambda>-</td>
 					</tr>
-					<tr>
-						<td>Blue</td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
+					<tr data-led-row data-color="blue" data-wavelength="4700" data-threshold="2.5">
+						<td>
+							<div class="planck-led-cell">
+								<span class="planck-led planck-led-blue" data-led-indicator></span>
+								<span>Blue</span>
+							</div>
+						</td>
+						<td>4700</td>
+						<td>
+							<div class="planck-slider-wrap">
+								<input type="range" min="0" max="3" step="0.01" value="0" class="voltage-slider" data-voltage-slider>
+								<span class="slider-value" data-voltage-display>0.00 V</span>
+							</div>
+						</td>
+						<td><button type="button" class="btn record-btn" data-record-btn>Record</button></td>
+						<td data-knee-voltage>-</td>
+						<td data-corrected-voltage>-</td>
+						<td data-inverse-lambda>-</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
+		<div class="u-mt-4 u-text-center">
+			<button type="button" id="calculateBtn" class="btn btn-primary">Calculate</button>
+			<button type="button" id="resetBtn" class="btn btn-danger">Reset</button>
+		</div>
+		<p id="recordedCount" class="u-mt-2">Recorded readings: 0</p>
+		<p id="planckError" class="u-mt-2" style="display:none; color:#b00020;"></p>
 	</section>
 
 	<section class="experiment-section">
 		<h3><u>RESULT</u></h3>
-		<p>The Planck's constant is found to be .......................................... Js</p>
+		<p>The Planck's constant is found to be <strong><span id="planckConstant">-</span></strong> Js</p>
+		<p>Slope of V vs 1/&lambda; graph: <strong><span id="slopeValue">-</span></strong></p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>PROCESSED DATA</u></h3>
+		<div class="table-container">
+			<table class="observation-table">
+				<thead>
+					<tr>
+						<th>SL No.</th>
+						<th>Wavelength (A<sup>0</sup>)</th>
+						<th>Knee voltage (V')</th>
+						<th>Corrected Knee voltage V</th>
+						<th>1/&lambda; (m<sup>-1</sup>)</th>
+					</tr>
+				</thead>
+				<tbody id="processedDataBody"></tbody>
+			</table>
+		</div>
+	</section>
+
+	<section class="graphs-section">
+		<h3><u>GRAPH</u></h3>
+		<div class="chart-frame">
+			<canvas id="planckChart"></canvas>
+		</div>
 	</section>
 
 	<section class="experiment-section">
@@ -167,4 +261,8 @@
 	</section>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/experiments/planck_sim.js') }}"></script>
 {% endblock %}
