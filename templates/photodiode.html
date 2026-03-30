@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="experiment-container">
+
+	<!-- EXPERIMENT TITLE -->
+	<div class="experiment-header">
+		<p>Experiment: 6</p>
+		<h2>PHOTODIODE CHARACTERISTICS</h2>
+	</div>
+
+	<!-- AIM SECTION -->
+	<section class="experiment-section">
+		<h3><u>AIM</u></h3>
+		<p>To obtain reverse bias characteristics of the given photodiode and hence determine its photo responsivity.</p>
+	</section>
+
+	<!-- APPARATUS SECTION -->
+	<section class="experiment-section">
+		<h3><u>APPARATUS</u></h3>
+		<p>Photodiode, Light Emitting Diode (LED), DC regulated power supply, Ammeter, Voltmeter and connecting wires.</p>
+	</section>
+
+	<!-- INTRODUCTION SECTION -->
+	<section class="experiment-section">
+		<h3><u>INTRODUCTION</u></h3>
+		<p>A photodiode is a semiconductor diode (p-n junction) which converts light energy into electrical current. When light of sufficient energy is incident on the diode, it generates an electron-hole pair. These carriers are separated by the electric field in the depletion region, producing photocurrent.</p>
+
+		<p>When the diode is reverse biased, the depletion region widens, increasing the efficiency of light absorption and charge separation.</p>
+	</section>
+
+	<!-- FORMULAE SECTION -->
+	<section class="experiment-section">
+		<h3><u>FORMULA</u></h3>
+		<div class="formulae-list">
+			<p><strong>1. Resistance:</strong> R = V / I = 1 / slope</p>
+			<p><strong>2. Photo Responsivity:</strong> Responsivity = Photocurrent / Light Intensity</p>
+		</div>
+	</section>
+
+	<!-- CIRCUIT DIAGRAM SECTION -->
+	<section class="experiment-section">
+		<h3><u>CIRCUIT DIAGRAM</u></h3>
+		<div class="ray-diagram-container lab-figure-box">
+			<img src="/static/images/photodiode.png" alt="Photodiode Circuit Diagram" class="lab-figure-image lab-figure-image-md">
+			<p class="lab-caption">
+				<strong>Figure:</strong> Circuit diagram for photodiode characteristics experiment.
+			</p>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>NATURE OF GRAPH</u></h3>
+		<ul>
+			<li>Reverse bias characteristic of photodiode (I vs V)</li>
+			<li>Variation of photocurrent with light intensity</li>
+		</ul>
+	</section>
+
+	<!-- PROCEDURE SECTION -->
+	<section class="experiment-section">
+		<h3><u>PROCEDURE</u></h3>
+		<ol class="procedure-list">
+			<li>Connect the circuit as shown in the diagram.</li>
+			<li>Keep the light source at a fixed distance from the photodiode.</li>
+			<li>Vary the reverse bias voltage from 0 to 5V.</li>
+			<li>Note the current for each voltage.</li>
+			<li>Plot graph of current vs voltage.</li>
+			<li>Fix voltage and vary light intensity.</li>
+			<li>Note current for different intensities.</li>
+			<li>Plot graph of current vs intensity.</li>
+			<li>Determine slope to find responsivity.</li>
+		</ol>
+	</section>
+
+	<!-- TABULAR COLUMN SECTION -->
+	<section class="experiment-section">
+		<h3><u>TABULAR COLUMN</u></h3>
+
+		<h3>Reverse Bias Characteristics</h3>
+		<p>For fixed distance (D) = ______ cm</p>
+
+		<table class="observation-table diffraction-table">
+		<tr>
+			<th>Applied Voltage (V)</th>
+			<th>Reverse Current (&mu;A)</th>
+		</tr>
+
+		<tr><td>0</td><td></td></tr>
+		<tr><td>0.1</td><td></td></tr>
+		<tr><td>0.2</td><td></td></tr>
+		<tr><td>0.3</td><td></td></tr>
+		<tr><td>0.4</td><td></td></tr>
+		<tr><td>0.5</td><td></td></tr>
+		<tr><td>1.0</td><td></td></tr>
+		<tr><td>1.5</td><td></td></tr>
+		<tr><td>2.0</td><td></td></tr>
+		<tr><td>2.5</td><td></td></tr>
+		<tr><td>3.0</td><td></td></tr>
+		<tr><td>3.5</td><td></td></tr>
+		<tr><td>4.0</td><td></td></tr>
+		<tr><td>4.5</td><td></td></tr>
+		<tr><td>5.0</td><td></td></tr>
+
+		</table>
+
+		<h3>Photo Responsivity</h3>
+		<p>For fixed voltage (V) = ______ V</p>
+
+		<table class="observation-table diffraction-table">
+		<tr>
+			<th>Distance (cm)</th>
+			<th>Reverse Current (&mu;A)</th>
+			<th>Intensity of light (Lux)</th>
+		</tr>
+
+		<tr><td>1.0</td><td></td><td></td></tr>
+		<tr><td>1.5</td><td></td><td></td></tr>
+		<tr><td>2.0</td><td></td><td></td></tr>
+		<tr><td>2.5</td><td></td><td></td></tr>
+		<tr><td>3.0</td><td></td><td></td></tr>
+		<tr><td>3.5</td><td></td><td></td></tr>
+		<tr><td>4.0</td><td></td><td></td></tr>
+
+		</table>
+	</section>
+
+	<!-- RESULT SECTION -->
+	<section class="experiment-section">
+		<h3><u>RESULT</u></h3>
+		<p>Resistance of photodiode in reverse bias = <span class="result-blank"></span> &Omega;</p>
+		<p>Photo responsivity of photodiode = <span class="result-blank"></span> A/Lux</p>
+	</section>
+
+</div>
+{% endblock %}
