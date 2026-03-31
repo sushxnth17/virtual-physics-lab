@@ -86,6 +86,36 @@ Students can understand:
 
 ---
 
+### 3. Determination of Planck's Constant
+
+This experiment determines Planck’s constant using LEDs of different wavelengths by analyzing the relationship between knee voltage and frequency of light.
+
+### Features
+
+- Adjustable voltage input using interactive sliders for each LED
+- Real-time LED glow based on applied voltage
+- Visual detection of knee voltage (LED starts glowing brightly)
+- Observation table for recording knee voltage values
+- Automatic calculation of corrected voltage
+- Automatic graph generation (Voltage vs 1/λ)
+- Best-fit line calculation for accurate slope determination
+- Automatic calculation of:
+  - Planck’s Constant
+  - Slope of V vs 1/λ graph
+- Supports multiple LEDs (Red, Yellow, Green, Blue)
+
+### Learning Outcomes
+
+Students can observe:
+
+- Relationship between energy and frequency of light
+- Concept of threshold (knee) voltage in LEDs
+- Linear relationship between voltage and inverse wavelength
+- Experimental determination of Planck’s constant
+- Data analysis using graphs and best-fit lines
+
+---
+
 ## Technologies Used
 
 - Python (Flask) – Backend experiment computation
