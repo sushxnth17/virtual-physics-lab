@@ -73,6 +73,39 @@
 		</ol>
 	</section>
 
+	<!-- SIMULATION CONTROL PANEL SECTION -->
+	<section class="experiment-section">
+		<h3><u>SIMULATION CONTROL PANEL</u></h3>
+
+		<div class="control-strip">
+			<label for="voltage"><strong>Voltage (V): </strong></label>
+			<input type="range" id="voltage" min="0" max="5" step="0.1" value="1">
+			<span id="voltageValue">1</span> V
+		</div>
+
+		<div class="control-strip">
+			<label for="lightIntensity"><strong>Light Intensity (Lux): </strong></label>
+			<input type="range" id="lightIntensity" min="100" max="1000" step="10" value="500">
+			<span id="lightIntensityValue">500</span> Lux
+		</div>
+
+		<div class="control-strip laser-control">
+			<label for="distance"><strong>Distance (cm): </strong></label>
+			<input type="number" id="distance" min="0" step="0.1" value="2" class="input-compact">
+
+			<label for="mode"><strong>Mode: </strong></label>
+			<select id="mode" aria-label="Photodiode mode">
+				<option value="reverse" selected>Reverse Bias</option>
+				<option value="responsivity">Photo Responsivity</option>
+			</select>
+		</div>
+
+		<div class="action-row">
+			<button type="button" id="runSimulation" class="btn btn-primary">Run Simulation</button>
+			<button type="button" id="resetSimulation" class="btn btn-danger">Reset</button>
+		</div>
+	</section>
+
 	<!-- TABULAR COLUMN SECTION -->
 	<section class="experiment-section">
 		<h3><u>TABULAR COLUMN</u></h3>
@@ -86,21 +119,21 @@
 			<th>Reverse Current (&mu;A)</th>
 		</tr>
 
-		<tr><td>0</td><td></td></tr>
-		<tr><td>0.1</td><td></td></tr>
-		<tr><td>0.2</td><td></td></tr>
-		<tr><td>0.3</td><td></td></tr>
-		<tr><td>0.4</td><td></td></tr>
-		<tr><td>0.5</td><td></td></tr>
-		<tr><td>1.0</td><td></td></tr>
-		<tr><td>1.5</td><td></td></tr>
-		<tr><td>2.0</td><td></td></tr>
-		<tr><td>2.5</td><td></td></tr>
-		<tr><td>3.0</td><td></td></tr>
-		<tr><td>3.5</td><td></td></tr>
-		<tr><td>4.0</td><td></td></tr>
-		<tr><td>4.5</td><td></td></tr>
-		<tr><td>5.0</td><td></td></tr>
+		<tr><td>0</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>0.1</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>0.2</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>0.3</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>0.4</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>0.5</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>1.0</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>1.5</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>2.0</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>2.5</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>3.0</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>3.5</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>4.0</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>4.5</td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>5.0</td><td><input type="number" class="current-input"></td></tr>
 
 		</table>
 
@@ -114,23 +147,93 @@
 			<th>Intensity of light (Lux)</th>
 		</tr>
 
-		<tr><td>1.0</td><td></td><td></td></tr>
-		<tr><td>1.5</td><td></td><td></td></tr>
-		<tr><td>2.0</td><td></td><td></td></tr>
-		<tr><td>2.5</td><td></td><td></td></tr>
-		<tr><td>3.0</td><td></td><td></td></tr>
-		<tr><td>3.5</td><td></td><td></td></tr>
-		<tr><td>4.0</td><td></td><td></td></tr>
+		<tr><td>1.0</td><td><input type="number" class="current-input"></td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>1.5</td><td><input type="number" class="current-input"></td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>2.0</td><td><input type="number" class="current-input"></td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>2.5</td><td><input type="number" class="current-input"></td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>3.0</td><td><input type="number" class="current-input"></td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>3.5</td><td><input type="number" class="current-input"></td><td><input type="number" class="current-input"></td></tr>
+		<tr><td>4.0</td><td><input type="number" class="current-input"></td><td><input type="number" class="current-input"></td></tr>
 
 		</table>
+
+		<div class="action-row">
+			<button type="button" id="calculatePhotodiode" class="btn btn-primary">Calculate</button>
+		</div>
+	</section>
+
+	<!-- GRAPHS SECTION -->
+	<section class="experiment-section" style="margin-top: 40px;">
+		<h3><u>GRAPHS</u></h3>
+
+		<div class="action-row">
+			<button type="button" id="plotGraphs" class="btn btn-primary">Plot Graphs</button>
+		</div>
+
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 40px 0;">
+			<div style="background-color: #ffffff; padding: 15px; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+				<canvas id="voltageGraphCanvas" width="500" height="400" style="width: 100% !important; height: auto !important;"></canvas>
+				<div style="margin-top: 15px; padding: 12px; background-color: #f0f7ff; border: 2px solid #4a90e2; border-radius: 4px;">
+					<p style="margin: 3px 0; font-size: 12px; color: #333;"><strong>Slope (m):</strong> <span id="slopeVoltageNumeric" style="font-family: 'Courier New', monospace; font-weight: bold; color: #4a90e2;">-</span> µA/V</p>
+					<p style="margin: 3px 0; font-size: 11px; color: #555;"><strong>Equation:</strong> I = <span id="equationVoltage" style="font-family: 'Courier New', monospace; font-weight: bold; color: #333;">-</span></p>
+				</div>
+			</div>
+			<div style="background-color: #ffffff; padding: 15px; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+				<canvas id="intensityGraphCanvas" width="500" height="400" style="width: 100% !important; height: auto !important;"></canvas>
+				<div style="margin-top: 15px; padding: 12px; background-color: #f0fff0; border: 2px solid #4bc04b; border-radius: 4px;">
+					<p style="margin: 3px 0; font-size: 12px; color: #333;"><strong>Slope (m):</strong> <span id="slopeIntensityNumeric" style="font-family: 'Courier New', monospace; font-weight: bold; color: #4bc04b;">-</span> µA/Lux</p>
+					<p style="margin: 3px 0; font-size: 11px; color: #555;"><strong>Equation:</strong> I = <span id="equationIntensity" style="font-family: 'Courier New', monospace; font-weight: bold; color: #333;">-</span></p>
+				</div>
+			</div>
+		</div>
 	</section>
 
 	<!-- RESULT SECTION -->
 	<section class="experiment-section">
 		<h3><u>RESULT</u></h3>
-		<p>Resistance of photodiode in reverse bias = <span class="result-blank"></span> &Omega;</p>
-		<p>Photo responsivity of photodiode = <span class="result-blank"></span> A/Lux</p>
+
+		<div style="margin-bottom: 20px; padding: 15px; background-color: #fffbf0; border-left: 4px solid #ff9800; border-radius: 5px;">
+			<h4 style="margin-top: 0; color: #e65100;">Direct Calculation (from tabular data)</h4>
+			<p style="margin: 8px 0;">Resistance = V / I = <span id="resistanceDirectOutput" style="font-family: monospace; font-weight: bold;">-</span> &Omega;</p>
+			<p style="margin: 8px 0;">Photo Responsivity = I / Intensity = <span id="responsivityDirectOutput" style="font-family: monospace; font-weight: bold;">-</span> A/Lux</p>
+		</div>
+
+		<div style="margin-bottom: 20px; padding: 15px; background-color: #f0f8ff; border-left: 4px solid #2196f3; border-radius: 5px;">
+			<h4 style="margin-top: 0; color: #0d47a1;">Graph-Based Result (from linear regression)</h4>
+			<p style="margin: 8px 0;">Resistance = 1 / slope (I vs V) = <span id="resistanceGraphOutput" style="font-family: monospace; font-weight: bold;">-</span> &Omega;</p>
+			<p style="margin: 8px 0;">Photo Responsivity = slope (I vs Lux) = <span id="responsivityGraphOutput" style="font-family: monospace; font-weight: bold;">-</span> A/Lux</p>
+		</div>
+
+		<div style="margin-bottom: 20px; padding: 15px; background-color: #f5f5f5; border-left: 4px solid #9c27b0; border-radius: 5px;">
+			<h4 style="margin-top: 0; color: #6a1b9a;">Error Analysis</h4>
+			<p style="margin: 8px 0;">% Error (Resistance) = <span id="percentErrorResistance" style="font-family: monospace; font-weight: bold;">-</span> %</p>
+			<p style="margin: 8px 0;">% Error (Responsivity) = <span id="percentErrorResponsivity" style="font-family: monospace; font-weight: bold;">-</span> %</p>
+		</div>
+	</section>
+
+	<!-- OBSERVATION & CONCLUSION SECTION -->
+	<section class="experiment-section" style="margin-top: 30px;">
+		<h3><u>OBSERVATION</u></h3>
+		<ul style="line-height: 1.8;">
+			<li>The photodiode exhibits a linear relationship between applied voltage and reverse current, confirming semiconductor diode characteristics.</li>
+			<li>As voltage increases in reverse bias, the depletion region widens, allowing more carriers to be collected.</li>
+			<li>Photo responsivity varies linearly with light intensity, demonstrating the photoelectric effect in the semiconductor junction.</li>
+			<li>The slope of the I vs V graph represents the dynamic resistance (dI/dV), which determines device responsivity.</li>
+			<li>The inverse of the I vs V slope equals the device resistance at the operating point.</li>
+		</ul>
+
+		<h3><u>CONCLUSION</u></h3>
+		<p style="line-height: 1.6;">
+			The photodiode follows expected theoretical behavior. The experimental results show
+			<strong id="observationText">-</strong>. Both direct calculation and graph-based methods confirm the device characteristics.
+			The error analysis indicates <strong id="errorInterpretation">-</strong> agreement between methods.
+		</p>
 	</section>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="{{ url_for('static', filename='js/photodiode.js') }}"></script>
 {% endblock %}
