@@ -116,6 +116,37 @@ Students can observe:
 
 ---
 
+### 4. Photodiode Characteristics
+
+This experiment studies the reverse bias characteristics of a photodiode and determines its photo responsivity by analyzing the relationship between photocurrent, voltage, and light intensity.
+
+### Features
+
+- Adjustable reverse bias voltage using an interactive slider
+- Real-time photocurrent calculation based on applied voltage
+- Simulation of light intensity variation using distance control
+- Observation table for recording I vs V data
+- Automatic graph generation (Reverse Current vs Voltage)
+- Automatic graph generation (Photocurrent vs Light Intensity)
+- Linear region selection for accurate slope calculation
+- Automatic calculation of:
+  - Reverse Resistance of Photodiode
+  - Photo Responsivity
+- Supports both voltage variation and light intensity analysis phases
+
+### Learning Outcomes
+
+Students can observe:
+
+- Reverse bias behavior of a photodiode
+- Relationship between photocurrent and applied voltage
+- Linear relationship between photocurrent and light intensity
+- Concept of photo responsivity
+- Effect of distance on light intensity (inverse square law)
+- Graph-based analysis and slope interpretation
+
+---
+
 ## Technologies Used
 
 - Python (Flask) – Backend experiment computation
@@ -131,9 +162,7 @@ Students can observe:
 The following experiments are planned for future development:
 
 - Determination of Fermi Energy
-- Transistor Characteristics
-- Determination of Planck's Constant 
-- Photodiode Characteristics
+- Transistor Characteristics 
 - Black Box
 - Numerical Aperture of an Optical Fibre
 - Measurement of Dielectric Constant
