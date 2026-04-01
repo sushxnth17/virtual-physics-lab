@@ -3,8 +3,133 @@
  * Graph-driven lab calculations with slope-based results.
  */
 
-let voltageGraph = null;
-let intensityGraph = null;
+let ivChart = null;
+let luxChart = null;
+
+function destroyChartSafely(chartInstance, canvasId) {
+	if (chartInstance) {
+		chartInstance.destroy();
+	}
+
+	const canvas = document.getElementById(canvasId);
+	if (canvas) {
+		const ctx = canvas.getContext('2d');
+		if (ctx) {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+		}
+	}
+}
+
+function setGraphMessage(canvasId, messageId, messageText, isWarning = false) {
+	const canvas = document.getElementById(canvasId);
+	if (!canvas || !canvas.parentElement) {
+		return;
+	}
+
+	let messageNode = document.getElementById(messageId);
+	if (!messageNode) {
+		messageNode = document.createElement('p');
+		messageNode.id = messageId;
+		messageNode.style.margin = '8px 0 0';
+		messageNode.style.fontSize = '12px';
+		messageNode.style.fontWeight = '600';
+		canvas.parentElement.appendChild(messageNode);
+	}
+
+	if (!messageText) {
+		messageNode.textContent = '';
+		messageNode.style.display = 'none';
+		return;
+	}
+
+	messageNode.style.display = 'block';
+	messageNode.style.color = isWarning ? '#b34700' : '#1d5f2c';
+	messageNode.textContent = messageText;
+}
+
+function hideSlopeInfoOverlay(panelId) {
+	const panel = document.getElementById(panelId);
+	if (panel) {
+		panel.style.display = 'none';
+	}
+}
+
+function ensureSlopeInfoOverlay(canvasId, panelId) {
+	const canvas = document.getElementById(canvasId);
+	if (!canvas || !canvas.parentElement) {
+		return null;
+	}
+
+	const host = canvas.parentElement;
+	host.style.position = 'relative';
+	host.style.overflow = 'visible';
+
+	let panel = document.getElementById(panelId);
+	if (!panel) {
+		panel = document.createElement('div');
+		panel.id = panelId;
+		panel.style.position = 'absolute';
+		panel.style.width = '220px';
+		panel.style.padding = '10px 12px';
+		panel.style.background = 'rgba(255, 255, 255, 0.95)';
+		panel.style.border = '1px solid rgba(120, 130, 145, 0.55)';
+		panel.style.borderRadius = '8px';
+		panel.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.14)';
+		panel.style.fontSize = '12px';
+		panel.style.lineHeight = '1.45';
+		panel.style.color = '#203040';
+		panel.style.zIndex = '4';
+		host.appendChild(panel);
+	}
+
+	return { host, canvas, panel };
+}
+
+function renderSlopeInfoOverlay({
+	canvasId,
+	panelId,
+	chart,
+	triangle,
+	deltaXLabel,
+	deltaXText,
+	deltaYLabel,
+	deltaYText,
+	slopeText,
+	slopeUnit
+}) {
+	if (!chart || !triangle || !triangle.A || !triangle.B || !triangle.C) {
+		hideSlopeInfoOverlay(panelId);
+		return;
+	}
+
+	const overlay = ensureSlopeInfoOverlay(canvasId, panelId);
+	if (!overlay) {
+		return;
+	}
+
+	const { canvas, panel } = overlay;
+	const xScale = chart.scales.x;
+	const yScale = chart.scales.y;
+	if (!xScale || !yScale) {
+		hideSlopeInfoOverlay(panelId);
+		return;
+	}
+
+	panel.innerHTML = `
+		<div style="font-weight: 700; margin-bottom: 6px; color: #1b3550;">Slope Calculation</div>
+		<div>${deltaYLabel} = ${deltaYText}</div>
+		<div>${deltaXLabel} = ${deltaXText}</div>
+		<div style="margin-top: 6px; font-weight: 700;">slope = ${deltaYLabel} / ${deltaXLabel} = <span style="color:#0b4b8a;">${slopeText} ${slopeUnit}</span></div>
+	`;
+
+	const panelWidth = 220;
+	const panelLeft = canvas.offsetLeft + chart.chartArea.left + 12;
+	const panelTop = canvas.offsetTop + chart.chartArea.top + 12;
+
+	panel.style.left = `${Math.max(10, panelLeft)}px`;
+	panel.style.top = `${Math.max(10, panelTop)}px`;
+	panel.style.display = 'block';
+}
 
 /**
  * Parse a numeric value from string.
@@ -131,20 +256,32 @@ function applyDirectResistanceNoise(baseResistance) {
  */
 function getIvManualPointPair(reverseRows) {
 	const linearRows = [...getLinearRegionReverseRows(reverseRows)]
+		.filter((row) => row.voltage >= 0.3 && row.voltage <= 0.4)
 		.sort((a, b) => a.voltage - b.voltage);
 
 	if (linearRows.length < 2) {
 		return null;
 	}
 
-	const p1 = linearRows.find((row) => Number(row.voltage.toFixed(1)) === 0.3) || null;
-	const p2 = linearRows.find((row) => Number(row.voltage.toFixed(1)) === 0.4) || null;
+	const p1 = linearRows[0] || null;
+	const p2 = linearRows[linearRows.length - 1] || null;
 
-	if (!p1 || !p2) {
+	if (!p1 || !p2 || p2.voltage <= p1.voltage) {
 		return null;
 	}
 
 	return { p1, p2 };
+}
+
+function calculateLuxTwoPointSlopeFromDisplay(displayData) {
+	const luxTriangle = getLuxManualTriangle(displayData);
+	if (!luxTriangle) {
+		return { slope: 0, intercept: 0, luxTriangle: null };
+	}
+
+	const slope = luxTriangle.slopeMicroampPerLux * 1e-6;
+	const intercept = (luxTriangle.A.y * 1e-6) - slope * luxTriangle.A.x;
+	return { slope, intercept, luxTriangle };
 }
 
 /**
@@ -385,6 +522,40 @@ const manualTrianglePlugin = {
 		const a = { x: xScale.getPixelForValue(cfg.A.x), y: yScale.getPixelForValue(cfg.A.y) };
 		const b = { x: xScale.getPixelForValue(cfg.B.x), y: yScale.getPixelForValue(cfg.B.y) };
 		const c = { x: xScale.getPixelForValue(cfg.C.x), y: yScale.getPixelForValue(cfg.C.y) };
+		const chartArea = chart.chartArea;
+
+		const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+		const getPaddedPoint = (point, dx, dy) => ({
+			x: clamp(point.x + dx, chartArea.left + 8, chartArea.right - 8),
+			y: clamp(point.y + dy, chartArea.top + 12, chartArea.bottom - 10)
+		});
+		const drawTextBox = (text, x, y, align, fillStyle, font) => {
+			ctx.save();
+			ctx.font = font || 'bold 12px Arial';
+			ctx.textAlign = align || 'left';
+			ctx.textBaseline = 'middle';
+
+			const metrics = ctx.measureText(text);
+			const boxW = metrics.width + 12;
+			const boxH = 18;
+			let boxX = x;
+			if (ctx.textAlign === 'center') {
+				boxX = x - boxW / 2;
+			} else if (ctx.textAlign === 'right') {
+				boxX = x - boxW;
+			}
+			const boxY = y - boxH / 2;
+
+			ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
+			ctx.fillRect(boxX, boxY, boxW, boxH);
+			ctx.strokeStyle = 'rgba(120, 120, 120, 0.45)';
+			ctx.lineWidth = 1;
+			ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+			ctx.fillStyle = fillStyle || 'rgba(35, 35, 35, 0.95)';
+			ctx.fillText(text, x, y);
+			ctx.restore();
+		};
 
 		ctx.save();
 		ctx.strokeStyle = 'rgba(70, 70, 70, 0.9)';
@@ -408,11 +579,11 @@ const manualTrianglePlugin = {
 		ctx.stroke();
 		ctx.setLineDash([]);
 
-		// Larger marker circles for A, B, C for manual-style readability.
+		// Mark only A and B as selected slope points.
 		ctx.fillStyle = '#ffffff';
 		ctx.strokeStyle = 'rgba(25, 25, 25, 0.95)';
 		ctx.lineWidth = 1.4;
-		[a, b, c].forEach((p) => {
+		[a, b].forEach((p) => {
 			ctx.beginPath();
 			ctx.arc(p.x, p.y, pointRadius, 0, Math.PI * 2);
 			ctx.fill();
@@ -422,14 +593,12 @@ const manualTrianglePlugin = {
 		ctx.fillStyle = 'rgba(20, 20, 20, 0.95)';
 		ctx.font = 'bold 13px Arial';
 		ctx.textAlign = 'left';
-		ctx.fillText(labelA, a.x - 16, a.y + 16);
-		ctx.fillText(labelB, b.x + 10, b.y - 10);
-		ctx.fillText(labelC, c.x - 4, c.y + 20);
+		const aLabel = getPaddedPoint(a, -18, 18);
+		const bLabel = getPaddedPoint(b, 12, -12);
+		drawTextBox(labelA, aLabel.x, aLabel.y, 'left', 'rgba(20, 20, 20, 0.95)', 'bold 13px Arial');
+		drawTextBox(labelB, bLabel.x, bLabel.y, 'left', 'rgba(20, 20, 20, 0.95)', 'bold 13px Arial');
 
-		ctx.fillStyle = 'rgba(35, 35, 35, 0.95)';
-		ctx.font = 'bold 12px Arial';
-		ctx.fillText(`${deltaXLabel} = ${cfg.deltaXText}`, (a.x + c.x) / 2, c.y + 22);
-		ctx.fillText(`${deltaYLabel} = ${cfg.deltaYText}`, c.x + 42, (c.y + b.y) / 2);
+		// Keep graph clean: delta labels are shown in the external slope box only.
 		ctx.restore();
 	}
 };
@@ -607,25 +776,23 @@ function getIntensityGraphData(responsivityRows) {
  */
 function plotVoltageGraph(data, slope, intercept, fitDomainData) {
 	if (!data || data.length < 2) {
-		alert('Insufficient data points for voltage graph (need at least 2).');
-		return;
+		return false;
 	}
 
 	const canvas = document.getElementById('voltageGraphCanvas');
 	if (!canvas) {
 		console.error("voltageGraphCanvas not found in DOM");
-		return;
+		return false;
 	}
 	const ctx = canvas.getContext('2d');
 	if (!ctx) {
 		console.error("Could not get 2D context from canvas");
-		return;
+		return false;
 	}
 
-	// Destroy existing chart if present
-	if (voltageGraph) {
-		voltageGraph.destroy();
-	}
+	// Always destroy and clear before rendering to prevent duplicate overlays.
+	destroyChartSafely(ivChart, 'voltageGraphCanvas');
+	ivChart = null;
 
 	// Sort data by x for better display
 	const sortedData = [...data].sort((a, b) => a.x - b.x);
@@ -639,6 +806,7 @@ function plotVoltageGraph(data, slope, intercept, fitDomainData) {
 		? { x: pointB.x, y: pointA.y }
 		: null;
 	const slopeLinePoints = pointA && pointB ? [pointA, pointB] : [];
+	const selectedIvPoints = pointA && pointB ? [pointA, pointB] : [];
 	const deltaVText = pointA && pointB
 		? `${(pointB.x - pointA.x).toFixed(2)} V`
 		: '';
@@ -646,8 +814,11 @@ function plotVoltageGraph(data, slope, intercept, fitDomainData) {
 		? `${(pointB.y - pointA.y).toFixed(2)} µA`
 		: '';
 	const slopeMicroampPerVolt = Number.isFinite(slope) ? slope * 1e6 : NaN;
+	const slopeText = Number.isFinite(slopeMicroampPerVolt)
+		? `slope = ΔI / ΔV = ${slopeMicroampPerVolt.toFixed(2)} µA/V`
+		: '';
 
-	voltageGraph = new Chart(ctx, {
+	ivChart = new Chart(ctx, {
 		type: 'line',
 		plugins: [manualTrianglePlugin],
 		data: {
@@ -684,6 +855,22 @@ function plotVoltageGraph(data, slope, intercept, fitDomainData) {
 					showLine: true
 				},
 				{
+					label: 'A-B Selected Points',
+					data: selectedIvPoints,
+					borderColor: 'transparent',
+					backgroundColor: 'rgb(255, 235, 90)',
+					fill: false,
+					tension: 0,
+					borderWidth: 0,
+					pointRadius: 8,
+					pointHoverRadius: 8,
+					pointBackgroundColor: 'rgb(255, 235, 90)',
+					pointBorderColor: 'rgba(20, 20, 20, 0.95)',
+					pointBorderWidth: 2,
+					showLine: false,
+					order: 98
+				},
+				{
 					label: '─ Slope Line (A-B)',
 					data: slopeLinePoints,
 					borderColor: 'rgb(220, 30, 30)',
@@ -709,6 +896,7 @@ function plotVoltageGraph(data, slope, intercept, fitDomainData) {
 					C: pointC,
 					deltaXText: deltaVText,
 					deltaYText: deltaIText,
+					slopeText,
 					labelA: 'A',
 					labelB: 'B',
 					labelC: 'C',
@@ -774,6 +962,21 @@ function plotVoltageGraph(data, slope, intercept, fitDomainData) {
 
 	});
 
+	renderSlopeInfoOverlay({
+		canvasId: 'voltageGraphCanvas',
+		panelId: 'ivSlopeInfoOverlay',
+		chart: ivChart,
+		triangle: pointA && pointB && pointC ? { A: pointA, B: pointB, C: pointC } : null,
+		deltaXLabel: 'ΔV',
+		deltaXText: deltaVText,
+		deltaYLabel: 'ΔI',
+		deltaYText: deltaIText,
+		slopeText: Number.isFinite(slopeMicroampPerVolt) ? slopeMicroampPerVolt.toFixed(2) : '-',
+		slopeUnit: 'µA/V'
+	});
+
+	return true;
+
 }
 
 /**
@@ -781,45 +984,37 @@ function plotVoltageGraph(data, slope, intercept, fitDomainData) {
  * @param {Array<{x: number, y: number}>} data - Display data in µA
  * @param {number} slope - Slope in A/Lux
  * @param {number} intercept - Intercept in A
+ * @param {{A:{x:number,y:number},B:{x:number,y:number},C:{x:number,y:number},deltaXText:string,deltaYText:string,slopeMicroampPerLux:number}|null} manualLuxTriangle
  */
-function plotIntensityGraph(data, slope, intercept) {
+function plotIntensityGraph(data, slope, intercept, manualLuxTriangle) {
 	if (!data || data.length < 2) {
-		alert('Insufficient data points for intensity graph (need at least 2).');
-		return;
+		return false;
 	}
 
-	const ctx = document.getElementById('intensityGraphCanvas');
+	const canvas = document.getElementById('intensityGraphCanvas');
+	if (!canvas) {
+		return false;
+	}
+	const ctx = canvas.getContext('2d');
 	if (!ctx) {
-		return;
+		return false;
 	}
 
-	// Destroy existing chart if present
-	if (intensityGraph) {
-		intensityGraph.destroy();
-	}
+	// Always destroy and clear before rendering to prevent duplicate overlays.
+	destroyChartSafely(luxChart, 'intensityGraphCanvas');
+	luxChart = null;
 
 	// Sort data by x for better display
 	const sortedData = [...data].sort((a, b) => a.x - b.x);
-	const luxTriangle = getLuxManualTriangle(sortedData);
+	const luxTriangle = manualLuxTriangle || getLuxManualTriangle(sortedData);
 	const luxSlopeLinePoints = luxTriangle ? [luxTriangle.A, luxTriangle.B] : [];
+	const selectedLuxPoints = luxTriangle ? [luxTriangle.A, luxTriangle.B] : [];
+	const slopeDisplay = Number.isFinite(slope) ? slope * 1e6 : NaN;
+	const slopeText = Number.isFinite(slopeDisplay)
+		? `slope = ΔI / ΔLux = ${slopeDisplay.toFixed(2)} µA/Lux`
+		: '';
 
-	// Calculate fitted line points using slope and intercept
-	const minX = Math.min(...sortedData.map((p) => p.x));
-	const maxX = Math.max(...sortedData.map((p) => p.x));
-	
-	// Convert slope and intercept to µA/Lux units for display
-	const slopeDisplay = slope * 1e6; // A/Lux → µA/Lux
-	const interceptDisplay = intercept * 1e6; // A → µA
-	
-	// Create best fit line with multiple points for smooth rendering
-	const fittedPoints = [];
-	const step = (maxX - minX) / 25; // 25 points for smooth line
-	for (let x = minX; x <= maxX; x += step) {
-		fittedPoints.push({ x: parseFloat(x.toFixed(4)), y: slopeDisplay * x + interceptDisplay });
-	}
-	fittedPoints.push({ x: maxX, y: slopeDisplay * maxX + interceptDisplay }); // Ensure end point
-
-	intensityGraph = new Chart(ctx, {
+	luxChart = new Chart(ctx, {
 		type: 'line',
 		plugins: [manualTrianglePlugin],
 		data: {
@@ -841,16 +1036,19 @@ function plotIntensityGraph(data, slope, intercept) {
 					order: 1
 				},
 				{
-					label: '─ Best Fit Line',
-					data: fittedPoints,
-					borderColor: 'rgb(255, 140, 60)',
-					backgroundColor: 'transparent',
+					label: 'A-B Selected Points',
+					data: selectedLuxPoints,
+					borderColor: 'transparent',
+					backgroundColor: 'rgb(255, 235, 90)',
 					fill: false,
-					tension: 0.4,
-					borderWidth: 3.5,
-					pointRadius: 0,
-					pointHoverRadius: 0,
-					showLine: true,
+					tension: 0,
+					borderWidth: 0,
+					pointRadius: 8,
+					pointHoverRadius: 8,
+					pointBackgroundColor: 'rgb(255, 235, 90)',
+					pointBorderColor: 'rgba(20, 20, 20, 0.95)',
+					pointBorderWidth: 2,
+					showLine: false,
 					order: 2
 				},
 				{
@@ -881,6 +1079,7 @@ function plotIntensityGraph(data, slope, intercept) {
 					deltaYLabel: 'ΔI',
 					deltaXText: luxTriangle ? luxTriangle.deltaXText : '',
 					deltaYText: luxTriangle ? luxTriangle.deltaYText : '',
+					slopeText,
 					labelA: 'A',
 					labelB: 'B',
 					labelC: 'C',
@@ -944,6 +1143,21 @@ function plotIntensityGraph(data, slope, intercept) {
 		},
 
 	});
+
+	renderSlopeInfoOverlay({
+		canvasId: 'intensityGraphCanvas',
+		panelId: 'luxSlopeInfoOverlay',
+		chart: luxChart,
+		triangle: luxTriangle ? { A: luxTriangle.A, B: luxTriangle.B, C: luxTriangle.C } : null,
+		deltaXLabel: 'ΔLux',
+		deltaXText: luxTriangle ? luxTriangle.deltaXText : '-',
+		deltaYLabel: 'ΔI',
+		deltaYText: luxTriangle ? luxTriangle.deltaYText : '-',
+		slopeText: Number.isFinite(slopeDisplay) ? slopeDisplay.toFixed(2) : '-',
+		slopeUnit: 'µA/Lux'
+	});
+
+	return true;
 }
 
 /**
@@ -1136,7 +1350,8 @@ function plotGraphsAndCalculate() {
 	
 	if (!reverseTable || !responsivityTable) {
 		console.error("Tables not found!");
-		alert('Error: Tables not found. Please check page layout.');
+		setGraphMessage('voltageGraphCanvas', 'ivGraphMessage', 'Not enough data for I vs V graph', true);
+		setGraphMessage('intensityGraphCanvas', 'luxGraphMessage', 'Not enough data for I vs Lux graph', true);
 		return;
 	}
 	
@@ -1147,18 +1362,9 @@ function plotGraphsAndCalculate() {
 	console.log("Reading responsivity rows...");
 	const responsivityRows = readResponsivityRows(responsivityTable);
 	console.log("Responsivity rows read:", responsivityRows.length, responsivityRows);
-
-	if (reverseRows.length < 2) {
-		console.error("Not enough reverse bias data points:", reverseRows);
-		alert('Need at least 2 valid I-V data points. Use sliders or enter values manually.');
-		return;
-	}
-	
-	if (responsivityRows.length < 2) {
-		console.error("Not enough responsivity data points:", responsivityRows);
-		alert('Need at least 2 valid I-Lux data points. Use sliders or enter values manually.');
-		return;
-	}
+	const validResponsivityRows = getValidResponsivityRows(responsivityRows);
+	const hasIVData = reverseRows.length >= 2;
+	const hasLuxData = validResponsivityRows.length >= 2;
 
 	let directResistance = 0;
 	let directResponsivity = 0;
@@ -1172,63 +1378,68 @@ function plotGraphsAndCalculate() {
 	// Calculate direct values first (lab manual linear-region method).
 	directResistance = calculateDirectResistanceFromLinearRegion(reverseRows);
 	directResistance = applyDirectResistanceNoise(directResistance);
-	directResponsivity = calculateResponsivity(responsivityRows);
+	directResponsivity = calculateResponsivity(validResponsivityRows);
 
-	// Process I vs V graph
-	if (reverseRows.length < 2) {
-		console.log("Not enough IV data:", reverseRows);
-		alert("Need at least 2 valid I-V data points");
-		return;
+	// Process I vs V graph independently.
+	if (hasIVData) {
+		const {
+			slope: slopeV,
+			intercept: interceptV,
+			fitRows: ivFitRows
+		} = calculateIvTwoPointSlope(reverseRows);
+
+		if (ivFitRows.length < 2) {
+			destroyChartSafely(ivChart, 'voltageGraphCanvas');
+			ivChart = null;
+			hideSlopeInfoOverlay('ivSlopeInfoOverlay');
+			setGraphMessage('voltageGraphCanvas', 'ivGraphMessage', 'Not enough data for I vs V graph', true);
+		} else {
+			slopeVoltageVal = slopeV;
+			interceptVoltageVal = interceptV;
+			if (slopeV > 0) {
+				resistanceFromSlope = 1 / slopeV;
+			}
+
+			const displayDataVoltage = getVoltageGraphData(reverseRows);
+			const fitDomainDisplay = ivFitRows.map((row) => ({ x: row.voltage, y: row.current * 1e6 }));
+			plotVoltageGraph(displayDataVoltage, slopeV, interceptV, fitDomainDisplay);
+			setGraphMessage('voltageGraphCanvas', 'ivGraphMessage', '');
+		}
+	} else {
+		destroyChartSafely(ivChart, 'voltageGraphCanvas');
+		ivChart = null;
+		hideSlopeInfoOverlay('ivSlopeInfoOverlay');
+		setGraphMessage('voltageGraphCanvas', 'ivGraphMessage', 'Not enough data for I vs V graph', true);
 	}
 
-	// I-V graph uses lab-manual two-point slope method (no regression for I-V).
-	const {
-		slope: slopeV,
-		intercept: interceptV,
-		fitRows: ivFitRows
-	} = calculateIvTwoPointSlope(reverseRows);
+	// Process I vs Lux graph independently.
+	if (hasLuxData) {
+		const displayDataIntensity = getIntensityGraphData(validResponsivityRows);
+		const {
+			slope: slopeL,
+			intercept: interceptL,
+			luxTriangle
+		} = calculateLuxTwoPointSlopeFromDisplay(displayDataIntensity);
 
-	if (ivFitRows.length < 2) {
-		alert('Need valid I-V readings at both 0.3V and 0.4V in the linear region');
-		return;
+		if (!luxTriangle) {
+			destroyChartSafely(luxChart, 'intensityGraphCanvas');
+			luxChart = null;
+			hideSlopeInfoOverlay('luxSlopeInfoOverlay');
+			setGraphMessage('intensityGraphCanvas', 'luxGraphMessage', 'Not enough data for I vs Lux graph', true);
+		} else {
+			slopeIntensityVal = slopeL;
+			interceptIntensityVal = interceptL;
+			responsivityFromSlope = slopeL;
+
+			plotIntensityGraph(displayDataIntensity, slopeL, interceptL, luxTriangle);
+			setGraphMessage('intensityGraphCanvas', 'luxGraphMessage', '');
+		}
+	} else {
+		destroyChartSafely(luxChart, 'intensityGraphCanvas');
+		luxChart = null;
+		hideSlopeInfoOverlay('luxSlopeInfoOverlay');
+		setGraphMessage('intensityGraphCanvas', 'luxGraphMessage', 'Not enough data for I vs Lux graph', true);
 	}
-
-	slopeVoltageVal = slopeV;
-	interceptVoltageVal = interceptV;
-
-	if (slopeV > 0) {
-		resistanceFromSlope = 1 / slopeV;
-	}
-
-	// Plot voltage graph with slope and intercept
-	console.log("Creating voltage graph with", reverseRows.length, "data points, slope:", slopeV);
-	const displayDataVoltage = getVoltageGraphData(reverseRows);
-	console.log("Voltage display data:", displayDataVoltage);
-	const fitDomainDisplay = ivFitRows.map((row) => ({ x: row.voltage, y: row.current * 1e6 }));
-	plotVoltageGraph(displayDataVoltage, slopeV, interceptV, fitDomainDisplay);
-	console.log("Voltage graph plotted");
-
-	// Process I vs Lux graph
-	if (responsivityRows.length < 2) {
-		console.log("Not enough Lux data:", responsivityRows);
-		alert("Need at least 2 valid I-Lux data points");
-		return;
-	}
-
-	const validResponsivityRows = getValidResponsivityRows(responsivityRows);
-	const intensityData = validResponsivityRows.map((row) => ({ x: row.intensity, y: row.current }));
-	const { slope: slopeL, intercept: interceptL } = linearRegression(intensityData);
-
-	slopeIntensityVal = slopeL;
-	interceptIntensityVal = interceptL;
-	responsivityFromSlope = slopeL;
-
-	// Plot intensity graph with slope and intercept
-	console.log("Creating intensity graph with", responsivityRows.length, "data points, slope:", slopeL);
-	const displayDataIntensity = getIntensityGraphData(validResponsivityRows);
-	console.log("Intensity display data:", displayDataIntensity);
-	plotIntensityGraph(displayDataIntensity, slopeL, interceptL);
-	console.log("Intensity graph plotted");
 
 	// Display both slope values and equations
 	displaySlopeValues(slopeVoltageVal, interceptVoltageVal, slopeIntensityVal, interceptIntensityVal);
@@ -1247,7 +1458,6 @@ function calculatePhotodiodeFromTables() {
 	const responsivityRows = readResponsivityRows(responsivityTable);
 
 	if (!reverseRows.length && !responsivityRows.length) {
-		alert('Please enter valid data');
 		updateDirectOutputs(0, 0);
 		return;
 	}
@@ -1292,15 +1502,14 @@ function resetPhotodiodeTables() {
 	}
 
 	// Destroy existing charts
-	if (voltageGraph) {
-		voltageGraph.destroy();
-		voltageGraph = null;
-	}
-
-	if (intensityGraph) {
-		intensityGraph.destroy();
-		intensityGraph = null;
-	}
+	destroyChartSafely(ivChart, 'voltageGraphCanvas');
+	ivChart = null;
+	destroyChartSafely(luxChart, 'intensityGraphCanvas');
+	luxChart = null;
+	hideSlopeInfoOverlay('ivSlopeInfoOverlay');
+	hideSlopeInfoOverlay('luxSlopeInfoOverlay');
+	setGraphMessage('voltageGraphCanvas', 'ivGraphMessage', '');
+	setGraphMessage('intensityGraphCanvas', 'luxGraphMessage', '');
 
 	// Reset both output sections
 	updateDirectOutputs(0, 0);
