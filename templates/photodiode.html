@@ -73,36 +73,60 @@
 		</ol>
 	</section>
 
-	<!-- SIMULATION CONTROL PANEL SECTION -->
-	<section class="experiment-section">
-		<h3><u>SIMULATION CONTROL PANEL</u></h3>
+	<!-- INTERACTIVE SIMULATION SECTION -->
+	<section class="experiment-section" style="margin-top: 32px;">
+		<h3><u>INTERACTIVE SIMULATION</u></h3>
 
-		<div class="control-strip">
-			<label for="voltage"><strong>Voltage (V): </strong></label>
-			<input type="range" id="voltage" min="0" max="5" step="0.1" value="1">
-			<span id="voltageValue">1</span> V
-		</div>
+		<div style="max-width: 920px; margin: 0 auto; text-align: center;">
+			<div style="padding: 18px; border: 1px solid #d9e3ee; background: #f8fbff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+				<h4 style="margin: 0 0 14px 0; color: #1f3b57;">Simulation Canvas Area</h4>
+				<canvas id="photodiodeCanvas" width="800" height="300" style="display: block; margin: 0 auto; border: 1px solid #c8d4e0; background: #fdfefe;"></canvas>
+			</div>
 
-		<div class="control-strip">
-			<label for="lightIntensity"><strong>Light Intensity (Lux): </strong></label>
-			<input type="range" id="lightIntensity" min="100" max="1000" step="10" value="500">
-			<span id="lightIntensityValue">500</span> Lux
-		</div>
+			<div style="margin-top: 20px; padding: 22px; border: 1px solid #d9e3ee; background: #ffffff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: left;">
+				<h4 style="margin: 0 0 16px 0; text-align: center; color: #1f3b57;">Controls Panel</h4>
 
-		<div class="control-strip laser-control">
-			<label for="distance"><strong>Distance (cm): </strong></label>
-			<input type="number" id="distance" min="0" step="0.1" value="2" class="input-compact">
+				<div style="display: grid; gap: 18px; max-width: 820px; margin: 0 auto;">
+					<div style="padding: 14px; border: 1px solid #dfe7f0; border-radius: 8px; background: #f9fcff;">
+						<div style="margin-bottom: 10px;"><strong>Section 1: I vs V (Reverse Bias)</strong></div>
+						<div style="margin-bottom: 12px; padding: 10px 12px; border: 1px solid #cfdceb; border-radius: 8px; background: #edf4fb; box-shadow: 0 1px 4px rgba(0,0,0,0.06); color: #28455f;">
+							<strong>Constant:</strong> Distance (Constant): <span id="ivFixedDistance">2.0</span> cm
+						</div>
+						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+							<label for="voltageSlider"><strong>Voltage (V)</strong></label>
+							<span id="voltageSliderValue">1.0</span>
+						</div>
+						<input type="range" id="voltageSlider" min="0" max="5" step="0.1" value="1" style="width: 100%;">
+						<div style="margin-top: 10px; line-height: 1.7;">
+							<div><strong>Voltage:</strong> <span id="liveVoltage">1.0</span> V</div>
+							<div><strong>Photocurrent:</strong> <span id="liveCurrentIV">0.00</span> &mu;A</div>
+						</div>
+						<div style="text-align: center; margin-top: 10px;">
+							<button type="button" id="resetIvBtn" class="btn btn-danger">Reset I vs V</button>
+						</div>
+					</div>
 
-			<label for="mode"><strong>Mode: </strong></label>
-			<select id="mode" aria-label="Photodiode mode">
-				<option value="reverse" selected>Reverse Bias</option>
-				<option value="responsivity">Photo Responsivity</option>
-			</select>
-		</div>
-
-		<div class="action-row">
-			<button type="button" id="runSimulation" class="btn btn-primary">Run Simulation</button>
-			<button type="button" id="resetSimulation" class="btn btn-danger">Reset</button>
+					<div style="padding: 14px; border: 1px solid #dfe7f0; border-radius: 8px; background: #f9fcff;">
+						<div style="margin-bottom: 10px;"><strong>Section 2: I vs Lux (Responsivity)</strong></div>
+						<div style="margin-bottom: 12px; padding: 10px 12px; border: 1px solid #cfdceb; border-radius: 8px; background: #edf4fb; box-shadow: 0 1px 4px rgba(0,0,0,0.06); color: #28455f;">
+							<strong>Constant:</strong> Voltage (Constant): <span id="luxFixedVoltage">5.0</span> V
+						</div>
+						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+							<label for="distanceSlider"><strong>Distance (cm)</strong></label>
+							<span id="distanceSliderValue">2.0</span>
+						</div>
+						<input type="range" id="distanceSlider" min="1" max="5" step="0.1" value="2" style="width: 100%;">
+						<div style="margin-top: 10px; line-height: 1.7;">
+							<div><strong>Distance:</strong> <span id="liveDistance">2.0</span> cm</div>
+							<div><strong>Light Intensity:</strong> <span id="liveIntensity">250.00</span> Lux</div>
+							<div><strong>Photocurrent:</strong> <span id="liveCurrentLux">0.00</span> &mu;A</div>
+						</div>
+						<div style="text-align: center; margin-top: 10px;">
+							<button type="button" id="resetLuxBtn" class="btn btn-danger">Reset I vs Lux</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</section>
 
@@ -192,6 +216,12 @@
 	<section class="experiment-section">
 		<h3><u>RESULT</u></h3>
 
+		<div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-left: 4px solid #4caf50; border-radius: 5px;">
+			<p style="margin: 0; font-style: italic; color: #2e7d32;">
+				<strong>Lab Manual Method:</strong> Both calculations use data from the linear region (0.2 V to 0.5 V) to avoid saturation effects and ensure accurate characterization of the photodiode's true operating characteristics.
+			</p>
+		</div>
+
 		<div style="margin-bottom: 20px; padding: 15px; background-color: #fffbf0; border-left: 4px solid #ff9800; border-radius: 5px;">
 			<h4 style="margin-top: 0; color: #e65100;">Direct Calculation (from tabular data)</h4>
 			<p style="margin: 8px 0;">Resistance = V / I = <span id="resistanceDirectOutput" style="font-family: monospace; font-weight: bold;">-</span> &Omega;</p>
@@ -236,4 +266,5 @@
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script src="{{ url_for('static', filename='js/photodiode.js') }}"></script>
+<script src="{{ url_for('static', filename='js/experiments/photodiode_sim.js') }}"></script>
 {% endblock %}
