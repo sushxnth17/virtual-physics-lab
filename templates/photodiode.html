@@ -38,24 +38,36 @@
 		</div>
 	</section>
 
-	<!-- CIRCUIT DIAGRAM SECTION -->
-	<section class="experiment-section">
-		<h3><u>CIRCUIT DIAGRAM</u></h3>
-		<div class="ray-diagram-container lab-figure-box">
-			<img src="/static/images/photodiode.png" alt="Photodiode Circuit Diagram" class="lab-figure-image lab-figure-image-md">
-			<p class="lab-caption">
-				<strong>Figure:</strong> Circuit diagram for photodiode characteristics experiment.
-			</p>
+	<!-- REFERENCE CIRCUIT SECTION -->
+	<section class="experiment-section reference-section">
+		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
+		<h3><u>Circuit Diagram</u></h3>
+		<div class="reference-card reference-card-single">
+			<figure class="reference-figure reference-figure-single">
+				<img src="{{ url_for('static', filename='js/images/photodiode_circuit.png') }}" alt="Photodiode Circuit Diagram" class="reference-image">
+				<figcaption class="lab-caption"><strong>Photodiode Circuit Diagram</strong></figcaption>
+			</figure>
 		</div>
 	</section>
 
-	<section class="experiment-section">
-		<h3><u>NATURE OF GRAPH</u></h3>
-		<ul>
-			<li>Reverse bias characteristic of photodiode (I vs V)</li>
-			<li>Variation of photocurrent with light intensity</li>
-		</ul>
+	<!-- REFERENCE GRAPH THEORY SECTION -->
+	<section class="experiment-section reference-section">
+		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
+		<h3><u>Graph Theory (Lab Manual Reference)</u></h3>
+		<div class="reference-card">
+			<div class="reference-grid">
+				<figure class="reference-figure">
+					<img src="{{ url_for('static', filename='js/images/iv_characteristics.png') }}" alt="I vs V characteristic graph" class="reference-image">
+					<figcaption class="lab-caption"><strong>Reverse Bias Characteristics</strong></figcaption>
+				</figure>
+				<figure class="reference-figure">
+					<img src="{{ url_for('static', filename='js/images/responsivity.png') }}" alt="I vs Lux graph" class="reference-image">
+					<figcaption class="lab-caption"><strong>Photocurrent vs Intensity</strong></figcaption>
+				</figure>
+			</div>
+		</div>
 	</section>
+
 
 	<!-- PROCEDURE SECTION -->
 	<section class="experiment-section">
@@ -72,6 +84,7 @@
 			<li>Determine slope to find responsivity.</li>
 		</ol>
 	</section>
+
 
 	<!-- INTERACTIVE SIMULATION SECTION -->
 	<section class="experiment-section" style="margin-top: 32px;">
@@ -192,6 +205,7 @@
 			<button type="button" id="calculatePhotodiode" class="btn btn-primary">Calculate</button>
 		</div>
 	</section>
+
 
 	<!-- GRAPHS SECTION -->
 	<section class="experiment-section" style="margin-top: 40px;">

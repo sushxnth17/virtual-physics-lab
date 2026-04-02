@@ -567,6 +567,58 @@ button[id*="reset"] {
   font-style: italic;
 }
 
+.reference-section {
+  margin-top: 30px;
+  background: #f2f4f7;
+}
+
+.reference-kicker {
+  margin: 0 0 0.7rem;
+  color: #67788d;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.reference-card {
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #d5dee8;
+  background: #fafbfd;
+  box-shadow: var(--shadow-soft);
+}
+
+.reference-card-single {
+  display: flex;
+  justify-content: center;
+}
+
+.reference-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.reference-figure {
+  margin: 0;
+  text-align: center;
+}
+
+.reference-figure-single {
+  width: 100%;
+  max-width: 500px;
+}
+
+.reference-image {
+  width: 100%;
+  max-width: 500px;
+  margin-inline: auto;
+  border: 1px solid #c0d0de;
+  border-radius: 10px;
+  box-shadow: 0 6px 14px rgba(28, 67, 97, 0.12);
+}
+
 .graph-container,
 div:has(> canvas#fermiChart),
 div:has(> canvas#diffractionChart) {
@@ -797,6 +849,10 @@ div:has(> canvas#diffractionChart) {
 
   .split-columns {
     gap: var(--space-4);
+  }
+
+  .reference-grid {
+    grid-template-columns: 1fr;
   }
 }
 
