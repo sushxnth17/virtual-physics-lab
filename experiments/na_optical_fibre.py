@@ -11,9 +11,9 @@ def compute_na_optical_fibre_response(**kwargs):
 	- theta_A (degrees) = degrees(theta_A)
 	- NA = sin(theta_A in radians)
 	"""
- 
-    L = kwargs.get('L')
-    D = kwargs.get('D')
+
+	L = kwargs.get('L')
+	D = kwargs.get('D')
 
 	if L is None or D is None:
 		raise ValueError("L and D must be provided.")

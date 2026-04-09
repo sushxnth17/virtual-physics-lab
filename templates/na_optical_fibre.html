@@ -91,18 +91,9 @@
 	</section>
 
 	<section class="experiment-section">
-		<h3><u>CONTROLS</u></h3>
-		<div class="control-strip">
-			<label for="distanceLInput"><strong>Distance L (cm): </strong></label>
-			<input type="number" id="distanceLInput" step="0.01" min="0" value="0.25" class="input-compact">
-			<button type="button" class="btn btn-primary" id="recordReadingBtn">Record Reading</button>
-		</div>
-	</section>
-
-	<section class="experiment-section">
 		<h3><u>TABULAR COLUMN</u></h3>
 		<div class="table-container">
-			<table class="observation-table">
+			<table class="observation-table" id="naObservationTable">
 				<thead>
 					<tr>
 						<th>Trial no</th>
@@ -115,56 +106,63 @@
 				<tbody>
 					<tr>
 						<td>1</td>
-						<td>0.25</td>
-						<td></td>
-						<td></td>
-						<td></td>
+						<td><input type="number" step="0.01" min="0" class="input-compact na-l-input" data-trial="1"></td>
+						<td><input type="number" step="0.01" min="0" class="input-compact na-d-input" data-trial="1"></td>
+						<td class="theta-value"></td>
+						<td class="na-value"></td>
 					</tr>
 					<tr>
 						<td>2</td>
-						<td>0.50</td>
-						<td></td>
-						<td></td>
-						<td></td>
+						<td><input type="number" step="0.01" min="0" class="input-compact na-l-input" data-trial="2"></td>
+						<td><input type="number" step="0.01" min="0" class="input-compact na-d-input" data-trial="2"></td>
+						<td class="theta-value"></td>
+						<td class="na-value"></td>
 					</tr>
 					<tr>
 						<td>3</td>
-						<td>0.75</td>
-						<td></td>
-						<td></td>
-						<td></td>
+						<td><input type="number" step="0.01" min="0" class="input-compact na-l-input" data-trial="3"></td>
+						<td><input type="number" step="0.01" min="0" class="input-compact na-d-input" data-trial="3"></td>
+						<td class="theta-value"></td>
+						<td class="na-value"></td>
 					</tr>
 					<tr>
 						<td>4</td>
-						<td>1.00</td>
-						<td></td>
-						<td></td>
-						<td></td>
+						<td><input type="number" step="0.01" min="0" class="input-compact na-l-input" data-trial="4"></td>
+						<td><input type="number" step="0.01" min="0" class="input-compact na-d-input" data-trial="4"></td>
+						<td class="theta-value"></td>
+						<td class="na-value"></td>
 					</tr>
 					<tr>
 						<td>5</td>
-						<td>1.25</td>
-						<td></td>
-						<td></td>
-						<td></td>
+						<td><input type="number" step="0.01" min="0" class="input-compact na-l-input" data-trial="5"></td>
+						<td><input type="number" step="0.01" min="0" class="input-compact na-d-input" data-trial="5"></td>
+						<td class="theta-value"></td>
+						<td class="na-value"></td>
 					</tr>
 					<tr>
 						<td>6</td>
-						<td>1.50</td>
-						<td></td>
-						<td></td>
-						<td></td>
+						<td><input type="number" step="0.01" min="0" class="input-compact na-l-input" data-trial="6"></td>
+						<td><input type="number" step="0.01" min="0" class="input-compact na-d-input" data-trial="6"></td>
+						<td class="theta-value"></td>
+						<td class="na-value"></td>
 					</tr>
 				</tbody>
 			</table>
+		</div>
+		<div class="action-row">
+			<button type="button" id="calculateAllBtn" class="btn btn-primary">Calculate All</button>
 		</div>
 	</section>
 
 	<section class="experiment-section">
 		<h3><u>RESULT</u></h3>
-		<p><strong>Mean &theta;<sub>A</sub> =</strong> ______ degree</p>
-		<p><strong>Mean N.A =</strong> ______</p>
+		<p><strong>Mean &theta;<sub>A</sub> =</strong> <span id="meanThetaValue">______</span> degree</p>
+		<p><strong>Mean N.A =</strong> <span id="meanNAValue">______</span></p>
 	</section>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/na_optical_fibre.js') }}"></script>
 {% endblock %}
