@@ -349,6 +349,22 @@ canvas {
   border-top: 1px dashed #b4c8dc;
 }
 
+.experiment-page {
+  gap: var(--space-5);
+}
+
+.info-section-card {
+  background: var(--color-surface);
+}
+
+.formula-block {
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid #d8e4f1;
+  border-radius: var(--radius-sm);
+  background: #f9fcff;
+}
+
 /* =============================
    7) Forms, Inputs, Sliders, Buttons
 ================================ */
@@ -457,6 +473,11 @@ button[id*="reset"] {
   box-shadow: inset 0 0 0 1px #eef4fb;
 }
 
+.responsive-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
 .observation-table {
   width: 100%;
   border-collapse: collapse;
@@ -498,6 +519,44 @@ button[id*="reset"] {
 .result-value {
   font-weight: 700;
   color: var(--color-success);
+}
+
+.measurement-table input[type="number"],
+.measurement-input {
+  max-width: 95px;
+  text-align: center;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.measurement-table input[type="number"]::-webkit-outer-spin-button,
+.measurement-table input[type="number"]::-webkit-inner-spin-button,
+.measurement-input::-webkit-outer-spin-button,
+.measurement-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.inference-label-cell,
+.inference-cell {
+  text-align: left !important;
+}
+
+.action-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.result-summary-card {
+  border-left-color: #5f8fb7;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+}
+
+.result-summary-list p {
+  margin-bottom: var(--space-2);
 }
 
 .result-blank {

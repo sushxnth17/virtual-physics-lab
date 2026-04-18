@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="experiment-container experiment-page">
+	<div class="experiment-header">
+		<p>Experiment: 11</p>
+		<h2>BLACK BOX</h2>
+	</div>
+
+	<section class="experiment-section info-section-card">
+		<h3><u>Aim</u></h3>
+		<p><strong>Aim:</strong> To identify various circuit elements &ndash;Inductor ( L),Capacitor (C), and Resistor (R) in the given black box and to determine its their values.</p>
+	</section>
+
+	<section class="experiment-section info-section-card">
+		<h3><u>Apparatus</u></h3>
+		<p><strong>Apparatus Required:</strong> Given Black Box, Function Generator, AC voltmeter (0-2 V), AC Ammeter (0-20 mA), connecting wires.</p>
+	</section>
+
+	<section class="experiment-section info-section-card">
+		<h3><u>Introduction</u></h3>
+		<p><strong>Introduction:</strong></p>
+
+		<h4><strong>Black box</strong></h4>
+		<p>Black box is a device, system or object which can be viewed in terms of its input, output (or transfer characteristics) without any knowledge of its internal workings. Its implementation is "opaque" (black). Almost anything might be referred to as a black box: a transistor, an algorithm, or the human brain.</p>
+
+		<h4><strong>Resistor</strong></h4>
+		<p>A resistor is a passive two-terminal electrical component that implements electrical resistance as a circuit element. The electrical resistance of an electrical conductor is the opposition to the passage of an electric current through that conductor. The purpose is to create specified values of current and voltage in a circuit. The SI unit of electrical resistance is the ohm (&Omega;). The resistance of a conductor depends mainly on the length, cross sectional area of the conductor and also the material of which the conductor is made.</p>
+
+		<h4><strong>Capacitor</strong></h4>
+		<p>A capacitor is a passive two-terminal electrical component which has the ability or &ldquo;capacity&rdquo; to store energy in the form of an electrical charge producing a potential difference (Static Voltage) across its plates. The property of a capacitor to store charge on its plates in the form of an electrostatic field is called the Capacitance of the capacitor with the unit of capacitance being the Farad.</p>
+
+		<h4><strong>Inductor</strong></h4>
+		<p>An inductor is a passive two-terminal electrical component which resists changes in electric current passing through it. It consists of a conductor such as a wire, usually wound into a coil. When a current flows through it, energy is stored temporarily in a magnetic field in the coil. When the current flowing through an inductor changes, the time-varying magnetic field induces a voltage in the conductor, according to Faraday's law of electromagnetic induction, which opposes the change in current that created it. Inductance is the property of a conductor by which a change in current flowing through it "induces" a voltage (electromotive force) in both the conductor itself (self-inductance) and in any nearby conductors (mutual inductance) with the unit of inductance being the Henry.</p>
+
+		<h4><strong>Capacitive and Inductive reactance</strong></h4>
+		<p>Reactance is the opposition to current flow in AC circuits only. Like resistance, reactance is also measured in Ohm&rsquo;s but is given the symbol X to distinguish it from a purely resistive value. As reactance is a quantity that can also be applied to Inductors as well as Capacitors, when used with capacitors it is more commonly known as Capacitive Reactance (X<sub>C</sub>). Capacitive reactance depends on the capacitance of the capacitor in Farads as well as the frequency of the AC waveform and the formula used to define capacitive reactance is given as:</p>
+
+		<h4><strong>Capacitive Reactance</strong></h4>
+		<p class="equation-line"><strong>X<sub>C</sub> = \(\frac{1}{2\pi f C}\) = \(\frac{1}{\omega C}\)</strong></p>
+		<p>Where: F is in Hertz and C is in Farads. 2&pi;f can also be expressed collectively as the Greek letter Omega, &omega; to denote an angular frequency.</p>
+
+		<p>The reactance of an inductor is called Inductive Reactance, ( X<sub>L</sub> ) and is measured in Ohms. Its value can be found from the formula.</p>
+
+		<h4><strong>Inductive Reactance</strong></h4>
+		<p class="equation-line"><strong>X<sub>L</sub> = 2&pi;fL = &omega;L</strong></p>
+		<p>Where: X<sub>L</sub> is the Inductive Reactance in Ohms, <em>f</em> is the frequency in Hertz and L is the inductance of the coil in Henry.</p>
+
+		<h4><strong>Capacitive Reactance against Frequency</strong></h4>
+		<p>From the capacitive reactance formula above, the capacitive reactance of the capacitor decreases as the frequency across it increases therefore capacitive reactance is inversely proportional to frequency. As the frequency approaches infinity the capacitors reactance would reduce to zero acting like a perfect conductor. Also as the frequency increases the current flowing through the capacitor increases in value because the rate of voltage change across its plates increases. However, as the frequency approaches zero or DC, the capacitors reactance would increase up to infinity, acting like a very large resistance. Then we can see that at DC a capacitor has infinite reactance (open-circuit), at very high frequencies a capacitor has zero reactance (short-circuit).</p>
+
+		<h4><strong>Inductive Reactance against Frequency</strong></h4>
+		<p>The inductive reactance of an inductor increases as the frequency across it increases therefore inductive reactance is proportional to frequency ( X<sub>L</sub> &alpha; <em>f</em> ) as the back emf generated in the inductor is equal to its inductance multiplied by the rate of change of current in the inductor. Also as the frequency increases the current flowing through the inductor also reduces in value.</p>
+	</section>
+
+	<section class="experiment-section info-section-card">
+		<h3><u>Formulae</u></h3>
+		<p><strong>Formulae:</strong></p>
+		<div class="formulae-list formula-block">
+			<p><strong>Impedance of Z<sub>1</sub></strong> &nbsp;&nbsp;&nbsp; X<sub>z 1</sub> = \(\frac{V_{z1}}{I_{z1}}\)</p>
+			<p><strong>Impedance of Z<sub>2</sub></strong> &nbsp;&nbsp;&nbsp; X<sub>z 2</sub> = \(\frac{V_{z2}}{I_{z2}}\)</p>
+			<p><strong>Impedance of Z<sub>3</sub></strong> &nbsp;&nbsp;&nbsp; X<sub>z 3</sub> = \(\frac{V_{z3}}{I_{z3}}\)</p>
+			<p><strong>Inductance</strong> &nbsp;&nbsp;&nbsp; L = \(\frac{\sqrt{\frac{V_L^2}{I_L^2} - r^2}}{2\pi f}\)</p>
+			<p><strong>Capacitance</strong> &nbsp;&nbsp;&nbsp; C = \(\frac{I_C}{2\pi f V_C}\)</p>
+			<p><strong>Resistance</strong> &nbsp;&nbsp;&nbsp; R = \(\frac{V_R}{I_R}\)</p>
+		</div>
+
+		<div class="formulae-definitions">
+			<p>V<sub>C</sub>,V<sub>R</sub>,V<sub>L</sub> is the voltage across the capacitor, resistor and inductor in V</p>
+			<p>I<sub>C</sub>,I<sub>R</sub>,I<sub>L</sub> is the current through the capacitor, resistor and inductor in A</p>
+			<p>f is the frequency in Hz</p>
+			<p>R is the internal resistance of the inductor in ohm</p>
+		</div>
+	</section>
+
+	<section class="experiment-section info-section-card">
+		<h3><u>Procedure</u></h3>
+		<p><strong>Procedure:</strong></p>
+		<p><strong>Part 1: &nbsp; To identify the circuit elements in the given Black box.</strong></p>
+		<ol class="procedure-list">
+			<li>Connections are made as shown in circuit diagram. Connect circuit element Z1 in the circuit.</li>
+			<li>Vary the frequency of ac signals from &nbsp;1kHz in the steps of &nbsp;1kHz &nbsp;and note down corresponding current &amp; voltage across the circuit element Z1.</li>
+			<li>Repeat step 3 for circuit elements Z2 and Z3 &nbsp;and find X (Impedance) for all frequencies.</li>
+			<li>If X varies directly with frequency, then the circuit element is Inductor (XL &alpha; f)<br>
+			If X varies inversely with frequency, then the circuit element is a capacitor (XC &alpha; 1/f)<br>
+			If X &nbsp; is independent of &nbsp; frequency, &nbsp; then &nbsp; the circuit element is &nbsp;a resistor (XR &nbsp;is independent of frequency)</li>
+		</ol>
+
+		<p class="u-mt-4"><strong>Part 2: To determine the value of the Inductance, Capacitance &amp; resistance</strong></p>
+		<ol class="procedure-list" start="5">
+			<li>Inductance &nbsp;&nbsp;&nbsp; L = \(\frac{\sqrt{\frac{V_L^2}{I_L^2} - r^2}}{2\pi f}\)</li>
+			<li>Capacitance &nbsp;&nbsp;&nbsp; C = \(\frac{I_C}{2\pi f . V_C}\)</li>
+			<li>Resistance &nbsp;&nbsp;&nbsp; R = \(\frac{V_R}{I_R}\)</li>
+		</ol>
+	</section>
+
+	<section class="experiment-section info-section-card">
+		<h3><u>Circuit Diagram</u></h3>
+		<div class="diagram-container">
+			<img src="" alt="Black Box Circuit Diagram" class="diagram-placeholder">
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>Observation Table</u></h3>
+
+		<h4><strong>a. &nbsp;Identifying &nbsp;Inductor/Capacitor/Resistor</strong></h4>
+		<div class="table-container responsive-table-wrapper">
+			<table class="observation-table measurement-table">
+				<thead>
+					<tr>
+						<th rowspan="4">Frequency<br>f &nbsp;(Hz)</th>
+						<th colspan="6">Voltage across the component</th>
+						<th rowspan="4">Impedance of Z1<br><br>X<sub>z 1</sub> = \(\frac{V_{z1}}{I_{z1}}\)<br><br>( &nbsp;&Omega; &nbsp;)</th>
+						<th rowspan="4">Impedance of Z2<br><br>X<sub>z 2</sub> = \(\frac{V_{z2}}{I_{z2}}\)<br><br>( &nbsp;&Omega; &nbsp;)</th>
+						<th rowspan="4">Impedance of Z3<br><br>X<sub>z 3</sub> = \(\frac{V_{z3}}{I_{z3}}\)<br><br>( &nbsp;&Omega; &nbsp;)</th>
+					</tr>
+					<tr>
+						<th colspan="2">Z<sub>1</sub></th>
+						<th colspan="2">Z<sub>2</sub></th>
+						<th colspan="2">Z<sub>3</sub></th>
+					</tr>
+					<tr>
+						<th>V<sub>z1</sub></th>
+						<th>I<sub>z1</sub></th>
+						<th>V<sub>z2</sub></th>
+						<th>I<sub>z2</sub></th>
+						<th>V<sub>z3</sub></th>
+						<th>I<sub>z3</sub></th>
+					</tr>
+					<tr>
+						<th>(&nbsp;V&nbsp;)</th>
+						<th>(&nbsp;mA&nbsp;)</th>
+						<th>(&nbsp;V&nbsp;)</th>
+						<th>(&nbsp;mA&nbsp;)</th>
+						<th>(&nbsp;V&nbsp;)</th>
+						<th>(&nbsp;mA&nbsp;)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1000</td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+					</tr>
+					<tr>
+						<td>2000</td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+					</tr>
+					<tr>
+						<td>3000</td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+					</tr>
+					<tr>
+						<td>4000</td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+					</tr>
+					<tr>
+						<td>5000</td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+					</tr>
+					<tr>
+						<td colspan="7" class="inference-label-cell"><strong>Inference</strong></td>
+						<td class="inference-cell">Xz1 is increasing<br>with frequency<br>/decreasing with frequency<br>/constant.<br><br>Hence Z1 is<br>..........</td>
+						<td class="inference-cell">Xz2 is increasing<br>with frequency<br>/decreasing with frequency<br>/constant.<br><br>Hence Z2 is<br>..........</td>
+						<td class="inference-cell">Xz3 is increasing<br>with frequency<br>/decreasing with frequency<br>/constant.<br><br>Hence Z3 is<br>......</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h4 class="u-mt-6"><strong>b. Determining the value of Inductance/Capacitance/Resistance</strong></h4>
+		<div class="table-container responsive-table-wrapper">
+			<table class="observation-table measurement-table">
+				<thead>
+					<tr>
+						<th>Frequency<br><br>f &nbsp;(Hz)</th>
+						<th>Inductance<br><br>L = \(\frac{\sqrt{\frac{V_I^2}{I_I^2} - r^2}}{2\pi f}\) &nbsp;(H)</th>
+						<th>Capacitance<br><br>C = \(\frac{I_C}{2\pi f . V_C}\) &nbsp;(F)</th>
+						<th>Resistance<br><br>R = \(\frac{V_R}{I_R}\) &nbsp;(&Omega;)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1000</td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+					</tr>
+					<tr>
+						<td>2000</td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+					</tr>
+					<tr>
+						<td>3000</td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+					</tr>
+					<tr>
+						<td>4000</td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+					</tr>
+					<tr>
+						<td>5000</td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+						<td><input type="number" step="any" class="measurement-input"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="action-row action-button-container u-mt-4">
+			<button type="button" id="calculateBlackBoxBtn" class="btn btn-primary">Calculate Results from Table Data</button>
+		</div>
+	</section>
+
+	<section class="graphs-section">
+		<h3><u>Graph</u></h3>
+		<div id="graph-container">Graph will be displayed here</div>
+	</section>
+
+	<section class="experiment-section result-summary-card">
+		<h3><u>Results</u></h3>
+		<div class="result-summary-list">
+			<p><strong>Results:</strong></p>
+			<p>i) Z1 is <span class="result-blank"></span> and its value is <span class="result-blank"></span>.</p>
+			<p>ii) Z2 is <span class="result-blank"></span> and its value is <span class="result-blank"></span>.</p>
+			<p>iii) Z3 is <span class="result-blank"></span> and its value is <span class="result-blank"></span>.</p>
+		</div>
+	</section>
+</div>
+{% endblock %}
