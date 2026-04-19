@@ -898,6 +898,170 @@ div:has(> canvas#diffractionChart) {
   min-width: 220px;
 }
 
+/* =============================
+   13) Optical Fiber NA Simulation
+================================ */
+.na-sim-panel {
+  border: 1px solid #c8d8e8;
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, #fafdff 0%, #f1f7fd 100%);
+  padding: var(--space-4);
+}
+
+.na-sim-canvas-wrap {
+  border: 1px solid #bbccdd;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  padding: 0.6rem;
+}
+
+#naSimulationCanvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+  cursor: crosshair;
+}
+
+.na-controls-grid {
+  margin-top: var(--space-4);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.na-control-card {
+  border: 1px solid #ccdaea;
+  border-radius: var(--radius-sm);
+  padding: 0.95rem;
+  background: #f9fcff;
+}
+
+.na-control-card h4 {
+  margin: 0 0 0.65rem;
+}
+
+.na-free-mode-label {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0.45rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: #fff5c9;
+  border: 1px solid #ccb978;
+  color: #5f4a16;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.na-free-mode-feedback {
+  margin: 0 0 0.55rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 8px;
+  background: #fffdf1;
+  border: 1px solid #e9ddb0;
+  color: #5a4920;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.na-control-card input[type="range"] {
+  width: 100%;
+  max-width: none;
+}
+
+.na-control-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.na-mode-indicator {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  margin-bottom: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.na-mode-text {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #34506b;
+}
+
+.na-mode-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #c7d8e8;
+  background: #f3f8fd;
+  color: #35516d;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+}
+
+.na-mode-chip.is-active {
+  border-color: #5684ad;
+  background: #dcefff;
+  color: #113a5d;
+}
+
+.na-mode-chip.na-mode-lab.is-active {
+  border-color: #4a7ca6;
+  background: #dcefff;
+  color: #0f3f63;
+}
+
+.na-mode-chip.na-mode-explore.is-active {
+  border-color: #ccb978;
+  background: #fff5c9;
+  color: #5f4a16;
+}
+
+#naObservationTable tbody tr.na-lab-row:not(.is-active) {
+  background: #f9fcff;
+}
+
+#naObservationTable tbody tr.na-lab-row td.na-l-fixed {
+  font-weight: 700;
+  color: #1d4468;
+}
+
+#naObservationTable tbody tr.na-explore-row:not(.is-active) {
+  background: #fff9ed;
+}
+
+#naObservationTable tbody tr.na-explore-row td:first-child::after {
+  content: " Explore Row";
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #8e5a14;
+  margin-left: 0.2rem;
+}
+
+.na-explore-l-warning {
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #9b1c1c;
+}
+
+@media (max-width: 860px) {
+  .na-controls-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .na-control-row .btn,
+  .na-control-row button {
+    width: 100%;
+  }
+}
+
 .planck-slider-wrap input[type="range"] {
   width: 150px;
 }
