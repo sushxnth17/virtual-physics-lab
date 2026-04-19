@@ -72,26 +72,49 @@
 
 	<section class="experiment-section">
 		<h3><u>INTERACTIVE SETUP</u></h3>
-		<div class="lab-figure-box">
-			<div class="lab-figure-image lab-figure-image-md" style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:12px;align-items:center;min-height:180px;border:1px solid #d3d3d3;padding:12px;">
-				<div style="text-align:center;">
-					<div><strong>Laser Source</strong></div>
+		<div class="na-sim-panel">
+			<div class="na-sim-canvas-wrap">
+				<canvas id="naSimulationCanvas" width="980" height="420" aria-label="Optical fiber numerical aperture simulation"></canvas>
+			</div>
+
+			<div class="na-controls-grid">
+				<div class="na-control-card">
+					<h4>Step 1: Move Screen to Set L</h4>
+					<label for="naScreenDistance"><strong>Screen Distance L (cm)</strong></label>
+					<input type="range" id="naScreenDistance" min="0.25" max="1.5" step="0.25" value="0.25">
+					<div class="na-control-row">
+						<button type="button" id="naMoveScreenNear" class="btn">Previous L</button>
+						<button type="button" id="naMoveScreenFar" class="btn">Next L</button>
+					</div>
+					<p class="measure-text"><strong>Measured L from setup:</strong> <span id="naMeasuredDistanceValue">--</span> cm</p>
+					<p class="helper-text">Follow fixed lab steps only: 0.25, 0.5, 0.75, 1.0, 1.25, 1.5 cm. Current L is highlighted on the scale and in the table.</p>
 				</div>
-				<div style="text-align:center;">
-					<div><strong>Optical Fiber</strong></div>
-					<div style="height:8px;background:#999;margin:10px auto;width:80%;"></div>
-				</div>
-				<div style="text-align:center;">
-					<div><strong>Screen</strong></div>
-					<div id="na-spot-placeholder" style="height:20px;width:20px;border-radius:50%;background:#f5f5f5;border:1px solid #666;margin:10px auto 0;"></div>
+
+				<div class="na-control-card">
+					<span id="naFreeModeLabel" class="na-free-mode-label" hidden>Free Exploration Mode</span>
+					<h4>Step 2: Observe Spot and Measure D</h4>
+					<p class="measure-text">Observe the circular spot on the screen and read its diameter marker.</p>
+					<p id="naFreeModeFeedback" class="na-free-mode-feedback" hidden>Live: L = <span id="naLiveExploreL">--</span> cm, D = <span id="naLiveExploreD">--</span> cm</p>
+					<p class="measure-text"><strong>Measured D from spot size:</strong> <span id="naMeasuredDiameterValue">--</span> cm</p>
+					<p class="helper-text">Do not auto-fill values. Record <strong>D</strong> manually in the observation table for each trial.</p>
 				</div>
 			</div>
-			<p class="lab-caption"><strong>Figure:</strong> Experimental arrangement for acceptance angle observation.</p>
+
+			<div class="action-row">
+				<button type="button" id="naCaptureReadingBtn" class="btn btn-primary">Capture Reading</button>
+				<p class="helper-text" id="naCaptureStatus">Capture stores current measured L and D into the next empty row.</p>
+			</div>
 		</div>
+		<p class="lab-caption"><strong>Figure:</strong> Laser source, optical fiber, movable screen, diverging light cone, and circular spot for manual L-D measurements.</p>
 	</section>
 
 	<section class="experiment-section">
 		<h3><u>TABULAR COLUMN</u></h3>
+		<div class="na-mode-indicator" aria-label="Experiment mode indicator">
+			<span class="na-mode-text">Current Mode:</span>
+			<span id="naModeLabLabel" class="na-mode-chip na-mode-lab is-active">Lab Mode</span>
+			<span id="naModeExploreLabel" class="na-mode-chip na-mode-explore">Explore Mode</span>
+		</div>
 		<div class="table-container">
 			<table class="observation-table" id="naObservationTable">
 				<thead>
@@ -104,44 +127,44 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
+					<tr class="na-lab-row">
 						<td>1</td>
-						<td><input type="number" step="0.01" min="0" class="input-compact na-l-input" data-trial="1"></td>
+						<td class="na-l-fixed" data-l="0.25">0.25</td>
 						<td><input type="number" step="0.01" min="0" class="input-compact na-d-input" data-trial="1"></td>
 						<td class="theta-value"></td>
 						<td class="na-value"></td>
 					</tr>
-					<tr>
+					<tr class="na-lab-row">
 						<td>2</td>
-						<td><input type="number" step="0.01" min="0" class="input-compact na-l-input" data-trial="2"></td>
+						<td class="na-l-fixed" data-l="0.5">0.5</td>
 						<td><input type="number" step="0.01" min="0" class="input-compact na-d-input" data-trial="2"></td>
 						<td class="theta-value"></td>
 						<td class="na-value"></td>
 					</tr>
-					<tr>
+					<tr class="na-lab-row">
 						<td>3</td>
-						<td><input type="number" step="0.01" min="0" class="input-compact na-l-input" data-trial="3"></td>
+						<td class="na-l-fixed" data-l="0.75">0.75</td>
 						<td><input type="number" step="0.01" min="0" class="input-compact na-d-input" data-trial="3"></td>
 						<td class="theta-value"></td>
 						<td class="na-value"></td>
 					</tr>
-					<tr>
+					<tr class="na-lab-row">
 						<td>4</td>
-						<td><input type="number" step="0.01" min="0" class="input-compact na-l-input" data-trial="4"></td>
+						<td class="na-l-fixed" data-l="1.0">1.0</td>
 						<td><input type="number" step="0.01" min="0" class="input-compact na-d-input" data-trial="4"></td>
 						<td class="theta-value"></td>
 						<td class="na-value"></td>
 					</tr>
-					<tr>
+					<tr class="na-lab-row">
 						<td>5</td>
-						<td><input type="number" step="0.01" min="0" class="input-compact na-l-input" data-trial="5"></td>
+						<td class="na-l-fixed" data-l="1.25">1.25</td>
 						<td><input type="number" step="0.01" min="0" class="input-compact na-d-input" data-trial="5"></td>
 						<td class="theta-value"></td>
 						<td class="na-value"></td>
 					</tr>
-					<tr>
+					<tr class="na-lab-row">
 						<td>6</td>
-						<td><input type="number" step="0.01" min="0" class="input-compact na-l-input" data-trial="6"></td>
+						<td class="na-l-fixed" data-l="1.5">1.5</td>
 						<td><input type="number" step="0.01" min="0" class="input-compact na-d-input" data-trial="6"></td>
 						<td class="theta-value"></td>
 						<td class="na-value"></td>
@@ -151,6 +174,8 @@
 		</div>
 		<div class="action-row">
 			<button type="button" id="calculateAllBtn" class="btn btn-primary">Calculate All</button>
+			<button type="button" id="exploreMoreBtn" class="btn">Explore More</button>
+			<button type="button" id="resetExperimentBtn" class="btn btn-danger">Reset Experiment</button>
 		</div>
 	</section>
 
@@ -165,4 +190,5 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/na_optical_fibre.js') }}"></script>
+<script src="{{ url_for('static', filename='js/experiments/optical_fibre_sim.js') }}"></script>
 {% endblock %}
