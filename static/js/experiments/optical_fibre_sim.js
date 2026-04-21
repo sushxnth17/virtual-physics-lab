@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	const freeModeFeedback = document.getElementById('naFreeModeFeedback');
 	const liveExploreL = document.getElementById('naLiveExploreL');
 	const liveExploreD = document.getElementById('naLiveExploreD');
+	const liveExploreTheta = document.getElementById('naLiveExploreTheta');
+	const liveExploreNA = document.getElementById('naLiveExploreNA');
+	const exploreDControlWrap = document.getElementById('naExploreDControlWrap');
 
 	if (!canvas || !distanceSlider) {
 		return;
@@ -22,12 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	const allowedLValues = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5];
-	const freeModeBounds = { min: 0.0, max: 5.0, step: 0.01 };
+	const freeModeBounds = { min: 0.25, max: 5.0, step: 0.01 };
+	// Acceptance angle is fixed for this setup and defined in radians.
+	const ACCEPTANCE_ANGLE_RAD = 0.20071286398;
 	const PIXELS_PER_CM = 100;
 	const axisConfig = {
 		maxCm: 5,
 		majorTickCm: 0.5,
-		minorTickCm: 0.25
+		minorTickCm: 0.1
 	};
 	const NA_MODES = Object.freeze({
 		LAB: 'lab',
@@ -38,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		Lcm: 0,
 		screenX: 0,
 		targetScreenX: 0,
-		halfAngleDeg: 11.5,
 		pixelsPerCm: PIXELS_PER_CM,
 		screenDragging: false,
 		animationFrameId: null,
@@ -47,7 +51,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		animationStartX: 0,
 		animationStartTime: 0,
 		animationDuration: 0,
-		animationEasing: null
+		animationEasing: null,
+		infoPanelDisplayL: 0,
+		infoPanelDisplayD: 0,
+		infoPanelLastTargetL: null,
+		infoPanelLastTargetD: null,
+		infoPanelPulseUntil: 0,
+		infoPanelAnimationFrameId: null,
+		visualFxFrameId: null,
+		visualFxLastRenderMs: 0
 	};
 
 	const geometry = {
@@ -182,6 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (freeModeFeedback) {
 				freeModeFeedback.hidden = false;
 			}
+			if (exploreDControlWrap) {
+				exploreDControlWrap.hidden = true;
+			}
 			render();
 			return;
 		}
@@ -197,6 +212,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 		if (freeModeFeedback) {
 			freeModeFeedback.hidden = true;
+		}
+		if (exploreDControlWrap) {
+			exploreDControlWrap.hidden = true;
 		}
 		render();
 	}
@@ -277,13 +295,25 @@ document.addEventListener('DOMContentLoaded', () => {
 		state.animationFrameId = requestAnimationFrame(step);
 	}
 
-	function getSpotRadiusPx() {
-		const halfAngleRad = (state.halfAngleDeg * Math.PI) / 180;
-		return cmToPixels(state.Lcm * Math.tan(halfAngleRad));
+	function getCalculatedSpotDiameterCm() {
+		return Math.max(0, 2 * state.Lcm * Math.tan(ACCEPTANCE_ANGLE_RAD));
 	}
 
 	function getSpotDiameterCm() {
-		return pixelsToCm(getSpotRadiusPx() * 2);
+		return getCalculatedSpotDiameterCm();
+	}
+
+	function getSpotRadiusPx() {
+		return cmToPixels(getSpotDiameterCm() / 2);
+	}
+
+	function getCurrentThetaDeg() {
+		const safeL = Math.max(state.Lcm, 0.0001);
+		return (Math.atan(getSpotDiameterCm() / (2 * safeL)) * 180) / Math.PI;
+	}
+
+	function getCurrentNAValue() {
+		return Math.sin((getCurrentThetaDeg() * Math.PI) / 180);
 	}
 
 	function updateDiameterReadout() {
@@ -295,6 +325,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		measuredDiameterLabel.textContent = `${dCm.toFixed(2)}`;
 		if (liveExploreD) {
 			liveExploreD.textContent = dCm.toFixed(2);
+		}
+		if (liveExploreTheta) {
+			liveExploreTheta.textContent = getCurrentThetaDeg().toFixed(2);
+		}
+		if (liveExploreNA) {
+			liveExploreNA.textContent = getCurrentNAValue().toFixed(4);
 		}
 	}
 
@@ -514,107 +550,166 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function drawBackground() {
-		// Main gradient background - professional lab appearance
-		const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-		gradient.addColorStop(0, '#fafbfc');
-		gradient.addColorStop(0.5, '#f3f7fb');
-		gradient.addColorStop(1, '#eef3f9');
-		ctx.fillStyle = gradient;
+		const ambient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+		ambient.addColorStop(0, '#ffffff');
+		ambient.addColorStop(1, '#edf1f5');
+		ctx.fillStyle = ambient;
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-		// Add subtle vignette effect for depth
-		const vignetteGradient = ctx.createRadialGradient(
-			canvas.width / 2, canvas.height / 2, 100,
-			canvas.width / 2, canvas.height / 2, canvas.width * 0.75
-		);
-		vignetteGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
-		vignetteGradient.addColorStop(1, 'rgba(190, 210, 235, 0.08)');
-		ctx.fillStyle = vignetteGradient;
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		const boardX = 14;
+		const boardY = 10;
+		const boardW = canvas.width - 28;
+		const boardH = canvas.height - 80;
 
-		// Draw professional frame border around simulation
-		ctx.strokeStyle = '#a0b8d0';
-		ctx.lineWidth = 3;
-		ctx.strokeRect(32, 18, canvas.width - 64, canvas.height - 90);
+		ctx.save();
+		ctx.shadowColor = 'rgba(32, 58, 84, 0.2)';
+		ctx.shadowBlur = 16;
+		ctx.shadowOffsetY = 4;
+		drawRoundRect(boardX, boardY, boardW, boardH, 16);
+		ctx.fillStyle = '#f2f4f8';
+		ctx.fill();
+		ctx.restore();
 
-		// Add subtle inner shadow effect for depth
-		ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-		ctx.lineWidth = 1.5;
-		ctx.strokeRect(34, 20, canvas.width - 68, canvas.height - 94);
+		const panelGradient = ctx.createLinearGradient(boardX, boardY, boardX, boardY + boardH);
+		panelGradient.addColorStop(0, '#f5f7fb');
+		panelGradient.addColorStop(0.6, '#edf1f6');
+		panelGradient.addColorStop(1, '#e5ebf3');
+		drawRoundRect(boardX, boardY, boardW, boardH, 16);
+		ctx.fillStyle = panelGradient;
+		ctx.fill();
+
+		ctx.strokeStyle = '#c7d2de';
+		ctx.lineWidth = 1.6;
+		drawRoundRect(boardX, boardY, boardW, boardH, 16);
+		ctx.stroke();
+
+		ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+		ctx.lineWidth = 1;
+		drawRoundRect(boardX + 1, boardY + 1, boardW - 2, boardH - 2, 14);
+		ctx.stroke();
+
+		ctx.strokeStyle = 'rgba(151, 166, 181, 0.4)';
+		ctx.lineWidth = 1;
+		drawRoundRect(boardX + 3, boardY + 3, boardW - 6, boardH - 6, 12);
+		ctx.stroke();
 	}
 
 	// Helper function to draw soft shadow
 	function drawSoftShadow(x, y, width, height, shadowBlur = 4, offsetX = 1, offsetY = 2) {
 		ctx.save();
 		ctx.filter = `blur(${shadowBlur}px)`;
-		ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+		ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
 		ctx.fillRect(x + offsetX, y + offsetY, width, height);
 		ctx.restore();
 	}
 
+	function requestInfoPanelAnimation() {
+		if (state.infoPanelAnimationFrameId !== null || state.animationFrameId !== null) {
+			return;
+		}
+
+		state.infoPanelAnimationFrameId = requestAnimationFrame(() => {
+			state.infoPanelAnimationFrameId = null;
+			render();
+			if (Date.now() < state.infoPanelPulseUntil - 12) {
+				requestInfoPanelAnimation();
+			}
+		});
+	}
+
+	function startVisualFxLoop() {
+		if (state.visualFxFrameId !== null) {
+			return;
+		}
+
+		const step = (timestamp) => {
+			state.visualFxFrameId = requestAnimationFrame(step);
+
+			if (state.screenDragging || state.animationFrameId !== null) {
+				return;
+			}
+
+			if (timestamp - state.visualFxLastRenderMs < 70) {
+				return;
+			}
+
+			state.visualFxLastRenderMs = timestamp;
+			render();
+		};
+
+		state.visualFxFrameId = requestAnimationFrame(step);
+	}
+
 	function drawMeasurementDisplay() {
-		const displayX = canvas.width - 185;
-		const displayY = 32;
-		const boxWidth = 160;
-		const boxHeight = 95;
-		const cornerRadius = 10;
+		const displayX = canvas.width - 160;
+		const displayY = 42;
+		const boxWidth = 128;
+		const boxHeight = 80;
+		const cornerRadius = 8;
+		const targetL = state.Lcm;
+		const targetD = getSpotDiameterCm();
 
-		// === PROFESSIONAL INFO PANEL ===
-		
-		// Draw enhanced shadow for depth
+		if (state.infoPanelLastTargetL === null || state.infoPanelLastTargetD === null) {
+			state.infoPanelDisplayL = targetL;
+			state.infoPanelDisplayD = targetD;
+			state.infoPanelLastTargetL = targetL;
+			state.infoPanelLastTargetD = targetD;
+		}
+
+		const lChanged = Math.abs(targetL - state.infoPanelLastTargetL) > 0.0005;
+		const dChanged = Math.abs(targetD - state.infoPanelLastTargetD) > 0.0005;
+		if (lChanged || dChanged) {
+			state.infoPanelPulseUntil = Date.now() + 260;
+			state.infoPanelLastTargetL = targetL;
+			state.infoPanelLastTargetD = targetD;
+			requestInfoPanelAnimation();
+		}
+
+		state.infoPanelDisplayL += (targetL - state.infoPanelDisplayL) * 0.26;
+		state.infoPanelDisplayD += (targetD - state.infoPanelDisplayD) * 0.26;
+
+		const pulseT = clamp((state.infoPanelPulseUntil - Date.now()) / 260, 0, 1);
+		const valueAlpha = 1 - 0.42 * pulseT;
+		const accentGlow = pulseT * 0.35;
+
 		ctx.save();
-		ctx.filter = 'blur(4px)';
-		ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
-		drawRoundRect(displayX + 1.5, displayY + 1.5, boxWidth, boxHeight, cornerRadius);
+		ctx.shadowColor = 'rgba(32, 42, 58, 0.2)';
+		ctx.shadowBlur = 10;
+		ctx.shadowOffsetY = 2;
+		drawRoundRect(displayX, displayY, boxWidth, boxHeight, cornerRadius);
+		ctx.fillStyle = '#f8fbff';
 		ctx.fill();
 		ctx.restore();
 
-		// Draw clean professional white background
-		ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
+		const panelFill = ctx.createLinearGradient(displayX, displayY, displayX, displayY + boxHeight);
+		panelFill.addColorStop(0, 'rgba(250, 252, 255, 0.96)');
+		panelFill.addColorStop(1, 'rgba(237, 244, 251, 0.98)');
 		drawRoundRect(displayX, displayY, boxWidth, boxHeight, cornerRadius);
+		ctx.fillStyle = panelFill;
 		ctx.fill();
 
-		// Draw professional border
-		ctx.strokeStyle = 'rgba(160, 180, 200, 0.8)';
-		ctx.lineWidth = 1.2;
-		drawRoundRect(displayX, displayY, boxWidth, boxHeight, cornerRadius);
-		ctx.stroke();
-
-		// Draw subtle top highlight for glass effect
-		ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+		ctx.strokeStyle = '#b9c8d8';
 		ctx.lineWidth = 1;
-		drawRoundRect(displayX + 1, displayY + 1, boxWidth - 2, boxHeight - 2, cornerRadius - 1);
+		drawRoundRect(displayX, displayY, boxWidth, boxHeight, cornerRadius);
 		ctx.stroke();
 
-		// === MEASUREMENT VALUES (L and D) ===
-		
-		const dCm = getSpotDiameterCm();
+		if (pulseT > 0) {
+			ctx.fillStyle = `rgba(255, 255, 255, ${0.18 + accentGlow * 0.35})`;
+			drawRoundRect(displayX + 2, displayY + 2, boxWidth - 4, boxHeight - 4, cornerRadius - 2);
+			ctx.fill();
+		}
 
-		// Padding and spacing
-		const padX = 16;
-		const padY = 14;
-		const lineHeight = 38;
-
-		// L value (distance in cm)
-		ctx.font = '500 13px "IBM Plex Sans", sans-serif';
-		ctx.fillStyle = '#4a5f7a';
 		ctx.textAlign = 'left';
-		ctx.fillText('L (cm):', displayX + padX, displayY + padY + 4);
-		
-		ctx.font = 'bold 19px "IBM Plex Sans", sans-serif';
-		ctx.fillStyle = '#0f4c81';
-		ctx.fillText(state.Lcm.toFixed(2), displayX + padX + 60, displayY + padY + 4);
+		ctx.fillStyle = '#4d6077';
+		ctx.font = '600 11px "IBM Plex Sans", sans-serif';
+		ctx.fillText('L (cm):', displayX + 14, displayY + 29);
+		ctx.fillText('D (cm):', displayX + 14, displayY + 58);
 
-		// D value (diameter in cm)
-		ctx.font = '500 13px "IBM Plex Sans", sans-serif';
-		ctx.fillStyle = '#4a5f7a';
-		ctx.fillText('D (cm):', displayX + padX, displayY + padY + lineHeight + 2);
-		
-		ctx.font = 'bold 19px "IBM Plex Sans", sans-serif';
-		ctx.fillStyle = '#d4870e';
-		ctx.fillText(dCm.toFixed(2), displayX + padX + 60, displayY + padY + lineHeight + 2);
-
-		ctx.restore();
+		ctx.font = '700 16px "IBM Plex Sans", sans-serif';
+		ctx.fillStyle = `rgba(31, 92, 148, ${valueAlpha})`;
+		ctx.fillText(state.infoPanelDisplayL.toFixed(2), displayX + 70, displayY + 29);
+		ctx.fillStyle = `rgba(201, 119, 23, ${valueAlpha})`;
+		ctx.fillText(state.infoPanelDisplayD.toFixed(2), displayX + 70, displayY + 58);
 	}
 
 	function drawAxis() {
@@ -622,21 +717,19 @@ document.addEventListener('DOMContentLoaded', () => {
 		const x0 = geometry.axisStartX;
 		const x1 = x0 + cmToPixels(axisConfig.maxCm);
 
-		// Draw main ruler baseline (darker, thicker)
-		ctx.strokeStyle = '#1a2535';
-		ctx.lineWidth = 3.2;
+		ctx.strokeStyle = '#1f3f62';
+		ctx.lineWidth = 2.2;
 		ctx.lineCap = 'round';
 		ctx.beginPath();
 		ctx.moveTo(x0, y);
 		ctx.lineTo(x1, y);
 		ctx.stroke();
 
-		// Draw subtle shadow/depth line below
-		ctx.strokeStyle = 'rgba(26, 37, 53, 0.18)';
-		ctx.lineWidth = 2;
+		ctx.strokeStyle = 'rgba(31, 63, 98, 0.2)';
+		ctx.lineWidth = 1;
 		ctx.beginPath();
-		ctx.moveTo(x0, y + 1.5);
-		ctx.lineTo(x1, y + 1.5);
+		ctx.moveTo(x0, y + 1);
+		ctx.lineTo(x1, y + 1);
 		ctx.stroke();
 
 		const totalMinorSteps = Math.round(axisConfig.maxCm / axisConfig.minorTickCm);
@@ -646,46 +739,34 @@ document.addEventListener('DOMContentLoaded', () => {
 			const LValue = step * axisConfig.minorTickCm;
 			const tx = x0 + cmToPixels(LValue);
 			const isMajor = step % majorStepSize === 0;
-			const isSelectedMajor = isMajor && Math.abs(LValue - state.Lcm) <= axisConfig.majorTickCm / 2;
+			const isSelectedMajor = isMajor && Math.abs(LValue - state.Lcm) < 0.26;
 
 			if (isMajor) {
-				// Major ticks: longer, darker, thicker
-				const tickH = isSelectedMajor ? 16 : 13;
-				ctx.strokeStyle = isSelectedMajor ? '#0f4c81' : '#1a2535';
-				ctx.lineWidth = isSelectedMajor ? 2.8 : 2.2;
+				const tickH = isSelectedMajor ? 13 : 10;
+				ctx.strokeStyle = isSelectedMajor ? '#0f4c81' : '#1f3f62';
+				ctx.lineWidth = isSelectedMajor ? 2 : 1.55;
 				ctx.lineCap = 'round';
 				ctx.beginPath();
 				ctx.moveTo(tx, y - tickH);
 				ctx.lineTo(tx, y);
 				ctx.stroke();
 
-				// Add subtle shadow on major tick
-				ctx.strokeStyle = 'rgba(26, 37, 53, 0.10)';
-				ctx.lineWidth = 1;
-				ctx.beginPath();
-				ctx.moveTo(tx + 0.5, y - tickH + 0.5);
-				ctx.lineTo(tx + 0.5, y + 0.5);
-				ctx.stroke();
-
-				// Draw numeric labels below ticks
-				ctx.fillStyle = isSelectedMajor ? '#0f4c81' : '#1a2535';
-				ctx.font = isSelectedMajor ? '700 13px "IBM Plex Sans", sans-serif' : '600 12px "IBM Plex Sans", sans-serif';
+				ctx.fillStyle = isSelectedMajor ? '#0f4c81' : '#1f3f62';
+				ctx.font = '700 11px "IBM Plex Sans", sans-serif';
 				ctx.textAlign = 'center';
 				ctx.lineWidth = 1;
-				
-				// Format label: show as integer if whole number, else as decimal
+
 				let label = LValue.toFixed(2);
 				if (LValue % 1 === 0) {
 					label = LValue.toFixed(0);
 				} else if (LValue % 0.5 === 0) {
 					label = LValue.toFixed(1);
 				}
-				ctx.fillText(label, tx, y + 28);
+				ctx.fillText(label, tx, y + 22);
 			} else {
-				// Minor ticks: shorter, lighter
-				const tickH = 6;
-				ctx.strokeStyle = '#304c69';
-				ctx.lineWidth = 1.2;
+				const tickH = 4;
+				ctx.strokeStyle = '#2f567f';
+				ctx.lineWidth = 0.95;
 				ctx.lineCap = 'round';
 				ctx.beginPath();
 				ctx.moveTo(tx, y - tickH);
@@ -694,273 +775,243 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		}
 
-		// Draw ruler label
-		ctx.strokeStyle = '#1a2535';
-		ctx.lineWidth = 1;
-		ctx.fillStyle = '#1a2535';
-		ctx.font = '600 13px "IBM Plex Sans", sans-serif';
+		ctx.fillStyle = '#1f3f62';
+		ctx.font = '600 11px "IBM Plex Sans", sans-serif';
 		ctx.textAlign = 'left';
-		ctx.fillText('Distance scale from fiber tip, L (cm)', x0, y + 50);
+		ctx.fillText('Distance scale from fiber tip, L (cm)', x0, y + 38);
 	}
 
 	function drawLaserAndFiber() {
-		const laserX = 35;
-		const laserY = geometry.centerY - 46;
-		const laserW = 130;
-		const laserH = 92;
-		const fiberStartX = 180;
-		const fiberY = geometry.centerY - 50;
-		const fiberH = 100;
-		const fiberW = geometry.fiberTipX - fiberStartX;
-		
-		// Nozzle position (where beam exits laser)
-		const nozzleX = laserX + laserW - 8;
+		const laserX = 32;
+		const laserY = geometry.centerY - 30;
+		const laserW = 126;
+		const laserH = 60;
 		const nozzleY = geometry.centerY;
-		
-		const beamStartX = laserX + laserW;
-		const beamEndX = geometry.fiberTipX - 1;
-		const beamY = geometry.centerY;
+		const nozzleBaseX = laserX + laserW;
+		const nozzleW = 24;
+		const nozzleH = 20;
+		const nozzleTipX = nozzleBaseX + nozzleW;
+		const fiberStartX = nozzleTipX + 3;
+		const currentDcm = Math.max(getSpotDiameterCm(), 0.001);
+		const currentLcm = Math.max(state.Lcm, 0.01);
+		const beamSlope = (currentDcm / 2) / currentLcm;
+		const guidedHalfWidth = clamp(cmToPixels(beamSlope * 0.07), 1.15, 2.5);
+		const beamFlicker = 0.9 + 0.1 * Math.sin(Date.now() * 0.014);
 
-		// Calculate subtle pulse animation based on time
-		const pulsePhase = (Date.now() * 0.002) % (Math.PI * 2);
-		const pulseFactor = 0.85 + 0.15 * Math.sin(pulsePhase);
-
-		// === DRAW LASER DEVICE ===
-		
-		// Draw shadow before laser body
-		drawSoftShadow(laserX, laserY, laserW, laserH, 3, 1, 2);
-
-		// Draw metallic laser body with enhanced 3D gradient
-		const laserGradient = ctx.createLinearGradient(laserX, laserY, laserX + laserW, laserY);
-		laserGradient.addColorStop(0, '#e8e8ec');
-		laserGradient.addColorStop(0.15, '#d4d4d8');
-		laserGradient.addColorStop(0.4, '#c0c0c8');
-		laserGradient.addColorStop(0.6, '#b0b0b8');
-		laserGradient.addColorStop(0.85, '#8a8a92');
-		laserGradient.addColorStop(1, '#707078');
-		
-		ctx.fillStyle = laserGradient;
-		ctx.fillRect(laserX, laserY, laserW, laserH);
-
-		// Draw laser body border with 3D edge effect
-		ctx.strokeStyle = '#4a4a52';
-		ctx.lineWidth = 2.5;
-		ctx.strokeRect(laserX, laserY, laserW, laserH);
-		
-		// Draw top edge highlight for 3D effect
-		ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-		ctx.lineWidth = 1.5;
-		ctx.beginPath();
-		ctx.moveTo(laserX + 2, laserY + 2);
-		ctx.lineTo(laserX + laserW - 2, laserY + 2);
-		ctx.stroke();
-
-		// Draw laser front panel (rounded corner section)
-		ctx.fillStyle = '#e8e8eb';
-		ctx.beginPath();
-		ctx.moveTo(laserX + 6, laserY + 10);
-		ctx.lineTo(laserX + laserW - 12, laserY + 10);
-		ctx.lineTo(laserX + laserW - 12, laserY + laserH - 10);
-		ctx.lineTo(laserX + 6, laserY + laserH - 10);
-		ctx.quadraticCurveTo(laserX, laserY + laserH - 4, laserX, laserY + laserH - 10);
-		ctx.quadraticCurveTo(laserX, laserY + 4, laserX + 6, laserY + 10);
-		ctx.fill();
-
-		// Draw red LASER label on front
-		ctx.fillStyle = '#c41e3a';
-		ctx.font = '600 11px "IBM Plex Sans", sans-serif';
-		ctx.textAlign = 'center';
-		ctx.fillText('LASER', laserX + laserW / 2 - 6, laserY + laserH / 2 + 2);
-
-		// Draw warning triangle icon
-		ctx.fillStyle = '#ffc107';
-		const triX = laserX + 12;
-		const triY = laserY + 15;
-		const triSize = 6;
-		ctx.beginPath();
-		ctx.moveTo(triX, triY - triSize);
-		ctx.lineTo(triX + triSize, triY + triSize);
-		ctx.lineTo(triX - triSize, triY + triSize);
-		ctx.closePath();
-		ctx.fill();
-
-		// Draw triangle border
-		ctx.strokeStyle = '#ff8c00';
-		ctx.lineWidth = 0.8;
-		ctx.stroke();
-
-		// === DRAW LASER NOZZLE ===
-		
-		// Draw nozzle glow
 		ctx.save();
-		ctx.filter = 'blur(3px)';
-		const nozzleGlowGradient = ctx.createRadialGradient(nozzleX, nozzleY, 0, nozzleX, nozzleY, 6);
-		nozzleGlowGradient.addColorStop(0, 'rgba(255, 100, 80, 0.25)');
-		nozzleGlowGradient.addColorStop(1, 'rgba(255, 80, 60, 0.05)');
-		ctx.fillStyle = nozzleGlowGradient;
+		ctx.fillStyle = 'rgba(30, 42, 56, 0.2)';
 		ctx.beginPath();
-		ctx.arc(nozzleX, nozzleY, 6, 0, Math.PI * 2);
+		ctx.ellipse(laserX + laserW * 0.52, laserY + laserH + 8, laserW * 0.55, 8, 0, 0, Math.PI * 2);
 		ctx.fill();
 		ctx.restore();
 
-		// Draw nozzle cylinder (dark metallic)
-		ctx.fillStyle = '#4a4a50';
-		ctx.beginPath();
-		ctx.arc(nozzleX, nozzleY, 4, 0, Math.PI * 2);
+		const bodyGradient = ctx.createLinearGradient(laserX, laserY, laserX, laserY + laserH);
+		bodyGradient.addColorStop(0, '#f2efe9');
+		bodyGradient.addColorStop(0.55, '#dbd6ce');
+		bodyGradient.addColorStop(1, '#c3bdb4');
+		drawRoundRect(laserX, laserY, laserW, laserH, 4);
+		ctx.fillStyle = bodyGradient;
+		ctx.fill();
+		ctx.strokeStyle = '#989289';
+		ctx.lineWidth = 1.4;
+		drawRoundRect(laserX, laserY, laserW, laserH, 4);
+		ctx.stroke();
+
+		ctx.fillStyle = 'rgba(255, 255, 255, 0.42)';
+		drawRoundRect(laserX + 2, laserY + 2, laserW - 4, 10, 3);
 		ctx.fill();
 
-		// Draw nozzle highlight
-		ctx.fillStyle = '#6a6a70';
+		ctx.save();
+		ctx.shadowColor = 'rgba(212, 24, 36, 0.38)';
+		ctx.shadowBlur = 6;
+		ctx.fillStyle = '#d8212d';
+		drawRoundRect(laserX + 10, laserY + 18, 60, 21, 2);
+		ctx.fill();
+		ctx.restore();
+		ctx.fillStyle = '#ffffff';
+		ctx.font = '700 10px "IBM Plex Sans", sans-serif';
+		ctx.textAlign = 'center';
+		ctx.fillText('LASER', laserX + 40, laserY + 32);
+
+		const warnCx = laserX + 95;
+		const warnCy = laserY + 30;
+		ctx.fillStyle = '#f4d54b';
 		ctx.beginPath();
-		ctx.arc(nozzleX - 1, nozzleY - 1, 1.5, 0, Math.PI * 2);
+		ctx.moveTo(warnCx, warnCy - 11);
+		ctx.lineTo(warnCx + 11, warnCy + 10);
+		ctx.lineTo(warnCx - 11, warnCy + 10);
+		ctx.closePath();
+		ctx.fill();
+		ctx.strokeStyle = '#5b4e2b';
+		ctx.lineWidth = 1;
+		ctx.stroke();
+		ctx.fillStyle = '#1d1b17';
+		ctx.font = '700 10px "IBM Plex Sans", sans-serif';
+		ctx.fillText('!', warnCx, warnCy + 5);
+
+		const nozzleGradient = ctx.createLinearGradient(nozzleBaseX, nozzleY - nozzleH / 2, nozzleTipX, nozzleY + nozzleH / 2);
+		nozzleGradient.addColorStop(0, '#647280');
+		nozzleGradient.addColorStop(0.5, '#a4b1bd');
+		nozzleGradient.addColorStop(1, '#56626f');
+		drawRoundRect(nozzleBaseX, nozzleY - nozzleH / 2, nozzleW, nozzleH, 8);
+		ctx.fillStyle = nozzleGradient;
+		ctx.fill();
+		ctx.strokeStyle = '#46505a';
+		ctx.lineWidth = 1;
+		drawRoundRect(nozzleBaseX, nozzleY - nozzleH / 2, nozzleW, nozzleH, 8);
+		ctx.stroke();
+
+		ctx.fillStyle = 'rgba(205, 220, 232, 0.7)';
+		drawRoundRect(nozzleBaseX + 2, nozzleY - nozzleH / 2 + 2, nozzleW - 7, 4, 2);
 		ctx.fill();
 
-		// === DRAW LASER BEAM ===
-		
-		// Draw beam expansion after fiber (cone shape)
-		const fiberTipX = geometry.fiberTipX;
-		const beamExpansionDistance = beamEndX - fiberTipX;
-		
-		// Calculate beam cone parameters
-		const coneTopY = beamY - 2;
-		const coneBottomY = beamY + 2;
-		
-		// Draw beam glow cone (widest, most transparent)
+		ctx.fillStyle = '#42505d';
+		ctx.beginPath();
+		ctx.ellipse(nozzleTipX + 2, nozzleY, 5.5, 7, 0, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.strokeStyle = '#2f3943';
+		ctx.stroke();
+
+		ctx.fillStyle = '#8395a7';
+		drawRoundRect(nozzleTipX + 1, nozzleY - 6, 4, 12, 2);
+		ctx.fill();
+
+		drawFiber(fiberStartX);
+
+		// Guided beam inside fiber: thin bright red core with a soft halo.
+		ctx.save();
+		ctx.lineCap = 'round';
+		ctx.strokeStyle = `rgba(255, 102, 86, ${0.32 * beamFlicker})`;
+		ctx.lineWidth = guidedHalfWidth * 2.8;
+		ctx.beginPath();
+		ctx.moveTo(fiberStartX + 1, nozzleY);
+		ctx.lineTo(geometry.fiberTipX - 2, nozzleY);
+		ctx.stroke();
+
+		const guidedGradient = ctx.createLinearGradient(fiberStartX, nozzleY, geometry.fiberTipX, nozzleY);
+		guidedGradient.addColorStop(0, `rgba(255, 78, 62, ${0.9 * beamFlicker})`);
+		guidedGradient.addColorStop(0.55, `rgba(255, 98, 82, ${0.82 * beamFlicker})`);
+		guidedGradient.addColorStop(1, `rgba(255, 136, 116, ${0.45 * beamFlicker})`);
+		ctx.strokeStyle = guidedGradient;
+		ctx.lineWidth = guidedHalfWidth * 1.35;
+		ctx.beginPath();
+		ctx.moveTo(fiberStartX + 1, nozzleY);
+		ctx.lineTo(geometry.fiberTipX - 1, nozzleY);
+		ctx.stroke();
+		ctx.restore();
+
+		const beamGradient = ctx.createLinearGradient(nozzleTipX + 3, nozzleY, geometry.fiberTipX, nozzleY);
+		beamGradient.addColorStop(0, `rgba(255, 74, 56, ${0.8 * beamFlicker})`);
+		beamGradient.addColorStop(0.6, `rgba(255, 108, 88, ${0.42 * beamFlicker})`);
+		beamGradient.addColorStop(1, `rgba(255, 136, 112, ${0.08 * beamFlicker})`);
+		ctx.fillStyle = beamGradient;
+		ctx.beginPath();
+		ctx.moveTo(nozzleTipX + 3, nozzleY);
+		ctx.lineTo(geometry.fiberTipX - 1, nozzleY - 3.2);
+		ctx.lineTo(geometry.fiberTipX - 1, nozzleY + 3.2);
+		ctx.closePath();
+		ctx.fill();
+
+		// Fiber exit emission node with compact bright glow.
+		const nodeRadius = clamp(guidedHalfWidth * 1.55, 2.0, 3.4);
 		ctx.save();
 		ctx.filter = 'blur(2px)';
-		const beamGlowGradient = ctx.createLinearGradient(beamStartX, beamY, beamEndX, beamY);
-		beamGlowGradient.addColorStop(0, `rgba(255, 100, 80, ${0.25 * pulseFactor})`);
-		beamGlowGradient.addColorStop(1, `rgba(255, 60, 40, ${0.05 * pulseFactor})`);
-		
-		ctx.fillStyle = beamGlowGradient;
+		const nodeHalo = ctx.createRadialGradient(
+			geometry.fiberTipX,
+			nozzleY,
+			nodeRadius * 0.4,
+			geometry.fiberTipX,
+			nozzleY,
+			nodeRadius * 3.0
+		);
+		nodeHalo.addColorStop(0, `rgba(255, 182, 156, ${0.52 * beamFlicker})`);
+		nodeHalo.addColorStop(0.6, `rgba(255, 123, 96, ${0.22 * beamFlicker})`);
+		nodeHalo.addColorStop(1, 'rgba(255, 90, 72, 0.01)');
+		ctx.fillStyle = nodeHalo;
 		ctx.beginPath();
-		ctx.moveTo(beamStartX, beamY);
-		ctx.lineTo(beamEndX, beamY - 5);
-		ctx.lineTo(beamEndX, beamY + 5);
-		ctx.closePath();
-		ctx.fill();
-		
-		// Draw mid glow layer
-		ctx.fillStyle = `rgba(255, 80, 60, ${0.35 * pulseFactor})`;
-		ctx.beginPath();
-		ctx.moveTo(beamStartX, beamY);
-		ctx.lineTo(beamEndX - 10, beamY - 3.5);
-		ctx.lineTo(beamEndX - 10, beamY + 3.5);
-		ctx.closePath();
+		ctx.arc(geometry.fiberTipX, nozzleY, nodeRadius * 3.0, 0, Math.PI * 2);
 		ctx.fill();
 		ctx.restore();
 
-		// Draw core beam (bright red, expanding cone)
-		ctx.fillStyle = '#ff4433';
+		const nodeCore = ctx.createRadialGradient(
+			geometry.fiberTipX,
+			nozzleY,
+			0,
+			geometry.fiberTipX,
+			nozzleY,
+			nodeRadius
+		);
+		nodeCore.addColorStop(0, `rgba(255, 246, 236, ${0.95 * beamFlicker})`);
+		nodeCore.addColorStop(0.55, `rgba(255, 145, 118, ${0.84 * beamFlicker})`);
+		nodeCore.addColorStop(1, `rgba(255, 108, 82, ${0.36 * beamFlicker})`);
+		ctx.fillStyle = nodeCore;
 		ctx.beginPath();
-		ctx.moveTo(beamStartX, beamY);
-		ctx.lineTo(beamEndX, beamY - 2);
-		ctx.lineTo(beamEndX, beamY + 2);
-		ctx.closePath();
+		ctx.arc(geometry.fiberTipX, nozzleY, nodeRadius, 0, Math.PI * 2);
 		ctx.fill();
-
-		// Draw bright inner core
-		ctx.fillStyle = '#ffaa88';
-		ctx.beginPath();
-		ctx.moveTo(beamStartX, beamY);
-		ctx.lineTo(beamEndX - 20, beamY - 1);
-		ctx.lineTo(beamEndX - 20, beamY + 1);
-		ctx.closePath();
-		ctx.fill();
-
-		// Draw fiber using new realistic visualization
-		drawFiber();
 	}
 
-	function drawFiber() {
-		const fiberStartX = 175;
-		const fiberY = geometry.centerY - 42;
-		const fiberH = 84;
+	function drawFiber(fiberStartX = 176) {
 		const fiberW = geometry.fiberTipX - fiberStartX;
 		const fiberCenterY = geometry.centerY;
-		const coreRadius = 8;
-		const claddingRadius = 12;
+		const claddingRadius = 8.4;
+		const coreRadius = 3.8;
 
-		// Draw shadow before fiber
-		drawSoftShadow(fiberStartX, fiberY, fiberW, fiberH, 3, 1, 2);
+		if (fiberW < 12) {
+			return;
+		}
 
-		// === DRAW FIBER BODY ===
-		
-		// Draw outer cladding cylinder with gradient
-		const claddingGradient = ctx.createLinearGradient(fiberStartX, fiberCenterY - claddingRadius, fiberStartX + fiberW / 2, fiberCenterY + claddingRadius);
-		claddingGradient.addColorStop(0, '#b5c5d5');
-		claddingGradient.addColorStop(0.3, '#a0b0c0');
-		claddingGradient.addColorStop(0.5, '#8fa0af');
-		claddingGradient.addColorStop(0.7, '#7a8a9d');
-		claddingGradient.addColorStop(1, '#5a7a8d');
-		
-		ctx.fillStyle = claddingGradient;
-		ctx.fillRect(fiberStartX, fiberCenterY - claddingRadius, fiberW, claddingRadius * 2);
+		const fiberTop = fiberCenterY - claddingRadius;
+		const fiberHeight = claddingRadius * 2;
+		drawSoftShadow(fiberStartX, fiberTop, fiberW, fiberHeight, 2, 1, 1);
 
-		// Draw fiber core cylinder with gradient
-		const coreGradient = ctx.createLinearGradient(fiberStartX, fiberCenterY - coreRadius, fiberStartX + fiberW / 2, fiberCenterY + coreRadius);
-		coreGradient.addColorStop(0, '#d8eef8');
-		coreGradient.addColorStop(0.25, '#c4e0f0');
-		coreGradient.addColorStop(0.5, '#a8d0e0');
-		coreGradient.addColorStop(0.75, '#8fc8d8');
-		coreGradient.addColorStop(1, '#70a8c0');
-		
+		const outerGradient = ctx.createLinearGradient(fiberStartX, fiberTop, fiberStartX, fiberTop + fiberHeight);
+		outerGradient.addColorStop(0, 'rgba(236, 247, 255, 0.94)');
+		outerGradient.addColorStop(0.45, 'rgba(174, 212, 238, 0.86)');
+		outerGradient.addColorStop(1, 'rgba(92, 155, 198, 0.92)');
+		drawRoundRect(fiberStartX, fiberTop, fiberW, fiberHeight, claddingRadius);
+		ctx.fillStyle = outerGradient;
+		ctx.fill();
+
+		const coreTop = fiberCenterY - coreRadius;
+		const coreHeight = coreRadius * 2;
+		const coreGradient = ctx.createLinearGradient(fiberStartX, coreTop, fiberStartX, coreTop + coreHeight);
+		coreGradient.addColorStop(0, 'rgba(247, 253, 255, 0.96)');
+		coreGradient.addColorStop(0.55, 'rgba(218, 240, 255, 0.9)');
+		coreGradient.addColorStop(1, 'rgba(159, 209, 238, 0.9)');
+		drawRoundRect(fiberStartX, coreTop, fiberW, coreHeight, coreRadius);
 		ctx.fillStyle = coreGradient;
-		ctx.fillRect(fiberStartX, fiberCenterY - coreRadius, fiberW, coreRadius * 2);
+		ctx.fill();
 
-		// Draw cladding edge lines (top and bottom)
-		ctx.strokeStyle = '#5f6f7f';
+		ctx.strokeStyle = 'rgba(62, 111, 155, 0.94)';
+		ctx.lineWidth = 1.25;
+		drawRoundRect(fiberStartX, fiberTop, fiberW, fiberHeight, claddingRadius);
+		ctx.stroke();
+
+		ctx.strokeStyle = 'rgba(255, 255, 255, 0.72)';
 		ctx.lineWidth = 1;
 		ctx.beginPath();
-		ctx.moveTo(fiberStartX, fiberCenterY - claddingRadius);
-		ctx.lineTo(geometry.fiberTipX, fiberCenterY - claddingRadius);
-		ctx.stroke();
-		
-		ctx.beginPath();
-		ctx.moveTo(fiberStartX, fiberCenterY + claddingRadius);
-		ctx.lineTo(geometry.fiberTipX, fiberCenterY + claddingRadius);
+		ctx.moveTo(fiberStartX + 2, fiberCenterY - 4.8);
+		ctx.lineTo(geometry.fiberTipX - 2, fiberCenterY - 4.8);
 		ctx.stroke();
 
-		// Draw reflection highlight on core (top)
-		const highlightGradient = ctx.createLinearGradient(fiberStartX, fiberCenterY - coreRadius - 2, fiberStartX, fiberCenterY - coreRadius + 2);
-		highlightGradient.addColorStop(0, 'rgba(220, 240, 255, 0.6)');
-		highlightGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.3)');
-		highlightGradient.addColorStop(1, 'rgba(220, 240, 255, 0)');
-		
-		ctx.fillStyle = highlightGradient;
-		ctx.fillRect(fiberStartX, fiberCenterY - coreRadius - 2, fiberW, 3);
-
-		// === DRAW FIBER TIP ===
-		
-		// Glowing tip effect at fiber exit (creates emission point)
 		ctx.save();
-		ctx.filter = 'blur(3px)';
-		const tipGlowGradient = ctx.createRadialGradient(geometry.fiberTipX, fiberCenterY, 0, geometry.fiberTipX, fiberCenterY, 8);
-		tipGlowGradient.addColorStop(0, 'rgba(255, 120, 80, 0.35)');
-		tipGlowGradient.addColorStop(1, 'rgba(255, 80, 60, 0.05)');
-		ctx.fillStyle = tipGlowGradient;
+		ctx.shadowColor = 'rgba(255, 133, 103, 0.52)';
+		ctx.shadowBlur = 10;
+		ctx.fillStyle = '#ffac91';
 		ctx.beginPath();
-		ctx.arc(geometry.fiberTipX, fiberCenterY, 8, 0, Math.PI * 2);
+		ctx.arc(geometry.fiberTipX, fiberCenterY, 2.8, 0, Math.PI * 2);
 		ctx.fill();
 		ctx.restore();
 
-		// Fiber tip cap (small circle at fiber end)
-		ctx.fillStyle = '#4a5a6a';
+		ctx.fillStyle = 'rgba(81, 103, 126, 0.5)';
 		ctx.beginPath();
-		ctx.arc(geometry.fiberTipX, fiberCenterY, coreRadius, 0, Math.PI * 2);
+		ctx.ellipse(fiberStartX - 1.5, fiberCenterY, 2.2, claddingRadius - 0.7, 0, 0, Math.PI * 2);
 		ctx.fill();
 
-		// Bright tip highlight
-		ctx.fillStyle = '#ffaa88';
-		ctx.beginPath();
-		ctx.arc(geometry.fiberTipX - 2, fiberCenterY - 2, 2, 0, Math.PI * 2);
-		ctx.fill();
-
-		// Label above fiber
-		ctx.fillStyle = '#2f455b';
-		ctx.font = '700 13px "IBM Plex Sans", sans-serif';
+		ctx.fillStyle = '#24415b';
+		ctx.font = '600 12px "IBM Plex Sans", sans-serif';
 		ctx.textAlign = 'left';
-		ctx.fillText('Optical Fiber', fiberStartX + 23, fiberY - 12);
+		ctx.fillText('Optical Fiber', fiberStartX + 16, fiberCenterY - 20);
 	}
 
 	function drawAcceptanceRays() {
@@ -1015,354 +1066,146 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function drawLightConeAndScreen() {
-		const screenX = getScreenX();
-		const spotRadius = getSpotRadiusPx();
-		const topY = geometry.centerY - spotRadius;
-		const bottomY = geometry.centerY + spotRadius;
-		const spotDiameterCm = getSpotDiameterCm();
-		const pulse = 0.6 + 0.4 * Math.sin(screenX * 0.04);
-		
-		// Draw acceptance rays to show cone structure
+		const rodX = getScreenX();
+		const scaleY = geometry.centerY + 138;
+		const spotDiameterCm = Math.max(getSpotDiameterCm(), 0.001);
+		const safeLcm = Math.max(state.Lcm, 0.01);
+		const beamSlope = (spotDiameterCm / 2) / safeLcm;
+		const screenRadius = cmToPixels(spotDiameterCm / 2);
+		const screenTopY = geometry.centerY - screenRadius;
+		const screenBottomY = geometry.centerY + screenRadius;
+		const beamFlicker = 0.93 + 0.07 * Math.sin(Date.now() * 0.012 + 1.4);
+
 		drawAcceptanceRays();
 
-		// === ENHANCED CONICAL LIGHT SPREAD ===
-		
-		// Draw multiple faint rays showing light propagation
+		// Draw movable rod first so cone remains visible over it and source never feels blocked.
+		const rodTop = 86;
+		const rodBottom = scaleY + 1;
+		const rodWidth = 5;
+		const rodLeft = rodX - rodWidth / 2;
+		const rodHeight = rodBottom - rodTop;
+
 		ctx.save();
-		ctx.filter = 'blur(0.5px)';
-		
-		// Draw 7 rays from fiber tip to screen (at various angles)
-		for (let i = -3; i <= 3; i++) {
-			const rayFraction = i / 3; // -1 to 1
-			const screenY = geometry.centerY + rayFraction * spotRadius;
-			const distanceToScreen = screenX - geometry.fiberTipX;
-			
-			// Gradient opacity that fades with distance
-			const maxOpacity = 0.20 - Math.abs(rayFraction) * 0.05;
-			
-			// Create gradient for each ray
-			const rayGradient = ctx.createLinearGradient(
-				geometry.fiberTipX, geometry.centerY,
-				screenX, screenY
-			);
-			rayGradient.addColorStop(0, `rgba(255, 150, 100, ${maxOpacity})`);
-			rayGradient.addColorStop(0.5, `rgba(255, 120, 80, ${maxOpacity * 0.6})`);
-			rayGradient.addColorStop(1, `rgba(255, 100, 60, ${maxOpacity * 0.1})`);
-			
-			ctx.strokeStyle = rayGradient;
-			ctx.lineWidth = 0.8;
-			ctx.lineCap = 'round';
-			ctx.beginPath();
-			ctx.moveTo(geometry.fiberTipX, geometry.centerY);
-			ctx.lineTo(screenX, screenY);
-			ctx.stroke();
-		}
-		
+		ctx.globalAlpha = 0.82;
+		ctx.shadowColor = 'rgba(24, 46, 72, 0.18)';
+		ctx.shadowBlur = 3;
+		ctx.shadowOffsetX = 1;
+		ctx.shadowOffsetY = 1;
+		const rodGradient = ctx.createLinearGradient(rodLeft, rodTop, rodLeft + rodWidth, rodTop);
+		rodGradient.addColorStop(0, '#193750');
+		rodGradient.addColorStop(0.5, '#2a5476');
+		rodGradient.addColorStop(1, '#163047');
+		drawRoundRect(rodLeft, rodTop, rodWidth, rodHeight, 3);
+		ctx.fillStyle = rodGradient;
+		ctx.fill();
 		ctx.restore();
 
-		// Draw main gradient cone fill (bright near fiber, fade towards screen)
+		ctx.strokeStyle = 'rgba(14, 36, 58, 0.62)';
+		ctx.lineWidth = 0.8;
+		drawRoundRect(rodLeft, rodTop, rodWidth, rodHeight, 3);
+		ctx.stroke();
+
+		ctx.strokeStyle = 'rgba(188, 223, 255, 0.52)';
+		ctx.lineWidth = 0.85;
+		ctx.beginPath();
+		ctx.moveTo(rodLeft + 1.2, rodTop + 2);
+		ctx.lineTo(rodLeft + 1.2, rodBottom - 2);
+		ctx.stroke();
+
 		ctx.save();
-		ctx.filter = 'blur(2px)';
-
-		const coneGradient = ctx.createLinearGradient(geometry.fiberTipX, geometry.centerY, screenX, geometry.centerY);
-		coneGradient.addColorStop(0, 'rgba(255, 160, 120, 0.50)');     // Bright orange at fiber
-		coneGradient.addColorStop(0.2, 'rgba(255, 140, 100, 0.45)');   
-		coneGradient.addColorStop(0.4, 'rgba(255, 120, 85, 0.35)');    
-		coneGradient.addColorStop(0.6, 'rgba(255, 100, 70, 0.20)');    // Fading orange
-		coneGradient.addColorStop(0.8, 'rgba(255, 90, 65, 0.10)');     // Very faint
-		coneGradient.addColorStop(1, 'rgba(255, 80, 60, 0.02)');       // Nearly invisible at screen
-
-		ctx.fillStyle = coneGradient;
+		ctx.filter = 'blur(2.6px)';
+		const coneOuterGradient = ctx.createLinearGradient(geometry.fiberTipX, geometry.centerY, rodX, geometry.centerY);
+		coneOuterGradient.addColorStop(0, `rgba(255, 96, 74, ${0.4 * beamFlicker})`);
+		coneOuterGradient.addColorStop(0.45, `rgba(255, 126, 96, ${0.24 * beamFlicker})`);
+		coneOuterGradient.addColorStop(0.8, `rgba(255, 169, 131, ${0.11 * beamFlicker})`);
+		coneOuterGradient.addColorStop(1, 'rgba(255, 206, 170, 0.01)');
+		ctx.fillStyle = coneOuterGradient;
 		ctx.beginPath();
 		ctx.moveTo(geometry.fiberTipX, geometry.centerY);
-		ctx.lineTo(screenX, topY);
-		ctx.lineTo(screenX, bottomY);
+		ctx.lineTo(rodX, screenTopY);
+		ctx.lineTo(rodX, screenBottomY);
+		ctx.closePath();
+		ctx.fill();
+		ctx.restore();
+
+		const coneInnerGradient = ctx.createLinearGradient(geometry.fiberTipX, geometry.centerY, rodX, geometry.centerY);
+		coneInnerGradient.addColorStop(0, `rgba(255, 74, 58, ${0.5 * beamFlicker})`);
+		coneInnerGradient.addColorStop(0.45, `rgba(255, 108, 82, ${0.3 * beamFlicker})`);
+		coneInnerGradient.addColorStop(1, 'rgba(255, 166, 124, 0.03)');
+		ctx.fillStyle = coneInnerGradient;
+		ctx.beginPath();
+		ctx.moveTo(geometry.fiberTipX, geometry.centerY);
+		ctx.lineTo(rodX, screenTopY);
+		ctx.lineTo(rodX, screenBottomY);
 		ctx.closePath();
 		ctx.fill();
 
-		ctx.restore();
-
-		// Draw smooth edge lines with gradual fade
-		ctx.strokeStyle = 'rgba(200, 70, 40, 0.80)';
-		ctx.lineWidth = 2.5;
-		ctx.beginPath();
-		ctx.moveTo(geometry.fiberTipX, geometry.centerY);
-		ctx.lineTo(screenX, topY);
-		ctx.moveTo(geometry.fiberTipX, geometry.centerY);
-		ctx.lineTo(screenX, bottomY);
-		ctx.stroke();
-
-		// Draw internal radiance rays with smooth fade
-		ctx.save();
-		ctx.filter = 'blur(0.8px)';
-		ctx.strokeStyle = `rgba(255, 150, 110, ${0.50 * pulse})`;
-		ctx.lineWidth = 1.5;
-		ctx.beginPath();
-		for (let i = -2; i <= 2; i += 1) {
-			const t = i / 2;
-			const rayY = geometry.centerY + t * spotRadius;
-			ctx.moveTo(geometry.fiberTipX, geometry.centerY);
-			ctx.lineTo(screenX, rayY);
-		}
-		ctx.stroke();
-		ctx.restore();
-
-		// === REALISTIC LAB SCREEN DESIGN ===
-		
-		// Screen panel dimensions - more prominent 3D appearance
-		const screenPanelWidth = 54;
-		const screenPanelHeight = 320;
-		const screenPanelTop = 48;
-		const screenPanelLeft = screenX - screenPanelWidth / 2;
-		const screenPanelRight = screenX + screenPanelWidth / 2;
-		const screenPanelBottom = screenPanelTop + screenPanelHeight;
-		
-		// Draw screen backing shadow for depth
-		ctx.save();
-		ctx.filter = 'blur(3px)';
-		ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-		ctx.fillRect(screenPanelLeft + 2, screenPanelTop + 2, screenPanelWidth, screenPanelHeight);
-		ctx.restore();
-		
-		// Draw main screen panel with enhanced 3D gradient
-		const panelGradient = ctx.createLinearGradient(screenPanelLeft, screenPanelTop, screenPanelRight, screenPanelTop);
-		panelGradient.addColorStop(0, '#c0d0e0');      // Left edge (darker shadow)
-		panelGradient.addColorStop(0.15, '#d5e0ed');   
-		panelGradient.addColorStop(0.5, '#e5f0f9');    // Center (lighter)
-		panelGradient.addColorStop(0.85, '#d0e0f0');   
-		panelGradient.addColorStop(1, '#b8c8d8');      // Right edge (darker shadow)
-		ctx.fillStyle = panelGradient;
-		ctx.fillRect(screenPanelLeft, screenPanelTop, screenPanelWidth, screenPanelHeight);
-		
-		// Draw screen frame border (darker edge)
-		ctx.strokeStyle = '#5a6a7a';
-		ctx.lineWidth = 2.5;
-		ctx.strokeRect(screenPanelLeft, screenPanelTop, screenPanelWidth, screenPanelHeight);
-		
-		// Draw inner highlight on left edge (3D beveled effect)
-		ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-		ctx.lineWidth = 1.5;
-		ctx.beginPath();
-		ctx.moveTo(screenPanelLeft + 1, screenPanelTop + 1);
-		ctx.lineTo(screenPanelLeft + 1, screenPanelBottom - 1);
-		ctx.stroke();
-		
-		// Draw inner shadow on right edge (beveled shadow)
-		ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
-		ctx.lineWidth = 1.5;
-		ctx.beginPath();
-		ctx.moveTo(screenPanelRight - 1, screenPanelTop + 1);
-		ctx.lineTo(screenPanelRight - 1, screenPanelBottom - 1);
-		ctx.stroke();
-		
-		// Draw screen surface with matte finish
-		const surfaceGradient = ctx.createLinearGradient(screenPanelLeft + 2, screenPanelTop + 2, screenPanelRight - 2, screenPanelBottom - 2);
-		surfaceGradient.addColorStop(0, 'rgba(240, 245, 250, 0.3)');
-		surfaceGradient.addColorStop(0.5, 'rgba(245, 250, 255, 0.1)');
-		surfaceGradient.addColorStop(1, 'rgba(235, 240, 248, 0.2)');
-		ctx.fillStyle = surfaceGradient;
-		ctx.fillRect(screenPanelLeft + 2, screenPanelTop + 2, screenPanelWidth - 4, screenPanelHeight - 4);
-		
-		// Draw screen label above
-		ctx.fillStyle = '#2a3a4a';
-		ctx.font = '700 13px "IBM Plex Sans", sans-serif';
-		ctx.textAlign = 'center';
-		ctx.fillText('Movable Screen', screenX, 50);
-		
-		// === SCREEN STAND/BASE ===
-		const baseWidth = 48;
-		const baseHeight = 8;
-		const baseLeft = screenX - baseWidth / 2;
-		const baseTop = screenPanelBottom + 1;
-		
-		// Draw stand shadow
-		ctx.save();
-		ctx.filter = 'blur(1.5px)';
-		ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
-		ctx.fillRect(baseLeft + 1, baseTop + 1, baseWidth, baseHeight);
-		ctx.restore();
-		
-		// Draw stand base gradient
-		const baseGradient = ctx.createLinearGradient(baseLeft, baseTop, baseLeft, baseTop + baseHeight);
-		baseGradient.addColorStop(0, '#b8c8d8');
-		baseGradient.addColorStop(0.5, '#a8b8c8');
-		baseGradient.addColorStop(1, '#98a8b8');
-		ctx.fillStyle = baseGradient;
-		ctx.fillRect(baseLeft, baseTop, baseWidth, baseHeight);
-		
-		// Draw stand edge definition
-		ctx.strokeStyle = '#7a8a9a';
+		ctx.strokeStyle = `rgba(230, 114, 86, ${0.36 * beamFlicker})`;
 		ctx.lineWidth = 1;
-		ctx.strokeRect(baseLeft, baseTop, baseWidth, baseHeight);
-		
-		// Draw support legs
-		const legWidth = 3;
-		const legHeight = 6;
-		const legColor = '#9ba8b8';
-		
-		// Left leg
-		ctx.fillStyle = legColor;
-		ctx.fillRect(baseLeft + 6, baseTop + baseHeight, legWidth, legHeight);
-		
-		// Right leg
-		ctx.fillRect(baseLeft + baseWidth - 9, baseTop + baseHeight, legWidth, legHeight);
-
-		// === ENHANCED SPOT ON SCREEN ===
-		
-		// Draw outer faint halo (very large, subtle)
-		ctx.save();
-		ctx.filter = 'blur(3px)';
-		const haloGradient = ctx.createRadialGradient(
-			screenX,
-			geometry.centerY,
-			spotRadius * 0.5,
-			screenX,
-			geometry.centerY,
-			spotRadius * 2.2
-		);
-		haloGradient.addColorStop(0, 'rgba(255, 140, 100, 0.12)');
-		haloGradient.addColorStop(0.4, 'rgba(255, 120, 85, 0.08)');
-		haloGradient.addColorStop(1, 'rgba(255, 80, 60, 0.01)');
-		ctx.fillStyle = haloGradient;
 		ctx.beginPath();
-		ctx.arc(screenX, geometry.centerY, spotRadius * 2.2, 0, Math.PI * 2);
-		ctx.fill();
-		ctx.restore();
-
-		// Draw main glow layer with blur (intermediate layer for depth)
-		ctx.save();
-		ctx.filter = 'blur(2.5px)';
-		const mainGlowGradient = ctx.createRadialGradient(
-			screenX,
-			geometry.centerY,
-			spotRadius * 0.10,
-			screenX,
-			geometry.centerY,
-			spotRadius * 1.8
-		);
-		mainGlowGradient.addColorStop(0, 'rgba(255, 180, 140, 0.60)');
-		mainGlowGradient.addColorStop(0.3, 'rgba(255, 150, 110, 0.50)');
-		mainGlowGradient.addColorStop(0.6, 'rgba(255, 120, 80, 0.25)');
-		mainGlowGradient.addColorStop(1, 'rgba(255, 80, 60, 0.05)');
-		ctx.fillStyle = mainGlowGradient;
-		ctx.beginPath();
-		ctx.arc(screenX, geometry.centerY, spotRadius * 1.8, 0, Math.PI * 2);
-		ctx.fill();
-		ctx.restore();
-
-		// Draw main spot with strong radial gradient (bright center → fade edges)
-		const spotGradient = ctx.createRadialGradient(
-			screenX,
-			geometry.centerY,
-			spotRadius * 0.01,
-			screenX,
-			geometry.centerY,
-			spotRadius
-		);
-		spotGradient.addColorStop(0, 'rgba(255, 200, 180, 0.85)');     // Intense white-red center
-		spotGradient.addColorStop(0.20, 'rgba(255, 160, 120, 0.80)');  
-		spotGradient.addColorStop(0.45, 'rgba(255, 130, 90, 0.72)');   
-		spotGradient.addColorStop(0.70, 'rgba(255, 100, 70, 0.55)');   
-		spotGradient.addColorStop(1, 'rgba(255, 70, 50, 0.25)');       // Faded edge
-
-		ctx.fillStyle = spotGradient;
-		ctx.beginPath();
-		ctx.arc(screenX, geometry.centerY, spotRadius, 0, Math.PI * 2);
-		ctx.fill();
-
-		// Draw spot edge for definition
-		ctx.strokeStyle = 'rgba(200, 60, 35, 0.70)';
-		ctx.lineWidth = 1.5;
-		ctx.beginPath();
-		ctx.arc(screenX, geometry.centerY, spotRadius, 0, Math.PI * 2);
+		ctx.moveTo(geometry.fiberTipX, geometry.centerY);
+		ctx.lineTo(rodX, screenTopY);
+		ctx.moveTo(geometry.fiberTipX, geometry.centerY);
+		ctx.lineTo(rodX, screenBottomY);
 		ctx.stroke();
 
-		// Draw bright center core
-		const coreRadius = Math.max(2, spotRadius * 0.35);
-		
-		// Core glow layer
-		ctx.save();
-		ctx.filter = 'blur(1.5px)';
-		const coreGlowGradient = ctx.createRadialGradient(
-			screenX,
-			geometry.centerY,
-			0,
-			screenX,
-			geometry.centerY,
-			coreRadius * 1.3
-		);
-		coreGlowGradient.addColorStop(0, 'rgba(255, 250, 235, 0.55)');
-		coreGlowGradient.addColorStop(1, 'rgba(255, 240, 220, 0.15)');
-		ctx.fillStyle = coreGlowGradient;
-		ctx.beginPath();
-		ctx.arc(screenX, geometry.centerY, coreRadius * 1.3, 0, Math.PI * 2);
-		ctx.fill();
-		ctx.restore();
-		
-		// Core bright center
-		const coreGradient = ctx.createRadialGradient(
-			screenX,
-			geometry.centerY,
-			0,
-			screenX,
-			geometry.centerY,
-			coreRadius
-		);
-		coreGradient.addColorStop(0, 'rgba(255, 250, 240, 0.85)');
-		coreGradient.addColorStop(1, 'rgba(255, 245, 225, 0.70)');
-		ctx.fillStyle = coreGradient;
-		ctx.beginPath();
-		ctx.arc(screenX, geometry.centerY, coreRadius, 0, Math.PI * 2);
-		ctx.fill();
-
-		ctx.fillStyle = '#233f59';
-		ctx.font = '600 12px "IBM Plex Sans", sans-serif';
-		ctx.textAlign = 'left';
-		ctx.fillText(`Selected L = ${state.Lcm.toFixed(2)} cm`, screenX + 14, 84);
-
-		ctx.strokeStyle = '#c28a10';
-		ctx.lineWidth = 2;
-		ctx.beginPath();
-		ctx.moveTo(screenX + 30, topY);
-		ctx.lineTo(screenX + 30, bottomY);
-		ctx.stroke();
-
-		ctx.beginPath();
-		ctx.moveTo(screenX + 22, topY);
-		ctx.lineTo(screenX + 38, topY);
-		ctx.moveTo(screenX + 22, bottomY);
-		ctx.lineTo(screenX + 38, bottomY);
-		ctx.stroke();
-
-		// === DIAMETER MEASUREMENT INDICATOR ===
-		
-		// Draw horizontal diameter line at top of spot
-		const diameterLineY = topY - 8;
-		ctx.strokeStyle = 'rgba(200, 100, 50, 0.8)';
-		ctx.lineWidth = 1.8;
-		ctx.setLineDash([]);
-		ctx.beginPath();
-		ctx.moveTo(screenX - spotRadius, diameterLineY);
-		ctx.lineTo(screenX + spotRadius, diameterLineY);
-		ctx.stroke();
-		
-		// Draw tick marks at ends
-		const tickLength = 6;
-		ctx.lineWidth = 1.8;
-		ctx.beginPath();
-		// Left tick
-		ctx.moveTo(screenX - spotRadius, diameterLineY - tickLength / 2);
-		ctx.lineTo(screenX - spotRadius, diameterLineY + tickLength / 2);
-		// Right tick
-		ctx.moveTo(screenX + spotRadius, diameterLineY - tickLength / 2);
-		ctx.lineTo(screenX + spotRadius, diameterLineY + tickLength / 2);
-		ctx.stroke();
-		
-		// Draw diameter label
-		ctx.fillStyle = '#c28a10';
-		ctx.font = '500 11px "IBM Plex Sans", sans-serif';
+		ctx.fillStyle = '#24435f';
+		ctx.font = '600 11px "IBM Plex Sans", sans-serif';
 		ctx.textAlign = 'center';
-		ctx.fillText(`D = ${spotDiameterCm.toFixed(2)} cm`, screenX, diameterLineY - 12);
+		const movableLabelX = clamp(rodX + 8, geometry.fiberTipX + 8, canvas.width - 110);
+		ctx.fillText('Movable Screen', movableLabelX, 52);
+		ctx.fillStyle = '#2b3f53';
+		const selectedLabelX = clamp(rodX + 44, geometry.fiberTipX + 88, canvas.width - 90);
+		ctx.fillText(`Selected L = ${state.Lcm.toFixed(2)} cm`, selectedLabelX, 68);
+
+		// D-based spot at movable screen position (diameter equals computed D).
+		const movableSpotRadius = Math.max(2, screenRadius);
+		ctx.save();
+		ctx.filter = 'blur(1.8px)';
+		const movableSpotHalo = ctx.createRadialGradient(rodX, geometry.centerY, 1, rodX, geometry.centerY, movableSpotRadius * 1.9);
+		movableSpotHalo.addColorStop(0, `rgba(255, 212, 186, ${0.4 * beamFlicker})`);
+		movableSpotHalo.addColorStop(0.55, `rgba(255, 150, 116, ${0.2 * beamFlicker})`);
+		movableSpotHalo.addColorStop(1, 'rgba(255, 120, 90, 0.02)');
+		ctx.fillStyle = movableSpotHalo;
+		ctx.beginPath();
+		ctx.arc(rodX, geometry.centerY, movableSpotRadius * 1.9, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.restore();
+
+		const movableSpotGradient = ctx.createRadialGradient(rodX, geometry.centerY, 0, rodX, geometry.centerY, movableSpotRadius);
+		movableSpotGradient.addColorStop(0, 'rgba(255, 249, 240, 0.95)');
+		movableSpotGradient.addColorStop(0.35, `rgba(255, 176, 139, ${0.88 * beamFlicker})`);
+		movableSpotGradient.addColorStop(1, `rgba(255, 122, 92, ${0.28 * beamFlicker})`);
+		ctx.fillStyle = movableSpotGradient;
+		ctx.beginPath();
+		ctx.arc(rodX, geometry.centerY, movableSpotRadius, 0, Math.PI * 2);
+		ctx.fill();
+
+		// Dynamic diameter indicator on the movable screen.
+		const exitBracketY = geometry.centerY - movableSpotRadius - 10;
+		const dynamicBracketW = Math.max(24, movableSpotRadius * 2);
+		const bracketStartX = rodX - dynamicBracketW / 2;
+		const bracketEndX = rodX + dynamicBracketW / 2;
+		const capH = 3.8;
+
+		ctx.strokeStyle = '#cc8a2e';
+		ctx.lineWidth = 1.2;
+		ctx.lineCap = 'round';
+		ctx.beginPath();
+		ctx.moveTo(bracketStartX, exitBracketY);
+		ctx.lineTo(bracketEndX, exitBracketY);
+		ctx.moveTo(bracketStartX, exitBracketY - capH);
+		ctx.lineTo(bracketStartX, exitBracketY + capH);
+		ctx.moveTo(bracketEndX, exitBracketY - capH);
+		ctx.lineTo(bracketEndX, exitBracketY + capH);
+		ctx.stroke();
+
+		ctx.fillStyle = '#c6781b';
+		ctx.font = '600 11px "IBM Plex Sans", sans-serif';
+		ctx.textAlign = 'left';
+		const dLabelX = Math.min(bracketEndX + 8, canvas.width - 120);
+		const dLabelY = exitBracketY - 8;
+		ctx.fillText(`D = ${spotDiameterCm.toFixed(2)} cm`, dLabelX, dLabelY);
 	}
 
 	function render() {
@@ -1441,7 +1284,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	function onPointerDown(event) {
 		const pointerX = getPointerX(event);
 
-		if (Math.abs(pointerX - state.screenX) <= 14) {
+		if (Math.abs(pointerX - state.screenX) <= 10) {
 			stopScreenAnimation();
 			state.screenDragging = true;
 		}
@@ -1534,4 +1377,5 @@ document.addEventListener('DOMContentLoaded', () => {
 	setCaptureStatus('Capture stores current measured L and D into the next empty row.');
 	syncModeDependentState();
 	render();
+	startVisualFxLoop();
 });

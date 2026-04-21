@@ -55,16 +55,25 @@
 	</section>
 
 	<section class="experiment-section">
+		<h3><u>PROCEDURE</u></h3>
+		<ol class="procedure-list">
+			<li>Connect the fiber to the Laser source.</li>
+			<li>Take the other end of the fiber and project the light output on to the screen to obtain a bright circular spot of size say 5mm.</li>
+			<li>Determine the diameter D of the bright spot and the distance L from the fiber end to the screen and measure the diameter of the spot (D) and the distance between the screen &amp; the optical fiber end (L).</li>
+			<li>Calculate the acceptance angle using the formula <strong>&theta;<sub>a</sub> = tan<sup>&minus;1</sup> (D / 2L)</strong>.</li>
+			<li>Numerical aperture is given by <strong>N.A = sin &theta;<sub>a</sub></strong>.</li>
+			<li>Now for the same fiber repeat this procedure for at least four other values of distance L and calculate the acceptance angle and numerical aperture in each case. Finally take the average of the four numerical aperture values.</li>
+			<li>Now repeat the above procedure for the remaining fibers.</li>
+		</ol>
+	</section>
+
+	<section class="experiment-section">
 		<h3><u>RAY DIAGRAM</u></h3>
-		<div class="ray-diagram-container lab-figure-box">
-			<div class="lab-figure-image lab-figure-image-md" style="display:flex;align-items:center;justify-content:space-around;min-height:180px;border:1px dashed #8a8a8a;">
-				<div><strong>Laser</strong></div>
-				<div><strong>&rarr;</strong></div>
-				<div><strong>Optical Fiber</strong></div>
-				<div><strong>&rarr;</strong></div>
-				<div><strong>Screen</strong></div>
+		<div class="ray-diagram-container">
+			<div class="ray-diagram-card">
+				<img src="{{ url_for('static', filename='js/images/NA_optical_fibre.png') }}" alt="Optical Fiber Ray Diagram" class="ray-diagram-image">
 			</div>
-			<p class="lab-caption">
+			<p class="ray-caption">
 				<strong>Figure:</strong> Laser &rarr; Optical Fiber &rarr; Screen showing cone angle &theta;<sub>A</sub> and spot diameter D.
 			</p>
 		</div>
@@ -94,7 +103,20 @@
 					<span id="naFreeModeLabel" class="na-free-mode-label" hidden>Free Exploration Mode</span>
 					<h4>Step 2: Observe Spot and Measure D</h4>
 					<p class="measure-text">Observe the circular spot on the screen and read its diameter marker.</p>
-					<p id="naFreeModeFeedback" class="na-free-mode-feedback" hidden>Live: L = <span id="naLiveExploreL">--</span> cm, D = <span id="naLiveExploreD">--</span> cm</p>
+					<p id="naFreeModeFeedback" class="na-free-mode-feedback" hidden>
+						Live: L = <span id="naLiveExploreL">--</span> cm,
+						D = <span id="naLiveExploreD">--</span> cm,
+						&theta;<sub>A</sub> = <span id="naLiveExploreTheta">--</span>&deg;,
+						N.A = <span id="naLiveExploreNA">--</span>
+					</p>
+					<div id="naExploreDControlWrap" class="na-explore-d-control" hidden>
+						<label for="naExploreDSlider"><strong>Adjust Spot Diameter D (cm)</strong></label>
+						<input type="range" id="naExploreDSlider" min="0.05" max="3.2" step="0.01" value="0.10">
+						<div class="na-explore-d-input-row">
+							<label for="naExploreDInput">D input (cm)</label>
+							<input type="number" id="naExploreDInput" class="input-compact" min="0.05" max="3.2" step="0.01" value="0.10">
+						</div>
+					</div>
 					<p class="measure-text"><strong>Measured D from spot size:</strong> <span id="naMeasuredDiameterValue">--</span> cm</p>
 					<p class="helper-text">Do not auto-fill values. Record <strong>D</strong> manually in the observation table for each trial.</p>
 				</div>
@@ -180,9 +202,9 @@
 	</section>
 
 	<section class="experiment-section">
-		<h3><u>RESULT</u></h3>
-		<p><strong>Mean &theta;<sub>A</sub> =</strong> <span id="meanThetaValue">______</span> degree</p>
-		<p><strong>Mean N.A =</strong> <span id="meanNAValue">______</span></p>
+		<h3><u>RESULTS:</u></h3>
+		<p>1. The acceptance angle of the given optical fiber is <span id="meanThetaValue" class="result-placeholder">______</span> &deg;</p>
+		<p>2. The numerical aperture for the given optical fiber is found to be <span id="meanNAValue" class="result-placeholder">______</span></p>
 	</section>
 
 </div>

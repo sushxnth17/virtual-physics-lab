@@ -567,6 +567,50 @@ button[id*="reset"] {
   font-style: italic;
 }
 
+.ray-diagram-container {
+  margin-top: var(--space-3);
+}
+
+.ray-diagram-card {
+  max-width: 700px;
+  width: 100%;
+  margin: 20px auto 0;
+  padding: 1rem;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  border: 1px solid #d9e5f1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.ray-diagram-image {
+  display: block;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ray-diagram-card:hover .ray-diagram-image,
+.ray-diagram-card:focus-within .ray-diagram-image {
+  transform: scale(1.02);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.ray-caption {
+  margin: 10px auto 0;
+  text-align: center;
+  font-style: italic;
+  color: #555;
+  max-width: 760px;
+}
+
+.ray-diagram-card img {
+  height: auto;
+}
+
 .reference-section {
   margin-top: 30px;
   background: #f2f4f7;
@@ -957,13 +1001,49 @@ div:has(> canvas#diffractionChart) {
 
 .na-free-mode-feedback {
   margin: 0 0 0.55rem;
-  padding: 0.35rem 0.55rem;
+  padding: 0.4rem 0.62rem;
   border-radius: 8px;
-  background: #fffdf1;
-  border: 1px solid #e9ddb0;
-  color: #5a4920;
-  font-size: 0.85rem;
+  background: #f7faff;
+  border: 1px solid #cfdeec;
+  color: #27445f;
+  font-size: 0.83rem;
   font-weight: 600;
+  line-height: 1.45;
+}
+
+.na-explore-d-control {
+  margin: 0 0 0.7rem;
+  padding: 0.56rem 0.62rem;
+  border: 1px solid #d2dfec;
+  border-radius: 8px;
+  background: #f9fcff;
+}
+
+.na-explore-d-control label {
+  display: block;
+  font-size: 0.8rem;
+  color: #24455f;
+  margin-bottom: 0.35rem;
+}
+
+.na-explore-d-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.45rem;
+}
+
+.na-explore-d-input-row label {
+  margin: 0;
+  min-width: 90px;
+  font-size: 0.77rem;
+  font-weight: 600;
+  color: #35516b;
+}
+
+#naExploreDInput {
+  max-width: 104px;
+  padding: 0.36rem 0.48rem;
 }
 
 .na-control-card input[type="range"] {
