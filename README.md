@@ -147,6 +147,30 @@ Students can observe:
 
 ---
 
+### 5.Black Box Experiment – Identification of Unknown Components
+
+This experiment helps determine whether unknown components inside a black box are a Resistor, Capacitor, or Inductor by analyzing their impedance behavior with varying frequency.
+
+### Features
+- Component selection (Z1, Z2, Z3) for independent testing
+- Simulated Ammeter and Voltmeter for real-time readings
+- Frequency selection (1 kHz to 5 kHz in steps)
+- Record button to store measured voltage and current values
+- Observation table for systematic data entry
+- Automatic impedance calculation for each component
+- Automatic inference of component type based on frequency response
+- Backend integration for calculation and validation
+
+### Learning Outcomes
+
+Students can observe:
+
+- How impedance varies with frequency for different components
+- Identification of resistor (constant impedance), capacitor (decreasing), and inductor (increasing)
+- Relationship between voltage, current, and impedance
+- Practical understanding of experimental data recording and analysis
+- Concept of using indirect measurements to identify unknown components
+
 ## Technologies Used
 
 - Python (Flask) – Backend experiment computation
