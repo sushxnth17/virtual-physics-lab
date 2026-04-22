@@ -314,6 +314,28 @@ canvas {
   }
 }
 
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
 .experiment-section h3,
 .graphs-section h3 {
   margin-bottom: var(--space-3);
@@ -825,6 +847,35 @@ div:has(> canvas#diffractionChart) {
 
 .column-panel .table-container {
   border-radius: var(--radius-sm);
+}
+
+.instrument-strip {
+  gap: var(--space-4);
+}
+
+.instrument-display-card {
+  background: linear-gradient(180deg, #f7fbff 0%, #edf6ff 100%);
+  border-color: #b7cee3;
+}
+
+.instrument-label {
+  margin: 0 0 var(--space-2);
+  color: #294864;
+  letter-spacing: 0.03em;
+}
+
+.instrument-value {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #244760;
+  border-radius: 10px;
+  background: #0c1c2a;
+  color: #8dffba;
+  font-family: "IBM Plex Mono", "Courier New", monospace;
+  font-size: clamp(1.15rem, 2vw, 1.7rem);
+  font-weight: 700;
+  text-align: center;
+  box-shadow: inset 0 0 0 1px rgba(143, 250, 189, 0.2);
 }
 
 /* =============================
