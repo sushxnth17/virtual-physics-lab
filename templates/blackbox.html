@@ -101,6 +101,65 @@
 		</div>
 	</section>
 
+	<section class="experiment-section info-section-card">
+		<h3><u>Simulation Panel</u></h3>
+
+		<div class="frequency-control">
+			<p><strong>Select Component</strong></p>
+			<div class="u-flex u-wrap u-gap-3 u-mt-2">
+				<label><input type="radio" name="componentSelect" value="Z1" checked> Z1</label>
+				<label><input type="radio" name="componentSelect" value="Z2"> Z2</label>
+				<label><input type="radio" name="componentSelect" value="Z3"> Z3</label>
+			</div>
+		</div>
+
+		<div class="frequency-control">
+			<label for="freqSelect">Frequency (Hz)</label>
+			<select id="freqSelect" class="u-mt-2">
+				<option value="1000">1000</option>
+				<option value="2000">2000</option>
+				<option value="3000">3000</option>
+				<option value="4000">4000</option>
+				<option value="5000">5000</option>
+			</select>
+		</div>
+
+		<div class="split-columns instrument-strip u-mt-4">
+			<div class="column-panel formula-block instrument-display-card u-text-center">
+				<p class="instrument-label"><strong>Voltmeter</strong></p>
+				<p class="instrument-value"><span id="voltmeterDisplay">0.00 V</span></p>
+			</div>
+			<div class="column-panel formula-block instrument-display-card u-text-center">
+				<p class="instrument-label"><strong>Ammeter</strong></p>
+				<p class="instrument-value"><span id="ammeterDisplay">0.00 mA</span></p>
+			</div>
+		</div>
+
+		<div class="split-columns u-mt-4">
+			<div class="column-panel formula-block">
+				<h4><strong>Z<sub>1</sub></strong></h4>
+				<p>Voltage (V): <span id="v1Display">0.00</span></p>
+				<p>Current (mA): <span id="i1Display">0.00</span></p>
+			</div>
+
+			<div class="column-panel formula-block">
+				<h4><strong>Z<sub>2</sub></strong></h4>
+				<p>Voltage (V): <span id="v2Display">0.00</span></p>
+				<p>Current (mA): <span id="i2Display">0.00</span></p>
+			</div>
+
+			<div class="column-panel formula-block">
+				<h4><strong>Z<sub>3</sub></strong></h4>
+				<p>Voltage (V): <span id="v3Display">0.00</span></p>
+				<p>Current (mA): <span id="i3Display">0.00</span></p>
+			</div>
+		</div>
+
+		<div class="action-row action-button-container u-mt-4">
+			<button type="button" id="addReadingBtn" class="btn btn-primary">Add Reading to Table</button>
+		</div>
+	</section>
+
 	<section class="experiment-section">
 		<h3><u>Observation Table</u></h3>
 
