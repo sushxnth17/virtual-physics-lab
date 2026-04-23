@@ -624,6 +624,340 @@ button[id*="reset"] {
   color: #3f5266;
 }
 
+.blackbox-circuit-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.blackbox-circuit-status {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.9fr);
+  gap: var(--space-4);
+  align-items: stretch;
+}
+
+.blackbox-frequency-strip {
+  padding: var(--space-3);
+  border: 1px solid #d3e0ec;
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, #fdfefe 0%, #f3f8fd 100%);
+}
+
+.status-kicker {
+  margin-bottom: 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5c7288;
+}
+
+.frequency-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.frequency-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid #bfd1e3;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #4b6178;
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition), background-color var(--transition), color var(--transition);
+}
+
+.frequency-chip.is-active {
+  border-color: #5e95c2;
+  background: linear-gradient(180deg, #eaf4fd 0%, #dff0ff 100%);
+  color: #12446f;
+  box-shadow: 0 8px 16px rgba(25, 84, 129, 0.16);
+  transform: translateY(-1px);
+}
+
+.instrument-display-card--compact {
+  margin-top: 0;
+  min-height: 100%;
+}
+
+.instrument-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.instrument-label {
+  margin-bottom: 0.35rem;
+}
+
+.instrument-value {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.2rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.live-reading {
+  display: inline-block;
+  transition: opacity 140ms ease, transform 140ms ease, color 140ms ease;
+}
+
+.instrument-display-card.is-updating .live-reading {
+  opacity: 0.6;
+  transform: scale(0.98);
+}
+
+.instrument-update-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(31, 122, 74, 0.2);
+  box-shadow: 0 0 0 rgba(31, 122, 74, 0);
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+}
+
+.instrument-update-indicator.is-active {
+  opacity: 1;
+  background: #1f7a4a;
+  transform: scale(1);
+  box-shadow: 0 0 0 7px rgba(31, 122, 74, 0.12);
+  animation: instrument-pulse 0.8s ease-out;
+}
+
+@keyframes instrument-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(31, 122, 74, 0.24);
+  }
+  100% {
+    box-shadow: 0 0 0 10px rgba(31, 122, 74, 0);
+  }
+}
+
+.blackbox-circuit-stage {
+  position: relative;
+  min-height: 260px;
+  border: 1px solid #cad8e7;
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(180deg, rgba(244, 249, 253, 0.96) 0%, rgba(237, 245, 252, 0.96) 100%),
+    radial-gradient(circle at top left, rgba(138, 180, 214, 0.24), transparent 32%),
+    #f7fbff;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.blackbox-circuit-stage::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border: 1px dashed rgba(92, 114, 136, 0.16);
+  border-radius: calc(var(--radius-md) - 2px);
+  pointer-events: none;
+}
+
+.blackbox-circuit-svg {
+  display: block;
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+  height: auto;
+}
+
+.bb-wire {
+  stroke: #405c74;
+  stroke-width: 2.4;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke var(--transition), opacity var(--transition);
+}
+
+.bb-wire--main {
+  stroke: #3a5268;
+}
+
+.bb-wire--lead,
+.bb-wire--voltmeter {
+  stroke: #4f6f8b;
+}
+
+.bb-source,
+.bb-meter {
+  fill: #fdfefe;
+  stroke: #2e4a62;
+  stroke-width: 2.2;
+}
+
+.bb-meter-needle-wrap {
+  transition: transform 320ms ease;
+  transform-box: view-box;
+}
+
+.bb-meter-needle {
+  stroke: #d44b4b;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+}
+
+.bb-meter-scale {
+  pointer-events: none;
+}
+
+.bb-meter-tick {
+  stroke: #39546d;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.bb-meter-scale-label {
+  font-size: 7px;
+  font-family: "IBM Plex Sans", "Segoe UI", Tahoma, sans-serif;
+  font-weight: 700;
+  fill: #35566f;
+}
+
+.bb-meter-pivot {
+  fill: #2d465d;
+  stroke: #f8fbff;
+  stroke-width: 1.2;
+}
+
+.bb-source-wave {
+  stroke: #394f63;
+  stroke-width: 2.8;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.bb-node-label {
+  font-size: 24px;
+  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  fill: #2d465d;
+  font-weight: 600;
+}
+
+.bb-component-label {
+  font-size: 28px;
+  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  fill: #22384b;
+  font-weight: 600;
+}
+
+.bb-meter-label {
+  font-size: 15px;
+  font-family: "IBM Plex Sans", "Segoe UI", Tahoma, sans-serif;
+  fill: #27465f;
+  font-weight: 700;
+}
+
+.bb-component-box {
+  fill: #fcfdff;
+  stroke: #355066;
+  stroke-width: 2.2;
+  transition: stroke var(--transition), fill var(--transition), opacity var(--transition), filter var(--transition);
+}
+
+.bb-component {
+  transition: opacity var(--transition);
+}
+
+.bb-component.is-active .bb-component-box,
+.bb-component.is-active .bb-wire--branch,
+.bb-component.is-active .bb-component-label {
+  opacity: 1;
+  stroke: #224e73;
+  fill: #22384b;
+  filter: drop-shadow(0 0 6px rgba(63, 125, 176, 0.35));
+}
+
+.bb-component.is-active .bb-component-box {
+  fill: #eef7ff;
+}
+
+.bb-component.is-muted .bb-component-box,
+.bb-component.is-muted .bb-wire--branch,
+.bb-component.is-muted .bb-component-label {
+  opacity: 0.38;
+  stroke: #7891a9;
+  fill: #596f84;
+}
+
+.bb-meter-reading,
+.bb-source-frequency {
+  font-size: 10px;
+  font-family: "IBM Plex Sans", "Segoe UI", Tahoma, sans-serif;
+  fill: #1f4f76;
+  font-weight: 600;
+  transition: opacity 150ms ease;
+}
+
+.component-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid #bfd1e3;
+  border-radius: 999px;
+  background: #f9fcff;
+  color: var(--color-primary-dark);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  transition: background-color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), color var(--transition);
+}
+
+.component-option input {
+  margin: 0;
+}
+
+.component-option.is-active {
+  border-color: #5e95c2;
+  background: linear-gradient(180deg, #eaf4fd 0%, #dff0ff 100%);
+  color: #12446f;
+  box-shadow: 0 8px 14px rgba(25, 84, 129, 0.12);
+  transform: translateY(-1px);
+}
+
+.blackbox-control-row {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.blackbox-control-row .frequency-control {
+  flex: 1 1 260px;
+  margin-top: 0;
+}
+
+.blackbox-control-row .frequency-control select {
+  max-width: 100%;
+}
+
+button:disabled,
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+button:disabled:hover,
+.btn:disabled:hover {
+  transform: none;
+}
+
 .lab-figure-image {
   width: 100%;
   height: auto;
@@ -801,6 +1135,36 @@ div:has(> canvas#diffractionChart) {
 
 .action-row {
   margin-top: var(--space-4);
+}
+
+@media (max-width: 900px) {
+  .blackbox-circuit-status {
+    grid-template-columns: 1fr;
+  }
+
+  .blackbox-circuit-stage {
+    min-width: 720px;
+  }
+
+  .blackbox-circuit-card {
+    overflow-x: auto;
+    padding-bottom: 0.2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .instrument-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .frequency-chip-list {
+    gap: 0.4rem;
+  }
+
+  .component-option {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .measure-panel {

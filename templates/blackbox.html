@@ -97,41 +97,138 @@
 	<section class="experiment-section info-section-card">
 		<h3><u>Circuit Diagram</u></h3>
 		<div class="diagram-container">
-			<img src="" alt="Black Box Circuit Diagram" class="diagram-placeholder">
+			<div class="diagram-placeholder-box">
+				<p>Static circuit image placeholder</p>
+			</div>
 		</div>
 	</section>
 
 	<section class="experiment-section info-section-card">
 		<h3><u>Simulation Panel</u></h3>
 
-		<div class="frequency-control">
-			<p><strong>Select Component</strong></p>
-			<div class="u-flex u-wrap u-gap-3 u-mt-2">
-				<label><input type="radio" name="componentSelect" value="Z1" checked> Z1</label>
-				<label><input type="radio" name="componentSelect" value="Z2"> Z2</label>
-				<label><input type="radio" name="componentSelect" value="Z3"> Z3</label>
-			</div>
-		</div>
+		<div class="diagram-container blackbox-circuit-card u-mt-3">
+			<div class="blackbox-circuit-status">
+				<div class="blackbox-frequency-strip">
+					<div class="blackbox-control-row">
+						<div class="frequency-control">
+							<p><strong>Select Component</strong></p>
+							<div class="u-flex u-wrap u-gap-3 u-mt-2">
+								<label class="component-option" data-component-option="Z1"><input type="radio" name="componentSelect" value="Z1" checked> Z1</label>
+								<label class="component-option" data-component-option="Z2"><input type="radio" name="componentSelect" value="Z2"> Z2</label>
+								<label class="component-option" data-component-option="Z3"><input type="radio" name="componentSelect" value="Z3"> Z3</label>
+							</div>
+						</div>
 
-		<div class="frequency-control">
-			<label for="freqSelect">Frequency (Hz)</label>
-			<select id="freqSelect" class="u-mt-2">
-				<option value="1000">1000</option>
-				<option value="2000">2000</option>
-				<option value="3000">3000</option>
-				<option value="4000">4000</option>
-				<option value="5000">5000</option>
-			</select>
-		</div>
+						<div class="frequency-control">
+							<label for="freqSelect">Frequency (Hz)</label>
+							<select id="freqSelect" class="u-mt-2">
+								<option value="1000">1000</option>
+								<option value="2000">2000</option>
+								<option value="3000">3000</option>
+								<option value="4000">4000</option>
+								<option value="5000">5000</option>
+							</select>
+						</div>
+					</div>
 
-		<div class="split-columns instrument-strip u-mt-4">
-			<div class="column-panel formula-block instrument-display-card u-text-center">
-				<p class="instrument-label"><strong>Voltmeter</strong></p>
-				<p class="instrument-value"><span id="voltmeterDisplay">0.00 V</span></p>
+				</div>
+
 			</div>
-			<div class="column-panel formula-block instrument-display-card u-text-center">
-				<p class="instrument-label"><strong>Ammeter</strong></p>
-				<p class="instrument-value"><span id="ammeterDisplay">0.00 mA</span></p>
+
+			<div class="blackbox-circuit-stage" aria-label="Black Box circuit connection diagram">
+				<svg class="blackbox-circuit-svg" viewBox="0 0 900 430" role="img" aria-label="Circuit with source between A and B, ammeter in series, selectable Z component between C and D, and voltmeter in parallel">
+					<line class="bb-wire bb-wire--main" x1="110" y1="180" x2="178" y2="180" />
+					<line class="bb-wire bb-wire--main" x1="262" y1="180" x2="360" y2="180" />
+					<line class="bb-wire bb-wire--main" x1="650" y1="180" x2="760" y2="180" />
+					<line class="bb-wire bb-wire--main" x1="760" y1="180" x2="760" y2="360" />
+					<line class="bb-wire bb-wire--main" x1="760" y1="360" x2="110" y2="360" />
+					<line class="bb-wire bb-wire--main" x1="110" y1="180" x2="110" y2="208" />
+					<line class="bb-wire bb-wire--main" x1="110" y1="292" x2="110" y2="360" />
+
+					<circle class="bb-meter" cx="220" cy="180" r="42" />
+					<g class="bb-meter-scale" aria-hidden="true">
+						<line class="bb-meter-tick" x1="220" y1="146" x2="220" y2="140" transform="rotate(-120 220 180)" />
+						<line class="bb-meter-tick" x1="220" y1="146" x2="220" y2="140" transform="rotate(-72 220 180)" />
+						<line class="bb-meter-tick" x1="220" y1="146" x2="220" y2="140" transform="rotate(-24 220 180)" />
+						<line class="bb-meter-tick" x1="220" y1="146" x2="220" y2="140" transform="rotate(24 220 180)" />
+						<line class="bb-meter-tick" x1="220" y1="146" x2="220" y2="140" transform="rotate(72 220 180)" />
+						<line class="bb-meter-tick" x1="220" y1="146" x2="220" y2="140" transform="rotate(120 220 180)" />
+
+						<text class="bb-meter-scale-label" x="194" y="198" text-anchor="middle">0</text>
+						<text class="bb-meter-scale-label" x="188" y="175" text-anchor="middle">1</text>
+						<text class="bb-meter-scale-label" x="204" y="156" text-anchor="middle">2</text>
+						<text class="bb-meter-scale-label" x="236" y="156" text-anchor="middle">3</text>
+						<text class="bb-meter-scale-label" x="252" y="175" text-anchor="middle">4</text>
+						<text class="bb-meter-scale-label" x="246" y="198" text-anchor="middle">5</text>
+					</g>
+					<g class="bb-meter-needle-wrap" id="ammeterNeedleWrap" aria-hidden="true">
+						<line class="bb-meter-needle" x1="220" y1="180" x2="220" y2="148" />
+						<circle class="bb-meter-pivot" cx="220" cy="180" r="4" />
+					</g>
+					<text class="bb-meter-label" x="220" y="184" text-anchor="middle">mA</text>
+					<text class="bb-meter-reading" id="circuitAmmeterReading" x="220" y="210" text-anchor="middle">0.00 mA</text>
+
+					<circle class="bb-source" cx="110" cy="250" r="42" />
+					<path class="bb-source-wave" d="M84 256 C92 220, 100 220, 110 256 C118 292, 126 292, 136 226" />
+					<text class="bb-source-frequency" id="generatorFrequencyText" x="110" y="308" text-anchor="middle">1.0 kHz</text>
+
+					<text class="bb-node-label" x="79" y="186">A</text>
+					<text class="bb-node-label" x="79" y="348">B</text>
+					<text class="bb-node-label" x="366" y="210">C</text>
+					<text class="bb-node-label" x="652" y="210">D</text>
+
+					<line class="bb-wire bb-wire--lead" id="componentLeadLeft" x1="360" y1="180" x2="360" y2="180" />
+					<line class="bb-wire bb-wire--lead" id="componentLeadRight" x1="650" y1="180" x2="650" y2="180" />
+
+					<g class="bb-component is-muted" data-circuit-component="Z3" data-circuit-y="80">
+						<line class="bb-wire bb-wire--branch" x1="360" y1="80" x2="430" y2="80" />
+						<rect class="bb-component-box" x="430" y="59" width="130" height="42" rx="3" />
+						<line class="bb-wire bb-wire--branch" x1="560" y1="80" x2="650" y2="80" />
+						<text class="bb-component-label" x="495" y="87" text-anchor="middle">Z3</text>
+					</g>
+
+					<g class="bb-component is-muted" data-circuit-component="Z2" data-circuit-y="130">
+						<line class="bb-wire bb-wire--branch" x1="360" y1="130" x2="430" y2="130" />
+						<rect class="bb-component-box" x="430" y="109" width="130" height="42" rx="3" />
+						<line class="bb-wire bb-wire--branch" x1="560" y1="130" x2="650" y2="130" />
+						<text class="bb-component-label" x="495" y="137" text-anchor="middle">Z2</text>
+					</g>
+
+					<g class="bb-component is-active" data-circuit-component="Z1" data-circuit-y="180">
+						<line class="bb-wire bb-wire--branch" x1="360" y1="180" x2="430" y2="180" />
+						<rect class="bb-component-box" x="430" y="159" width="130" height="42" rx="3" />
+						<line class="bb-wire bb-wire--branch" x1="560" y1="180" x2="650" y2="180" />
+						<text class="bb-component-label" x="495" y="187" text-anchor="middle">Z1</text>
+					</g>
+
+					<line class="bb-wire bb-wire--voltmeter" id="voltmeterLeadLeft" x1="360" y1="180" x2="360" y2="258" />
+					<line class="bb-wire bb-wire--voltmeter" id="voltmeterLeadRight" x1="650" y1="180" x2="650" y2="258" />
+					<line class="bb-wire bb-wire--voltmeter" id="voltmeterBridgeLeft" x1="360" y1="258" x2="463" y2="258" />
+					<line class="bb-wire bb-wire--voltmeter" id="voltmeterBridgeRight" x1="547" y1="258" x2="650" y2="258" />
+
+					<circle class="bb-meter" cx="505" cy="258" r="42" />
+					<g class="bb-meter-scale" aria-hidden="true">
+						<line class="bb-meter-tick" x1="505" y1="224" x2="505" y2="218" transform="rotate(-120 505 258)" />
+						<line class="bb-meter-tick" x1="505" y1="224" x2="505" y2="218" transform="rotate(-72 505 258)" />
+						<line class="bb-meter-tick" x1="505" y1="224" x2="505" y2="218" transform="rotate(-24 505 258)" />
+						<line class="bb-meter-tick" x1="505" y1="224" x2="505" y2="218" transform="rotate(24 505 258)" />
+						<line class="bb-meter-tick" x1="505" y1="224" x2="505" y2="218" transform="rotate(72 505 258)" />
+						<line class="bb-meter-tick" x1="505" y1="224" x2="505" y2="218" transform="rotate(120 505 258)" />
+
+						<text class="bb-meter-scale-label" x="479" y="276" text-anchor="middle">0</text>
+						<text class="bb-meter-scale-label" x="473" y="253" text-anchor="middle">2</text>
+						<text class="bb-meter-scale-label" x="489" y="234" text-anchor="middle">4</text>
+						<text class="bb-meter-scale-label" x="521" y="234" text-anchor="middle">6</text>
+						<text class="bb-meter-scale-label" x="537" y="253" text-anchor="middle">8</text>
+						<text class="bb-meter-scale-label" x="531" y="276" text-anchor="middle">10</text>
+					</g>
+					<g class="bb-meter-needle-wrap" id="voltmeterNeedleWrap" aria-hidden="true">
+						<line class="bb-meter-needle" x1="505" y1="258" x2="505" y2="226" />
+						<circle class="bb-meter-pivot" cx="505" cy="258" r="4" />
+					</g>
+					<text class="bb-meter-label" x="505" y="262" text-anchor="middle">V</text>
+					<text class="bb-meter-reading" id="circuitVoltmeterReading" x="505" y="288" text-anchor="middle">0.00 V</text>
+				</svg>
 			</div>
 		</div>
 
@@ -156,7 +253,7 @@
 		</div>
 
 		<div class="action-row action-button-container u-mt-4">
-			<button type="button" id="addReadingBtn" class="btn btn-primary">Add Reading to Table</button>
+			<button type="button" id="addReadingBtn" class="btn btn-primary" disabled>Add Reading to Table</button>
 		</div>
 	</section>
 

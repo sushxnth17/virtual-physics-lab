@@ -170,13 +170,150 @@ function updateSelectedComponentDisplay(component, reading) {
 function updateInstrumentDisplays(reading) {
 	const voltmeterDisplay = document.getElementById('voltmeterDisplay');
 	const ammeterDisplay = document.getElementById('ammeterDisplay');
+	const voltmeterPulse = document.getElementById('voltmeterPulse');
+	const ammeterPulse = document.getElementById('ammeterPulse');
+	const circuitVoltmeterReading = document.getElementById('circuitVoltmeterReading');
+	const circuitAmmeterReading = document.getElementById('circuitAmmeterReading');
+	const ammeterNeedleWrap = document.getElementById('ammeterNeedleWrap');
+	const voltmeterNeedleWrap = document.getElementById('voltmeterNeedleWrap');
+
+	const setMeterNeedle = (needleElement, value, minValue, maxValue, centerX, centerY) => {
+		if (!needleElement) {
+			return;
+		}
+
+		const numericValue = Number(value);
+		const safeValue = Number.isFinite(numericValue) ? numericValue : minValue;
+		const clampedValue = Math.min(maxValue, Math.max(minValue, safeValue));
+		const ratio = maxValue > minValue ? (clampedValue - minValue) / (maxValue - minValue) : 0;
+		const angle = -120 + (ratio * 240);
+
+		needleElement.style.transformOrigin = `${centerX}px ${centerY}px`;
+		needleElement.style.transform = `rotate(${angle}deg)`;
+	};
+
+	const animateLiveReading = (displayElement, pulseElement, textValue) => {
+		if (!displayElement) {
+			return;
+		}
+
+		const instrumentCard = displayElement.closest('.instrument-display-card');
+		if (instrumentCard) {
+			instrumentCard.classList.add('is-updating');
+		}
+
+		if (pulseElement) {
+			pulseElement.classList.remove('is-active');
+			window.requestAnimationFrame(() => {
+				pulseElement.classList.add('is-active');
+			});
+			window.setTimeout(() => {
+				pulseElement.classList.remove('is-active');
+			}, 700);
+		}
+
+		displayElement.style.opacity = '0.45';
+		displayElement.style.transform = 'translateY(-1px) scale(0.98)';
+
+		window.setTimeout(() => {
+			displayElement.textContent = textValue;
+			window.requestAnimationFrame(() => {
+				displayElement.style.opacity = '1';
+				displayElement.style.transform = 'translateY(0) scale(1)';
+			});
+			window.setTimeout(() => {
+				if (instrumentCard) {
+					instrumentCard.classList.remove('is-updating');
+				}
+			}, 180);
+		}, 110);
+	};
 
 	if (voltmeterDisplay) {
-		voltmeterDisplay.textContent = `${Number(reading.V).toFixed(2)} V`;
+		animateLiveReading(voltmeterDisplay, voltmeterPulse, `${Number(reading.V).toFixed(2)} V`);
 	}
 	if (ammeterDisplay) {
-		ammeterDisplay.textContent = `${Number(reading.I).toFixed(2)} mA`;
+		animateLiveReading(ammeterDisplay, ammeterPulse, `${Number(reading.I).toFixed(2)} mA`);
 	}
+
+	if (circuitVoltmeterReading) {
+		circuitVoltmeterReading.textContent = `${Number(reading.V).toFixed(2)} V`;
+	}
+	if (circuitAmmeterReading) {
+		circuitAmmeterReading.textContent = `${Number(reading.I).toFixed(2)} mA`;
+	}
+
+	setMeterNeedle(ammeterNeedleWrap, reading.I, 0, 5, 220, 180);
+	setMeterNeedle(voltmeterNeedleWrap, reading.V, 0, 10, 505, 258);
+}
+
+function setBlackBoxActiveComponent(component) {
+	const componentCards = document.querySelectorAll('[data-component-card]');
+	const circuitComponents = document.querySelectorAll('[data-circuit-component]');
+	const componentOptions = document.querySelectorAll('[data-component-option]');
+
+	componentCards.forEach((card) => {
+		const isActive = card.getAttribute('data-component-card') === component;
+		card.classList.toggle('is-active', isActive);
+		card.classList.toggle('is-muted', !isActive);
+	});
+
+	circuitComponents.forEach((group) => {
+		const isActive = group.getAttribute('data-circuit-component') === component;
+		group.classList.toggle('is-active', isActive);
+		group.classList.toggle('is-muted', !isActive);
+	});
+
+	const selectedCircuitComponent = document.querySelector(`[data-circuit-component="${component}"]`);
+	const selectedY = selectedCircuitComponent
+		? Number(selectedCircuitComponent.getAttribute('data-circuit-y'))
+		: 180;
+
+	const updateLineY = (lineId, y1, y2) => {
+		const line = document.getElementById(lineId);
+		if (!line) {
+			return;
+		}
+		line.setAttribute('y1', String(y1));
+		line.setAttribute('y2', String(y2));
+	};
+
+	updateLineY('componentLeadLeft', 180, selectedY);
+	updateLineY('componentLeadRight', 180, selectedY);
+	updateLineY('voltmeterLeadLeft', selectedY, 258);
+	updateLineY('voltmeterLeadRight', selectedY, 258);
+
+	componentOptions.forEach((option) => {
+		const isActive = option.getAttribute('data-component-option') === component;
+		option.classList.toggle('is-active', isActive);
+	});
+}
+
+function setBlackBoxActiveFrequency(freq) {
+	const selectedFrequency = Number(freq);
+	const frequencyChips = document.querySelectorAll('[data-frequency-chip]');
+	const generatorFrequencyText = document.getElementById('generatorFrequencyText');
+
+	frequencyChips.forEach((chip) => {
+		const chipFrequency = Number(chip.getAttribute('data-frequency-chip'));
+		chip.classList.toggle('is-active', chipFrequency === selectedFrequency);
+	});
+
+	if (generatorFrequencyText && Number.isFinite(selectedFrequency)) {
+		generatorFrequencyText.textContent = `${selectedFrequency} Hz`;
+	}
+}
+
+function updateBlackBoxRecordState(component, freq) {
+	const isReady = Boolean(component) && Number.isFinite(Number(freq));
+	const buttons = ['addReadingBtn', 'recordBtn'];
+
+	buttons.forEach((buttonId) => {
+		const button = document.getElementById(buttonId);
+		if (button) {
+			button.disabled = !isReady;
+		}
+	});
 }
 
 function updateSimulationDisplayWithDelay(readings, delayMs = 180) {
@@ -683,6 +820,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			const selectedComponent = selectedRadio ? selectedRadio.value : 'Z1';
 			const selectedFrequency = Number(freqSelect.value);
 			const instrumentReading = getReading(selectedComponent, selectedFrequency);
+			setBlackBoxActiveComponent(selectedComponent);
+			setBlackBoxActiveFrequency(selectedFrequency);
+			updateBlackBoxRecordState(selectedComponent, selectedFrequency);
 			highlightActiveFrequencyRow(selectedFrequency);
 			updateSelectedComponentDisplay(selectedComponent, instrumentReading);
 			updateInstrumentDisplays(instrumentReading);
