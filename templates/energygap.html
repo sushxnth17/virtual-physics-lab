@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="experiment-container">
+
+	<div class="experiment-header">
+		<p>Experiment: 8</p>
+		<h2>ENERGY GAP OF THE SEMICONDUCTOR</h2>
+	</div>
+
+	<section class="experiment-section">
+		<h3><u>AIM</u></h3>
+		<p>To determine the energy gap of the semiconductor (thermistor).</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>APPARATUS REQUIRED</u></h3>
+		<p>Multimeter, thermistor, heater, thermometer, and beaker.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>FORMULA USED</u></h3>
+		<p class="equation-line"><strong>$$E_g = \frac{2.303 \times 2K \times S}{1.601 \times 10^{-19}}\ \text{eV}$$</strong></p>
+		<p><strong>Where</strong></p>
+		<p>E<sub>g</sub> = Energy gap of the given semiconductor in eV</p>
+		<p>K = Boltzmann constant = 1.38 &times; 10<sup>-23</sup> JK<sup>-1</sup></p>
+		<p>S = Slope of the graph</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>THEORY</u></h3>
+		<p>
+			Thermistors are semiconductor devices whose resistance varies with temperature. The variation of
+			resistance (R) with absolute temperature (T) is given by:
+		</p>
+		<p class="equation-line"><strong>$$R = R_0 e^{\left(E_g / 2KT\right)}$$</strong></p>
+		<p>Taking logarithm on both sides:</p>
+		<p class="equation-line"><strong>$$\log R = \log R_0 + \frac{E_g}{2KT}$$</strong></p>
+		<p>
+			Therefore, a plot of log R versus 1/T is a straight line. If the slope of this graph is S,
+			the energy gap can be determined using the above formula.
+		</p>
+	</section>
+
+	<section class="experiment-section reference-section">
+		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
+		<h3><u>CIRCUIT DIAGRAM</u></h3>
+		<div class="diagram-placeholder-box">
+			<img
+				src="{{ url_for('static', filename='js/images/energygap_circuit.png') }}"
+				alt="Energy gap experiment circuit diagram"
+				class="reference-image"
+				onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+			>
+			<p style="display:none;">Circuit with thermistor immersed in a heated beaker, thermometer, and ohmmeter connection.</p>
+		</div>
+	</section>
+
+	<section class="experiment-section reference-section">
+		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
+		<h3><u>NATURE OF GRAPH</u></h3>
+		<div class="diagram-placeholder-box">
+			<img
+				src="{{ url_for('static', filename='js/images/energygap_graph.png') }}"
+				alt="Nature of graph log R versus inverse temperature"
+				class="reference-image"
+				onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+			>
+			<p style="display:none;">Straight line graph of log R versus 1/T (K<sup>-1</sup>), with slope S = AB / BC.</p>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>TABULAR COLUMN</u></h3>
+		<div class="table-container">
+			<table class="observation-table">
+				<thead>
+					<tr>
+						<th>Sl No</th>
+						<th>Temp (&deg;C)</th>
+						<th>Temp (K)</th>
+						<th>Resistance (&Omega;)</th>
+						<th>log R</th>
+						<th>1/T (K<sup>-1</sup>)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr><td>1</td><td>75</td><td></td><td></td><td></td><td></td></tr>
+					<tr><td>2</td><td>70</td><td></td><td></td><td></td><td></td></tr>
+					<tr><td>3</td><td>65</td><td></td><td></td><td></td><td></td></tr>
+					<tr><td>4</td><td>60</td><td></td><td></td><td></td><td></td></tr>
+					<tr><td>5</td><td>55</td><td></td><td></td><td></td><td></td></tr>
+					<tr><td>6</td><td>50</td><td></td><td></td><td></td><td></td></tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>PROCEDURE</u></h3>
+		<ol class="procedure-list">
+			<li>An ohmmeter is connected across the thermistor (red to red and black to black).</li>
+			<li>The thermistor is immersed in hot water, heated to about 95&deg;C.</li>
+			<li>During cooling, the resistance of the thermistor is noted for different temperatures at 5&deg;C intervals.</li>
+			<li>The readings are tabulated and a graph of log R versus 1/T is plotted. The slope (S) of the straight line is determined.</li>
+			<li>The energy gap of the given semiconductor is calculated using the formula.</li>
+		</ol>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>RESULT</u></h3>
+		<p>The energy gap of the given semiconducting material is E<sub>g</sub> = <span class="result-blank">&nbsp;</span> eV.</p>
+	</section>
+
+</div>
+{% endblock %}
