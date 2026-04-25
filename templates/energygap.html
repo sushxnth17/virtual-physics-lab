@@ -42,6 +42,48 @@
 		</p>
 	</section>
 
+	<section class="experiment-section energygap-simulation-section">
+		<h3><u>INTERACTIVE SIMULATION</u></h3>
+		<p class="energygap-instruction">Follow the lab procedure in order: Start Heating, allow the cooling step to settle, record the reading, then move to the next step.</p>
+		<div class="energygap-sim-layout">
+			<div class="energygap-scene-card">
+				<canvas id="energygapSimulationCanvas" width="980" height="420" aria-label="Energy gap simulation scene"></canvas>
+			</div>
+			<div class="energygap-controls-card">
+				<div class="energygap-status-panel">
+					<p class="energygap-status-kicker">Current Procedure State</p>
+					<div class="energygap-status-value" id="energygapPhaseLabel">Ready to start heating</div>
+					<div class="energygap-live-grid">
+						<div>
+							<span class="energygap-live-label">Temperature</span>
+							<strong id="energygapTempDisplay">30.0</strong> &deg;C
+						</div>
+						<div>
+							<span class="energygap-live-label">Kelvin</span>
+							<strong id="energygapTempKDisplay">303</strong> K
+						</div>
+						<div>
+							<span class="energygap-live-label">Resistance</span>
+							<strong id="energygapResistanceDisplay">-</strong> &Omega;
+						</div>
+						<div>
+							<span class="energygap-live-label">Energy gap</span>
+							<strong id="energygapResultDisplay">-</strong> eV
+						</div>
+					</div>
+				</div>
+				<div class="energygap-control-actions">
+					<button type="button" id="energygapStartBtn" class="btn btn-primary">Start Heating</button>
+					<button type="button" id="energygapNextBtn" class="btn btn-secondary">Next Reading</button>
+					<button type="button" id="energygapRecordBtn" class="btn btn-primary">Record Reading</button>
+				</div>
+				<div class="energygap-helper-box" id="energygapHelperText">
+					Heating has not started yet.
+				</div>
+			</div>
+		</div>
+	</section>
+
 	<section class="experiment-section reference-section">
 		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
 		<h3><u>CIRCUIT DIAGRAM</u></h3>
@@ -72,6 +114,7 @@
 
 	<section class="experiment-section">
 		<h3><u>TABULAR COLUMN</u></h3>
+		<p class="energygap-table-note">Record only after the cooling step settles. The matching row becomes available at 75&deg;C, 70&deg;C, 65&deg;C, 60&deg;C, 55&deg;C and 50&deg;C.</p>
 		<div class="table-container">
 			<table class="observation-table">
 				<thead>
@@ -107,10 +150,28 @@
 		</ol>
 	</section>
 
+	<section class="experiment-section energygap-graph-section">
+		<h3><u>GRAPH</u></h3>
+		<div class="energygap-graph-shell">
+			<div class="graph-container energygap-graph-card">
+				<canvas id="energygapGraphCanvas" width="900" height="360"></canvas>
+			</div>
+			<div class="energygap-analysis-card">
+				<p class="energygap-analysis-label">Best-fit analysis</p>
+				<p>Slope S = <strong id="energygapSlopeValue">-</strong></p>
+				<p>Energy gap E<sub>g</sub> = <strong id="energygapGraphResult">-</strong> eV</p>
+			</div>
+		</div>
+	</section>
+
 	<section class="experiment-section">
 		<h3><u>RESULT</u></h3>
-		<p>The energy gap of the given semiconducting material is E<sub>g</sub> = <span class="result-blank">&nbsp;</span> eV.</p>
+		<p>The energy gap of the given semiconducting material is E<sub>g</sub> = <span class="result-blank" id="energyGapResultValue">&nbsp;</span> eV.</p>
 	</section>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='energygap.js') }}"></script>
 {% endblock %}
