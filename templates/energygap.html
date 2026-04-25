@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="experiment-container">
+
+	<div class="experiment-header">
+		<p>Experiment: 8</p>
+		<h2>ENERGY GAP OF THE SEMICONDUCTOR</h2>
+	</div>
+
+	<section class="experiment-section">
+		<h3><u>AIM</u></h3>
+		<p>To determine the energy gap of the semiconductor (thermistor).</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>APPARATUS REQUIRED</u></h3>
+		<p>Multimeter, thermistor, heater, thermometer, and beaker.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>FORMULA USED</u></h3>
+		<p class="equation-line"><strong>$$E_g = \frac{2.303 \times 2K \times S}{1.601 \times 10^{-19}}\ \text{eV}$$</strong></p>
+		<p><strong>Where</strong></p>
+		<p>E<sub>g</sub> = Energy gap of the given semiconductor in eV</p>
+		<p>K = Boltzmann constant = 1.38 &times; 10<sup>-23</sup> JK<sup>-1</sup></p>
+		<p>S = Slope of the graph</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>THEORY</u></h3>
+		<p>
+			Thermistors are semiconductor devices whose resistance varies with temperature. The variation of
+			resistance (R) with absolute temperature (T) is given by:
+		</p>
+		<p class="equation-line"><strong>$$R = R_0 e^{\left(E_g / 2KT\right)}$$</strong></p>
+		<p>Taking logarithm on both sides:</p>
+		<p class="equation-line"><strong>$$\log R = \log R_0 + \frac{E_g}{2KT}$$</strong></p>
+		<p>
+			Therefore, a plot of log R versus 1/T is a straight line. If the slope of this graph is S,
+			the energy gap can be determined using the above formula.
+		</p>
+	</section>
+
+	<section class="experiment-section energygap-simulation-section">
+		<h3><u>INTERACTIVE SIMULATION</u></h3>
+		<p class="energygap-instruction">Follow the lab procedure in order: Start Heating, allow the cooling step to settle, record the reading, then move to the next step.</p>
+		<div class="energygap-sim-layout">
+			<div class="energygap-scene-card">
+				<canvas id="energygapSimulationCanvas" width="980" height="420" aria-label="Energy gap simulation scene"></canvas>
+			</div>
+			<div class="energygap-controls-card">
+				<div class="energygap-status-panel">
+					<p class="energygap-status-kicker">Current Procedure State</p>
+					<div class="energygap-status-value" id="energygapPhaseLabel">Ready to start heating</div>
+					<div class="energygap-live-grid">
+						<div>
+							<span class="energygap-live-label">Temperature</span>
+							<strong id="energygapTempDisplay">30.0</strong> &deg;C
+						</div>
+						<div>
+							<span class="energygap-live-label">Kelvin</span>
+							<strong id="energygapTempKDisplay">303</strong> K
+						</div>
+						<div>
+							<span class="energygap-live-label">Resistance</span>
+							<strong id="energygapResistanceDisplay">-</strong> &Omega;
+						</div>
+						<div>
+							<span class="energygap-live-label">Energy gap</span>
+							<strong id="energygapResultDisplay">-</strong> eV
+						</div>
+					</div>
+				</div>
+				<div class="energygap-control-actions">
+					<button type="button" id="energygapStartBtn" class="btn btn-primary">Start Heating</button>
+					<button type="button" id="energygapNextBtn" class="btn btn-secondary">Next Reading</button>
+					<button type="button" id="energygapRecordBtn" class="btn btn-primary">Record Reading</button>
+				</div>
+				<div class="energygap-helper-box" id="energygapHelperText">
+					Heating has not started yet.
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="experiment-section reference-section">
+		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
+		<h3><u>CIRCUIT DIAGRAM</u></h3>
+		<div class="diagram-placeholder-box">
+			<img
+				src="{{ url_for('static', filename='js/images/energygap_circuit.png') }}"
+				alt="Energy gap experiment circuit diagram"
+				class="reference-image"
+				onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+			>
+			<p style="display:none;">Circuit with thermistor immersed in a heated beaker, thermometer, and ohmmeter connection.</p>
+		</div>
+	</section>
+
+	<section class="experiment-section reference-section">
+		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
+		<h3><u>NATURE OF GRAPH</u></h3>
+		<div class="diagram-placeholder-box">
+			<img
+				src="{{ url_for('static', filename='js/images/energygap_graph.png') }}"
+				alt="Nature of graph log R versus inverse temperature"
+				class="reference-image"
+				onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+			>
+			<p style="display:none;">Straight line graph of log R versus 1/T (K<sup>-1</sup>), with slope S = AB / BC.</p>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>TABULAR COLUMN</u></h3>
+		<p class="energygap-table-note">Record only after the cooling step settles. The matching row becomes available at 75&deg;C, 70&deg;C, 65&deg;C, 60&deg;C, 55&deg;C and 50&deg;C.</p>
+		<div class="table-container">
+			<table class="observation-table">
+				<thead>
+					<tr>
+						<th>Sl No</th>
+						<th>Temp (&deg;C)</th>
+						<th>Temp (K)</th>
+						<th>Resistance (&Omega;)</th>
+						<th>log R</th>
+						<th>1/T (K<sup>-1</sup>)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr><td>1</td><td>75</td><td></td><td></td><td></td><td></td></tr>
+					<tr><td>2</td><td>70</td><td></td><td></td><td></td><td></td></tr>
+					<tr><td>3</td><td>65</td><td></td><td></td><td></td><td></td></tr>
+					<tr><td>4</td><td>60</td><td></td><td></td><td></td><td></td></tr>
+					<tr><td>5</td><td>55</td><td></td><td></td><td></td><td></td></tr>
+					<tr><td>6</td><td>50</td><td></td><td></td><td></td><td></td></tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>PROCEDURE</u></h3>
+		<ol class="procedure-list">
+			<li>An ohmmeter is connected across the thermistor (red to red and black to black).</li>
+			<li>The thermistor is immersed in hot water, heated to about 95&deg;C.</li>
+			<li>During cooling, the resistance of the thermistor is noted for different temperatures at 5&deg;C intervals.</li>
+			<li>The readings are tabulated and a graph of log R versus 1/T is plotted. The slope (S) of the straight line is determined.</li>
+			<li>The energy gap of the given semiconductor is calculated using the formula.</li>
+		</ol>
+	</section>
+
+	<section class="experiment-section energygap-graph-section">
+		<h3><u>GRAPH</u></h3>
+		<div class="energygap-graph-shell">
+			<div class="graph-container energygap-graph-card">
+				<canvas id="energygapGraphCanvas" width="900" height="360"></canvas>
+			</div>
+			<div class="energygap-analysis-card">
+				<p class="energygap-analysis-label">Best-fit analysis</p>
+				<p>Slope S = <strong id="energygapSlopeValue">-</strong></p>
+				<p>Energy gap E<sub>g</sub> = <strong id="energygapGraphResult">-</strong> eV</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>RESULT</u></h3>
+		<p>The energy gap of the given semiconducting material is E<sub>g</sub> = <span class="result-blank" id="energyGapResultValue">&nbsp;</span> eV.</p>
+	</section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='energygap.js') }}"></script>
+{% endblock %}

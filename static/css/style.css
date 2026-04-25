@@ -456,10 +456,20 @@ button[id*="compute"] {
   box-shadow: 0 6px 12px rgba(11, 63, 102, 0.24);
 }
 
+.btn-secondary {
+  background: #5b7287;
+  color: #ffffff;
+  box-shadow: 0 6px 12px rgba(59, 84, 109, 0.2);
+}
+
 .btn-primary:hover,
 button[id*="calculate"]:hover,
 button[id*="compute"]:hover {
   background: var(--color-primary-dark);
+}
+
+.btn-secondary:hover {
+  background: #46586a;
 }
 
 button[id*="reset"] {
@@ -586,6 +596,170 @@ button[id*="reset"] {
   min-width: 90px;
   border-bottom: 1px solid #8ea8c3;
   padding: 0 0.55rem;
+}
+
+.energygap-simulation-section,
+.energygap-graph-section {
+  border-left-color: #4d86b5;
+}
+
+.energygap-instruction,
+.energygap-table-note {
+  margin-bottom: var(--space-3);
+  color: var(--color-text-soft);
+}
+
+.energygap-sim-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.9fr);
+  gap: var(--space-4);
+  align-items: stretch;
+}
+
+.energygap-scene-card,
+.energygap-controls-card,
+.energygap-analysis-card {
+  border: 1px solid #c8d7e6;
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, #ffffff 0%, #f6fbff 100%);
+  box-shadow: var(--shadow-card);
+}
+
+.energygap-scene-card {
+  padding: var(--space-3);
+}
+
+#energygapSimulationCanvas,
+#energygapGraphCanvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.energygap-controls-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.energygap-status-panel {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid #d5e2ee;
+  background: linear-gradient(180deg, #f9fcff 0%, #eef6fd 100%);
+}
+
+.energygap-status-kicker,
+.energygap-analysis-label {
+  margin-bottom: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5a7288;
+}
+
+.energygap-status-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  margin-bottom: var(--space-4);
+}
+
+.energygap-live-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.energygap-live-grid > div {
+  padding: 0.75rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #d7e4ef;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.energygap-live-label {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.8rem;
+  color: var(--color-text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.energygap-live-grid strong {
+  font-size: 1.05rem;
+  color: var(--color-primary-dark);
+}
+
+.energygap-control-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.energygap-helper-box {
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #d9e6f1;
+  background: #f9fcff;
+  color: #35526a;
+}
+
+.energygap-graph-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(250px, 0.6fr);
+  gap: var(--space-4);
+  align-items: stretch;
+}
+
+.energygap-graph-card {
+  min-height: 100%;
+}
+
+.energygap-analysis-card {
+  padding: var(--space-4);
+}
+
+.energygap-analysis-card p {
+  margin-bottom: var(--space-2);
+}
+
+.energygap-analysis-card p:last-child {
+  margin-bottom: 0;
+}
+
+.energygap-recorded-row {
+  background: #eef9ef !important;
+}
+
+.energygap-recorded-row td {
+  color: #224a32;
+  font-weight: 600;
+}
+
+@media (max-width: 1100px) {
+  .energygap-sim-layout,
+  .energygap-graph-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .energygap-live-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .energygap-control-actions {
+    flex-direction: column;
+  }
+
+  .energygap-control-actions .btn,
+  .energygap-control-actions button {
+    width: 100%;
+  }
 }
 
 /* =============================
