@@ -19,34 +19,98 @@
 	</section>
 
 	<section class="experiment-section">
-		<h3><u>INTRODUCTION</u></h3>
-		<p>In a metal, electrons are free to move inside the material and are responsible for electrical conduction. Even at very low temperatures, these electrons occupy energy levels up to a highest filled level called the Fermi energy. This energy gives important information about how electrons behave in the metal.</p>
-		<p>When the temperature of a metal wire changes, its resistance also changes. By measuring resistance at different temperatures, we can estimate how strongly the electron system responds to temperature variation. This allows us to calculate the slope of resistance with respect to temperature, which is used in the Fermi energy formula.</p>
-		<p>Once Fermi energy is known, we can find the Fermi temperature. Fermi temperature is a theoretical temperature scale associated with the electron energy distribution in the metal. Together, these values help us understand the microscopic electronic properties of conducting materials.</p>
+		<h3><u>CIRCUIT DIAGRAM</u></h3>
+		<div class="diagram-placeholder-box">
+			<img
+				src="{{ url_for('static', filename='js/images/fermiCircuit.png') }}"
+				alt="Fermi energy circuit diagram"
+				style="display:block;max-width:100%;height:auto;margin:0 auto;"
+			>
+		</div>
 	</section>
 
 	<section class="experiment-section">
-		<h3><u>CIRCUIT DIAGRAM</u></h3>
+		<h3><u>NATURE OF GRAPH</u></h3>
 		<div class="diagram-placeholder-box">
-			<p>[Circuit diagram: heating coil, thermometer, power supply]</p>
+			<img
+				src="{{ url_for('static', filename='js/images/fermiNatureGraph.png') }}"
+				alt="Nature of graph for Fermi energy experiment"
+				style="display:block;max-width:100%;height:auto;margin:0 auto;"
+			>
 		</div>
 	</section>
 
 	<section class="experiment-section">
 		<h3><u>FORMULAE</u></h3>
 		<div>
-			<p><strong>E<sub>F</sub> = C (T / R)<sup>2</sup> (dR/dT)<sup>2</sup></strong></p>
-			<p><strong>T<sub>F</sub> = E<sub>F</sub> / k</strong></p>
-			<p><strong>Slope = &Delta;R / &Delta;T</strong></p>
+			<p><strong>(a)&nbsp;&nbsp;E<sub>F</sub> = [ (n e<sup>2</sup> &pi; A r<sup>2</sup>) / (L sqrt(2m)) ]<sup>2</sup> &times; (&Delta;R / &Delta;T)<sup>2</sup></strong></p>
+			<p>Where&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;E<sub>F</sub> is the Fermi energy of the material of the given coil in J</p>
+			<p class="u-ml-4">n is the number density of electrons in m<sup>-3</sup></p>
+			<p class="u-ml-4">m is the mass of electron in kg</p>
+			<p class="u-ml-4">e is the charge of the electron in C</p>
+			<p class="u-ml-4">A is &lambda;<sub>F</sub> &times; T</p>
+			<p class="u-ml-4">&lambda;<sub>F</sub> is the mean free path of electrons in m</p>
+			<p class="u-ml-4">T is the reference temperature of the wire in K</p>
+			<p class="u-ml-4">r is the radius of the copper wire in m</p>
+			<p class="u-ml-4">L is the length of the copper wire in m</p>
+			<p class="u-ml-4">&Delta;R / &Delta;T is the slope of the straight line obtained by plotting resistance of the metal against absolute temperature of the metal in &Omega;K<sup>-1</sup></p>
+
+			<p><strong>Also, Fermi Energy can be written as,&nbsp;&nbsp;E<sub>F</sub> = C (T / R)<sup>2</sup> (&Delta;R / &Delta;T)<sup>2</sup></strong></p>
+			<p class="u-ml-4">Where, C = constant = 11.22 &times; 10<sup>-19</sup> J</p>
+			<p class="u-ml-4">R is resistance at reference temperature T</p>
+
+			<p class="u-mt-4"><strong>(b)&nbsp;&nbsp;T<sub>F</sub> = E<sub>F</sub> / k</strong></p>
+			<p class="u-ml-4">Where,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;T<sub>F</sub> is the Fermi temperature in K</p>
+			<p class="u-ml-4">K = Boltzmann constant = 1.38 &times; 10<sup>-23</sup> J/K,</p>
+			<p class="u-ml-4">E<sub>F</sub> is Fermi energy in J</p>
 		</div>
-		<div class="u-mt-4">
-			<p><strong>C = 11.22 &times; 10<sup>-19</sup></strong></p>
-			<p><strong>k = 1.38 &times; 10<sup>-23</sup></strong></p>
+	</section>
+
+	<section class="experiment-section energygap-simulation-section">
+		<h3><u>INTERACTIVE SIMULATION</u></h3>
+		<p class="energygap-instruction">Follow the lab sequence exactly: Start Heating to 85&deg;C, Cool Down in 5&deg;C steps, and Record Reading at each step up to 60&deg;C.</p>
+		<div class="energygap-sim-layout">
+			<div class="energygap-scene-card">
+				<canvas id="fermiSimulationCanvas" width="980" height="420" aria-label="Fermi energy simulation scene"></canvas>
+			</div>
+			<div class="energygap-controls-card">
+				<div class="energygap-status-panel">
+					<p class="energygap-status-kicker">Current Procedure State</p>
+					<div class="energygap-status-value" id="fermiPhaseLabel">Ready to start heating</div>
+					<div class="energygap-live-grid">
+						<div>
+							<span class="energygap-live-label">Temperature</span>
+							<strong id="fermiTempDisplay">30.0</strong> &deg;C
+						</div>
+						<div>
+							<span class="energygap-live-label">Kelvin</span>
+							<strong id="fermiTempKDisplay">303</strong> K
+						</div>
+						<div>
+							<span class="energygap-live-label">Resistance</span>
+							<strong id="fermiResistanceDisplay">-</strong> &Omega;
+						</div>
+						<div>
+							<span class="energygap-live-label">Slope (&Delta;R/&Delta;T)</span>
+							<strong id="fermiSlopeDisplay">-</strong>
+						</div>
+					</div>
+				</div>
+				<div class="energygap-control-actions">
+					<button type="button" id="fermiStartBtn" class="btn btn-primary">Start Heating</button>
+					<button type="button" id="fermiCoolBtn" class="btn btn-secondary">Cool Down</button>
+					<button type="button" id="fermiRecordBtn" class="btn btn-primary">Record Reading</button>
+				</div>
+				<div class="energygap-helper-box" id="fermiHelperText">
+					Heating has not started yet.
+				</div>
+			</div>
 		</div>
 	</section>
 
 	<section class="experiment-section">
 		<h3><u>TABULAR COLUMN</u></h3>
+		<p class="energygap-table-note">Record in order only: 85, 80, 75, 70, 65 and 60&deg;C. Values are generated from simulation only.</p>
 		<div class="table-container">
 			<table class="observation-table">
 				<thead>
@@ -60,32 +124,32 @@
 					<tr>
 						<td>85</td>
 						<td class="temp-k"></td>
-						<td><input type="number" step="any" class="resistance-input"></td>
+						<td class="resistance-cell"></td>
 					</tr>
 					<tr>
 						<td>80</td>
 						<td class="temp-k"></td>
-						<td><input type="number" step="any" class="resistance-input"></td>
+						<td class="resistance-cell"></td>
 					</tr>
 					<tr>
 						<td>75</td>
 						<td class="temp-k"></td>
-						<td><input type="number" step="any" class="resistance-input"></td>
+						<td class="resistance-cell"></td>
 					</tr>
 					<tr>
 						<td>70</td>
 						<td class="temp-k"></td>
-						<td><input type="number" step="any" class="resistance-input"></td>
+						<td class="resistance-cell"></td>
 					</tr>
 					<tr>
 						<td>65</td>
 						<td class="temp-k"></td>
-						<td><input type="number" step="any" class="resistance-input"></td>
+						<td class="resistance-cell"></td>
 					</tr>
 					<tr>
 						<td>60</td>
 						<td class="temp-k"></td>
-						<td><input type="number" step="any" class="resistance-input"></td>
+						<td class="resistance-cell"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -96,17 +160,23 @@
 	</section>
 
 	<section class="experiment-section">
-		<h3><u>RESULT</u></h3>
-		<p>Fermi Energy: <span id="fermi-energy">&mdash;</span></p>
-		<p>Fermi Temperature: <span id="fermi-temp">&mdash;</span></p>
+		<h3><u>GRAPH</u></h3>
+		<p><strong>Graph: Resistance vs Temperature</strong></p>
+		<div class="energygap-graph-shell">
+			<div class="chart-frame chart-frame-wide energygap-graph-card">
+				<canvas id="fermiChart"></canvas>
+			</div>
+			<div class="energygap-analysis-card">
+				<p class="energygap-analysis-label">Best-fit analysis</p>
+				<p>Slope &Delta;R/&Delta;T = <strong id="fermiGraphSlope">-</strong></p>
+			</div>
+		</div>
 	</section>
 
 	<section class="experiment-section">
-		<h3><u>GRAPH</u></h3>
-		<p><strong>Graph: Resistance vs Temperature</strong></p>
-		<div class="chart-frame chart-frame-wide">
-			<canvas id="fermiChart"></canvas>
-		</div>
+		<h3><u>RESULT</u></h3>
+		<p>Fermi Energy = <span id="fermi-energy">&mdash;</span></p>
+		<p>Fermi Temperature = <span id="fermi-temp">&mdash;</span></p>
 	</section>
 
 </div>

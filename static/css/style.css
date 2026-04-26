@@ -1475,6 +1475,10 @@ div:has(> canvas#diffractionChart) {
   margin-top: var(--space-4);
 }
 
+.u-ml-4 {
+  margin-left: var(--space-4);
+}
+
 .u-mt-6 {
   margin-top: var(--space-6);
 }

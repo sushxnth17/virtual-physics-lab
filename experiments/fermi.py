@@ -1,53 +1,103 @@
-def compute_fermi_response(temperatures_c, resistances):
+"""Backend computations for Fermi energy experiment."""
+
+import math
+from typing import List, Dict, Any
+
+BOLTZMANN_CONSTANT = 1.38e-23
+FERMI_CONSTANT = 11.22e-19  # given in lab manual
+
+
+def validate_input(temperatures_c: List[float], resistances: List[float]):
     if not isinstance(temperatures_c, list) or not isinstance(resistances, list):
         raise ValueError("temperatures_c and resistances must be lists")
 
-    if not temperatures_c or not resistances:
-        raise ValueError("temperatures_c and resistances must not be empty")
-
     if len(temperatures_c) != len(resistances):
-        raise ValueError("temperatures_c and resistances must have the same length")
+        raise ValueError("temperatures_c and resistances must have same length")
 
-    if any(r <= 0 for r in resistances):
-        raise ValueError("All resistance values must be positive")
+    if len(temperatures_c) < 3:
+        raise ValueError("At least 3 data points required")
 
-    temperatures_k = [t + 273.15 for t in temperatures_c]
+    for i, (t, r) in enumerate(zip(temperatures_c, resistances), start=1):
+        if t is None or r is None:
+            raise ValueError(f"Missing value at row {i}")
 
-    if any(t <= 0 for t in temperatures_k):
-        raise ValueError("All temperatures in Kelvin must be positive")
+        try:
+            t = float(t)
+            r = float(r)
+        except:
+            raise ValueError(f"Invalid numeric value at row {i}")
 
-    t_first = temperatures_k[0]
-    t_last = temperatures_k[-1]
-    r_first = resistances[0]
-    r_last = resistances[-1]
+        if r <= 0:
+            raise ValueError(f"Resistance must be positive at row {i}")
 
-    delta_t = t_last - t_first
-    if delta_t == 0:
-        raise ValueError("Cannot compute slope when first and last Kelvin temperatures are equal")
 
-    slope = (r_last - r_first) / delta_t
+def compute_kelvin(temperatures_c: List[float]) -> List[float]:
+    return [t + 273.15 for t in temperatures_c]
 
-    t_ref = t_first
-    r_ref = r_first
 
-    c_constant = 11.22e-19
-    k_constant = 1.38e-23
+def calculate_slope(x: List[float], y: List[float]) -> float:
+    """
+    Least squares linear regression
+    x = Temperature (K)
+    y = Resistance (Ω)
+    """
+    n = len(x)
+    sum_x = sum(x)
+    sum_y = sum(y)
+    sum_xy = sum(xi * yi for xi, yi in zip(x, y))
+    sum_x2 = sum(xi * xi for xi in x)
 
-    fermi_energy = c_constant * (t_ref / r_ref) ** 2 * (slope ** 2)
-    fermi_temperature = fermi_energy / k_constant
+    denominator = (n * sum_x2) - (sum_x ** 2)
+
+    if abs(denominator) < 1e-12:
+        raise ValueError("Cannot compute slope (degenerate data)")
+
+    slope = ((n * sum_xy) - (sum_x * sum_y)) / denominator
+    return slope
+
+
+def compute_fermi_response(
+    temperatures_c: List[float],
+    resistances: List[float]
+) -> Dict[str, Any]:
+
+    validate_input(temperatures_c, resistances)
+
+    # Convert to Kelvin
+    temperatures_k = compute_kelvin(temperatures_c)
+
+    # Sort data (important for stability)
+    combined = sorted(zip(temperatures_k, resistances))
+    temperatures_k = [t for t, _ in combined]
+    resistances = [r for _, r in combined]
+
+    # Calculate slope (ΔR / ΔT)
+    slope = calculate_slope(temperatures_k, resistances)
+
+    # Reference values (first point)
+    T = temperatures_k[0]
+    R = resistances[0]
+
+    # Fermi Energy
+    fermi_energy = FERMI_CONSTANT * ((T / R) ** 2) * (slope ** 2)
+
+    # Fermi Temperature
+    fermi_temperature = fermi_energy / BOLTZMANN_CONSTANT
 
     return {
-        "temperatures_k": temperatures_k,
+        "temperatures_K": temperatures_k,
+        "resistances": resistances,
         "slope": slope,
         "fermi_energy": fermi_energy,
-        "fermi_temperature": fermi_temperature,
+        "fermi_temperature": fermi_temperature
     }
-""" testing the backend logic with some sample data. In a real application, this would be replaced with proper unit tests.
-if __name__ == "__main__":
-    result = compute_fermi_response(
-        temperatures_c=[273.15, 200, 100, 0],
-        resistances=[1000, 800, 600, 400]
-    )
 
-    print(result)
-"""
+
+# # Example test
+# if __name__ == "__main__":
+#     result = compute_fermi_response(
+#         temperatures_c=[85, 80, 75, 70, 65, 60],
+#         resistances=[5.6, 5.5, 5.4, 5.3, 5.2, 5.1]
+#     )
+
+#     print(result)
