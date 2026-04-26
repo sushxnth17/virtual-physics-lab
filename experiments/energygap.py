@@ -7,6 +7,9 @@ from typing import Dict, List, Tuple, Any
 BOLTZMANN_CONSTANT = 1.38e-23
 EV_DENOMINATOR = 1.601e-19
 CELSIUS_TO_KELVIN_OFFSET = 273.0
+THERMISTOR_R0 = 2000.0
+THERMISTOR_T0_K = 348.0
+THERMISTOR_B = 3500.0
 
 
 def validate_input(temp_c: List[Any], resistance: List[Any]) -> Tuple[List[float], List[float]]:
@@ -69,6 +72,22 @@ def compute_values(temp_c: List[float], resistance: List[float]) -> Tuple[List[f
     return temp_k, log_r, inv_t
 
 
+def compute_resistance_from_temperature(temp_c: float) -> float:
+    """Compute thermistor resistance using fixed model constants."""
+
+    temp_k = temp_c + CELSIUS_TO_KELVIN_OFFSET
+
+    if temp_k <= 0:
+        raise ValueError("Invalid temperature (Kelvin <= 0) for resistance computation.")
+
+    resistance = THERMISTOR_R0 * math.exp(THERMISTOR_B * ((1.0 / temp_k) - (1.0 / THERMISTOR_T0_K)))
+
+    if resistance <= 0 or not math.isfinite(resistance):
+        raise ValueError("Computed resistance is invalid.")
+
+    return resistance
+
+
 def calculate_slope(x_values: List[float], y_values: List[float]) -> float:
     """Calculate slope using least-squares linear regression."""
 
@@ -105,6 +124,8 @@ def compute_energygap_response(temp_c=None, resistance=None, **kwargs) -> Dict[s
 
     validated_temp_c, validated_resistance = validate_input(temp_c, resistance)
 
+    # Use measured resistance values from the simulation (with controlled noise)
+    # so each run reflects realistic experimental variation.
     temp_k, log_r, inv_t = compute_values(validated_temp_c, validated_resistance)
 
     slope = calculate_slope(inv_t, log_r)
@@ -117,6 +138,7 @@ def compute_energygap_response(temp_c=None, resistance=None, **kwargs) -> Dict[s
 
     return {
         "temp_K": temp_k,
+        "resistance": validated_resistance,
         "logR": log_r,
         "invT": inv_t,
         "slope": slope,
