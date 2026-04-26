@@ -97,9 +97,7 @@
 	<section class="experiment-section info-section-card">
 		<h3><u>Circuit Diagram</u></h3>
 		<div class="diagram-container">
-			<div class="diagram-placeholder-box">
-				<p>Static circuit image placeholder</p>
-			</div>
+			<img src="/static/js/images/blackbox.png" alt="Black box circuit diagram" class="reference-image">
 		</div>
 	</section>
 
@@ -417,7 +415,19 @@
 
 	<section class="graphs-section">
 		<h3><u>Graph</u></h3>
-		<div id="graph-container">Graph will be displayed here</div>
+		<div class="graph-container">
+			<h4>Capacitive Reactance (X<sub>C</sub>) vs Frequency (f)</h4>
+			<div class="chart-frame">
+				<canvas id="capacitiveReactanceChart"></canvas>
+			</div>
+		</div>
+
+		<div class="graph-container u-mt-4">
+			<h4>Inductive Reactance (X<sub>L</sub>) vs Frequency (f)</h4>
+			<div class="chart-frame">
+				<canvas id="inductiveReactanceChart"></canvas>
+			</div>
+		</div>
 	</section>
 
 	<section class="experiment-section result-summary-card">

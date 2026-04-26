@@ -5,6 +5,240 @@
 
 const BLACKBOX_FREQUENCIES = [1000, 2000, 3000, 4000, 5000];
 let componentMap = {};
+let capacitiveReactanceChartInstance = null;
+let inductiveReactanceChartInstance = null;
+
+function destroyBlackBoxCharts() {
+	if (capacitiveReactanceChartInstance) {
+		capacitiveReactanceChartInstance.destroy();
+		capacitiveReactanceChartInstance = null;
+	}
+
+	if (inductiveReactanceChartInstance) {
+		inductiveReactanceChartInstance.destroy();
+		inductiveReactanceChartInstance = null;
+	}
+}
+
+function getReactanceSeriesByType(responseData, targetType) {
+	const componentInfo = [
+		{ info: responseData.Z1, reactance: responseData.X1 },
+		{ info: responseData.Z2, reactance: responseData.X2 },
+		{ info: responseData.Z3, reactance: responseData.X3 }
+	];
+
+	const match = componentInfo.find((entry) => {
+		return entry.info && entry.info.type === targetType && Array.isArray(entry.reactance);
+	});
+
+	return match ? match.reactance : null;
+}
+
+function computeLinearRegression(points) {
+	if (!Array.isArray(points) || points.length < 2) {
+		return null;
+	}
+
+	let sumX = 0;
+	let sumY = 0;
+	let sumXY = 0;
+	let sumXX = 0;
+
+	points.forEach((point) => {
+		const x = Number(point.x);
+		const y = Number(point.y);
+		if (!Number.isFinite(x) || !Number.isFinite(y)) {
+			return;
+		}
+
+		sumX += x;
+		sumY += y;
+		sumXY += x * y;
+		sumXX += x * x;
+	});
+
+	const n = points.length;
+	const denominator = (n * sumXX) - (sumX * sumX);
+	if (Math.abs(denominator) < 1e-12) {
+		return null;
+	}
+
+	const slope = ((n * sumXY) - (sumX * sumY)) / denominator;
+	const intercept = (sumY - (slope * sumX)) / n;
+
+	return { slope, intercept };
+}
+
+function createCapacitiveReactanceChart(canvasId, frequencies, reactanceValues) {
+	if (typeof Chart === 'undefined') {
+		return null;
+	}
+
+	const canvas = document.getElementById(canvasId);
+	if (!canvas) {
+		return null;
+	}
+
+	if (!Array.isArray(frequencies) || !Array.isArray(reactanceValues) || frequencies.length !== reactanceValues.length || frequencies.length === 0) {
+		return null;
+	}
+
+	return new Chart(canvas, {
+		type: 'line',
+		data: {
+			labels: frequencies,
+			datasets: [{
+				label: 'Capacitive Reactance (Xc)',
+				data: reactanceValues,
+				borderColor: '#1f77b4',
+				backgroundColor: 'rgba(31, 119, 180, 0.18)',
+				borderWidth: 2,
+				pointRadius: 4,
+				pointHoverRadius: 5,
+				fill: false,
+				tension: 0.4
+			}]
+		},
+		options: {
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: {
+				legend: {
+					display: true,
+					position: 'top'
+				}
+			},
+			scales: {
+				x: {
+					title: {
+						display: true,
+						text: 'Frequency (Hz)'
+					}
+				},
+				y: {
+					title: {
+						display: true,
+						text: 'Reactance (ohm)'
+					},
+					beginAtZero: true
+				}
+			}
+		}
+	});
+}
+
+function createInductiveReactanceChart(canvasId, frequencies, reactanceValues) {
+	if (typeof Chart === 'undefined') {
+		return null;
+	}
+
+	const canvas = document.getElementById(canvasId);
+	if (!canvas) {
+		return null;
+	}
+
+	if (!Array.isArray(frequencies) || !Array.isArray(reactanceValues) || frequencies.length !== reactanceValues.length || frequencies.length === 0) {
+		return null;
+	}
+
+	const points = frequencies.map((frequency, index) => ({
+		x: Number(frequency),
+		y: Number(reactanceValues[index])
+	})).filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+
+	if (points.length < 2) {
+		return null;
+	}
+
+	const regression = computeLinearRegression(points);
+	if (!regression) {
+		return null;
+	}
+
+	const xValues = points.map((point) => point.x).sort((a, b) => a - b);
+	const xMin = xValues[0];
+	const xMax = xValues[xValues.length - 1];
+	const linePoints = [
+		{ x: xMin, y: (regression.slope * xMin) + regression.intercept },
+		{ x: xMax, y: (regression.slope * xMax) + regression.intercept }
+	];
+
+	return new Chart(canvas, {
+		type: 'scatter',
+		data: {
+			datasets: [
+				{
+					label: 'Inductive Reactance Data (XL)',
+					data: points,
+					showLine: false,
+					borderColor: '#2c3e50',
+					backgroundColor: '#2c3e50',
+					pointRadius: 4,
+					pointHoverRadius: 5
+				},
+				{
+					label: 'Best-fit Line',
+					data: linePoints,
+					type: 'line',
+					showLine: true,
+					borderColor: '#c0392b',
+					backgroundColor: '#c0392b',
+					borderWidth: 2,
+					pointRadius: 0,
+					pointHoverRadius: 0,
+					fill: false,
+					tension: 0
+				}
+			]
+		},
+		options: {
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: {
+				legend: {
+					display: true,
+					position: 'top'
+				}
+			},
+			scales: {
+				x: {
+					type: 'linear',
+					title: {
+						display: true,
+						text: 'Frequency (Hz)'
+					}
+				},
+				y: {
+					title: {
+						display: true,
+						text: 'Reactance (ohm)'
+					},
+					beginAtZero: true
+				}
+			}
+		}
+	});
+}
+
+function renderBlackBoxReactanceGraphs(responseData) {
+	destroyBlackBoxCharts();
+
+	const frequencies = Array.isArray(responseData.freq) ? responseData.freq : BLACKBOX_FREQUENCIES;
+	const capacitiveReactance = getReactanceSeriesByType(responseData, 'Capacitor');
+	const inductiveReactance = getReactanceSeriesByType(responseData, 'Inductor');
+
+	capacitiveReactanceChartInstance = createCapacitiveReactanceChart(
+		'capacitiveReactanceChart',
+		frequencies,
+		capacitiveReactance
+	);
+
+	inductiveReactanceChartInstance = createInductiveReactanceChart(
+		'inductiveReactanceChart',
+		frequencies,
+		inductiveReactance
+	);
+}
 
 function showSuccessNotification(message) {
 	const notification = document.createElement('div');
@@ -732,6 +966,8 @@ function displayBlackBoxResults(responseData) {
 			}
 		});
 	}
+
+	renderBlackBoxReactanceGraphs(responseData);
 }
 
 async function calculateBlackBox() {
