@@ -30,21 +30,22 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	const BOLTZMANN_CONSTANT = 1.38e-23;
-	const BOLTZMANN_CONSTANT_EV = 8.617e-5;
 	const EV_DENOMINATOR = 1.601e-19;
 	const CELSIUS_TO_KELVIN_OFFSET = 273;
-	const THERMISTOR_REFERENCE_TEMPERATURE_K = 300;
-	const THERMISTOR_BETA_MIN = 2000;
-	const THERMISTOR_BETA_MAX = 5000;
-	const RESISTANCE_MIN_OHMS = 1000;
-	const RESISTANCE_MAX_OHMS = 100000;
+	const THERMISTOR_R0 = 2000;
+	const THERMISTOR_T0_K = 348;
+	const THERMISTOR_B = 3500;
+	const SYSTEMATIC_BIAS_SPAN = 0.05;
+	const POINT_NOISE_SPAN = 0.01;
+	const RUN_SLOPE_DRIFT_MIN = -150;
+	const RUN_SLOPE_DRIFT_MAX = 270;
+	const MONOTONIC_EPSILON_RATIO = 0.0005;
 	const HEATING_TARGET_C = 95;
 	const COOLING_STEPS = [90, 85, 80, 75, 70, 65, 60, 55, 50];
 	const RECORDABLE_STEPS = new Set([75, 70, 65, 60, 55, 50]);
 	const AMBIENT_TEMPERATURE_C = 30;
 	const HEAT_UP_DURATION = 3600;
 	const COOL_STEP_DURATION = 1300;
-	const NOISE_PERCENT = 0.03;
 
 	const state = {
 		phase: 'idle',
@@ -52,22 +53,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		displayTempC: AMBIENT_TEMPERATURE_C,
 		displayResistance: 0,
 		targetResistance: 0,
-		egTrue: 0,
-		r0: 0,
 		coolingIndex: -1,
 		recordedData: [],
 		recordedTemps: new Set(),
+		temperatureResistanceMap: new Map(),
+		runBiasFactor: 1,
+		runSlopeDrift: 0,
 		chart: null,
 		animationFrameId: null,
 		isAnimating: false,
-		stepResistance: 0,
-		beta: 0,
-		resistanceNoiseSeed: 0
+		stepResistance: 0
 	};
-
-	function randomBetween(min, max) {
-		return min + Math.random() * (max - min);
-	}
 
 	function formatTemperature(value) {
 		return Number.isFinite(value) ? value.toFixed(1) : '-';
@@ -153,9 +149,58 @@ document.addEventListener('DOMContentLoaded', () => {
 		return tempC + CELSIUS_TO_KELVIN_OFFSET;
 	}
 
+	function generateRunBiasFactor() {
+		return 1 + (Math.random() - 0.5) * SYSTEMATIC_BIAS_SPAN;
+	}
+
+	function applySmallPointNoise(resistance) {
+		const smallNoise = 1 + (Math.random() - 0.5) * POINT_NOISE_SPAN;
+		return resistance * smallNoise;
+	}
+
+	function generateRunSlopeDrift() {
+		return RUN_SLOPE_DRIFT_MIN + Math.random() * (RUN_SLOPE_DRIFT_MAX - RUN_SLOPE_DRIFT_MIN);
+	}
+
+	function enforceMonotonicResistance(tempC, resistance) {
+		let nearestHigher = null;
+		let nearestLower = null;
+
+		state.temperatureResistanceMap.forEach((cachedResistance, cachedTemp) => {
+			if (cachedTemp > tempC) {
+				if (!nearestHigher || cachedTemp < nearestHigher.temp) {
+					nearestHigher = { temp: cachedTemp, resistance: cachedResistance };
+				}
+			}
+
+			if (cachedTemp < tempC) {
+				if (!nearestLower || cachedTemp > nearestLower.temp) {
+					nearestLower = { temp: cachedTemp, resistance: cachedResistance };
+				}
+			}
+		});
+
+		let adjustedResistance = resistance;
+
+		if (nearestHigher && adjustedResistance <= nearestHigher.resistance) {
+			adjustedResistance = nearestHigher.resistance * (1 + MONOTONIC_EPSILON_RATIO);
+		}
+
+		if (nearestLower && adjustedResistance >= nearestLower.resistance) {
+			adjustedResistance = nearestLower.resistance * (1 - MONOTONIC_EPSILON_RATIO);
+		}
+
+		return adjustedResistance;
+	}
+
 	function getResistanceForTemperature(tempC) {
 		if (!Number.isFinite(tempC)) {
 			return null;
+		}
+
+		const normalizedTemp = Math.round(tempC);
+		if (state.temperatureResistanceMap.has(normalizedTemp)) {
+			return state.temperatureResistanceMap.get(normalizedTemp);
 		}
 
 		const tempK = getTemperatureKelvin(tempC);
@@ -163,25 +208,38 @@ document.addEventListener('DOMContentLoaded', () => {
 			return null;
 		}
 
-		const beta = Number.isFinite(state.beta)
-			? state.beta
-			: Math.min(THERMISTOR_BETA_MAX, Math.max(THERMISTOR_BETA_MIN, state.egTrue / (2 * BOLTZMANN_CONSTANT_EV)));
-
-		// Thermistor model: R = R0 * exp(B * (1/T - 1/T0)).
-		const idealResistance = state.r0 * Math.exp(beta * ((1 / tempK) - (1 / THERMISTOR_REFERENCE_TEMPERATURE_K)));
-
-		// Stable pseudo-noise (temperature-dependent) avoids unrealistic random jumps.
-		const waveA = Math.sin((tempC * 0.83) + state.resistanceNoiseSeed);
-		const waveB = Math.sin((tempC * 0.19) + (state.resistanceNoiseSeed * 1.71));
-		const combinedWave = Math.max(-1, Math.min(1, (waveA * 0.7) + (waveB * 0.3)));
-		const noiseMultiplier = 1 + (combinedWave * NOISE_PERCENT);
-
-		const measuredResistance = idealResistance * noiseMultiplier;
-		if (!Number.isFinite(measuredResistance) || measuredResistance <= 0) {
+		const computedResistance = THERMISTOR_R0 * Math.exp(THERMISTOR_B * ((1 / tempK) - (1 / THERMISTOR_T0_K)));
+		if (!Number.isFinite(computedResistance) || computedResistance <= 0) {
 			return null;
 		}
 
-		return Math.max(RESISTANCE_MIN_OHMS, Math.min(RESISTANCE_MAX_OHMS, measuredResistance));
+		const driftFactor = Math.exp(state.runSlopeDrift * ((1 / tempK) - (1 / THERMISTOR_T0_K)));
+		if (!Number.isFinite(driftFactor) || driftFactor <= 0) {
+			return null;
+		}
+
+		const driftedResistance = computedResistance * driftFactor;
+		if (!Number.isFinite(driftedResistance) || driftedResistance <= 0) {
+			return null;
+		}
+
+		const biasedResistance = driftedResistance * state.runBiasFactor;
+		if (!Number.isFinite(biasedResistance) || biasedResistance <= 0) {
+			return null;
+		}
+
+		const noisyResistance = applySmallPointNoise(biasedResistance);
+		if (!Number.isFinite(noisyResistance) || noisyResistance <= 0) {
+			return null;
+		}
+
+		const monotonicResistance = enforceMonotonicResistance(normalizedTemp, noisyResistance);
+		if (!Number.isFinite(monotonicResistance) || monotonicResistance <= 0) {
+			return null;
+		}
+
+		state.temperatureResistanceMap.set(normalizedTemp, monotonicResistance);
+		return monotonicResistance;
 	}
 
 	function updateLiveDisplays() {
@@ -276,22 +334,18 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function initializeSimulationParameters() {
-		state.egTrue = randomBetween(0.5, 0.8);
-		state.r0 = randomBetween(2000, 10000);
-		state.beta = Math.min(
-			THERMISTOR_BETA_MAX,
-			Math.max(THERMISTOR_BETA_MIN, state.egTrue / (2 * BOLTZMANN_CONSTANT_EV))
-		);
-		state.resistanceNoiseSeed = randomBetween(0, Math.PI * 2);
 		state.currentTempC = AMBIENT_TEMPERATURE_C;
 		state.displayTempC = AMBIENT_TEMPERATURE_C;
-		state.targetResistance = getResistanceForTemperature(AMBIENT_TEMPERATURE_C);
-		state.displayResistance = state.targetResistance;
-		state.stepResistance = state.targetResistance;
+		state.targetResistance = 0;
+		state.displayResistance = 0;
+		state.stepResistance = 0;
 		state.phase = 'idle';
 		state.coolingIndex = -1;
 		state.recordedData = [];
 		state.recordedTemps = new Set();
+		state.temperatureResistanceMap = new Map();
+		state.runBiasFactor = generateRunBiasFactor();
+		state.runSlopeDrift = generateRunSlopeDrift();
 
 		tableRows.forEach((row) => {
 			row.classList.remove('energygap-recorded-row');
@@ -622,16 +676,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		const tempK = getTemperatureKelvin(tempC);
 		const invTFromTemp = tempK > 0 ? 1 / tempK : null;
-		const validResistance = Number.isFinite(resistance) && resistance > 0 ? resistance : null;
+		const recordedResistance = Number.isFinite(resistance) && resistance > 0 ? resistance : null;
 		let logR = null;
 		let invT = invTFromTemp;
 		const existingInvT = row.cells[5] ? row.cells[5].textContent.trim() : '';
 		const shouldComputeInvT = existingInvT === '' || existingInvT === '-';
 
 		row.cells[2].textContent = tempK.toFixed(0);
-		row.cells[3].textContent = formatTableResistance(validResistance);
+		row.cells[3].textContent = formatTableResistance(recordedResistance);
 
-		const recordedResistance = Number.parseFloat(row.cells[3].textContent);
 		if (Number.isFinite(recordedResistance) && recordedResistance > 0) {
 			logR = Math.log10(recordedResistance);
 		}

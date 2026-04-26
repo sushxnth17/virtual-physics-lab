@@ -42,6 +42,34 @@
 		</p>
 	</section>
 
+	<section class="experiment-section reference-section">
+		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
+		<h3><u>CIRCUIT DIAGRAM</u></h3>
+		<div class="diagram-placeholder-box">
+			<img
+				src="{{ url_for('static', filename='js/images/energygapCircuit.png') }}"
+				alt="Energy gap experiment circuit diagram"
+				class="reference-image"
+				onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+			>
+			<p style="display:none;">Circuit with thermistor immersed in a heated beaker, thermometer, and ohmmeter connection.</p>
+		</div>
+	</section>
+
+	<section class="experiment-section reference-section">
+		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
+		<h3><u>NATURE OF GRAPH</u></h3>
+		<div class="diagram-placeholder-box">
+			<img
+				src="{{ url_for('static', filename='js/images/energygapNatureGraph.png') }}"
+				alt="Nature of graph log R versus inverse temperature"
+				class="reference-image"
+				onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+			>
+			<p style="display:none;">Straight line graph of log R versus 1/T (K<sup>-1</sup>), with slope S = AB / BC.</p>
+		</div>
+	</section>
+
 	<section class="experiment-section energygap-simulation-section">
 		<h3><u>INTERACTIVE SIMULATION</u></h3>
 		<p class="energygap-instruction">Follow the lab procedure in order: Start Heating, allow the cooling step to settle, record the reading, then move to the next step.</p>
@@ -81,34 +109,6 @@
 					Heating has not started yet.
 				</div>
 			</div>
-		</div>
-	</section>
-
-	<section class="experiment-section reference-section">
-		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
-		<h3><u>CIRCUIT DIAGRAM</u></h3>
-		<div class="diagram-placeholder-box">
-			<img
-				src="{{ url_for('static', filename='js/images/energygap_circuit.png') }}"
-				alt="Energy gap experiment circuit diagram"
-				class="reference-image"
-				onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-			>
-			<p style="display:none;">Circuit with thermistor immersed in a heated beaker, thermometer, and ohmmeter connection.</p>
-		</div>
-	</section>
-
-	<section class="experiment-section reference-section">
-		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
-		<h3><u>NATURE OF GRAPH</u></h3>
-		<div class="diagram-placeholder-box">
-			<img
-				src="{{ url_for('static', filename='js/images/energygap_graph.png') }}"
-				alt="Nature of graph log R versus inverse temperature"
-				class="reference-image"
-				onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-			>
-			<p style="display:none;">Straight line graph of log R versus 1/T (K<sup>-1</sup>), with slope S = AB / BC.</p>
 		</div>
 	</section>
 
