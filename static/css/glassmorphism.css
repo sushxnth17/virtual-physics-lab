@@ -20,10 +20,10 @@
 }
 
 body {
-  background-color: var(--app-bg) !important;
-  background-image: none !important;
+  background: linear-gradient(135deg, #e0f2fe, #bae6fd) !important;
   font-family: 'Nunito', system-ui, sans-serif !important;
   color: var(--text-main) !important;
+  min-height: 100vh;
 }
 
 /* Ensure original body background blobs are hidden */
