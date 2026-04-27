@@ -1,0 +1,314 @@
+/* =============================
+   SOFT TACTILE / NEUMORPHISM OVERRIDE (GLOBAL)
+================================ */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+:root {
+  --app-bg: #E0E5EC;
+  --text-main: #4A5568;
+  --color-primary: #3B82F6; /* Cool indicator blue */
+  --color-danger: #EF4444; /* Soft glowing red */
+  
+  --shadow-extruded: 9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5);
+  --shadow-extruded-hover: 12px 12px 20px rgba(163,177,198,0.7), -12px -12px 20px rgba(255,255,255, 0.6);
+  --shadow-inset: inset 6px 6px 10px 0 rgba(163,177,198, 0.7), inset -6px -6px 10px 0 rgba(255,255,255, 0.8);
+  --shadow-inset-deep: inset 9px 9px 16px 0 rgba(163,177,198, 0.8), inset -9px -9px 16px 0 rgba(255,255,255, 0.9);
+  
+  --radius-soft: 16px;
+  --radius-pill: 999px;
+  --radius-round: 50%;
+}
+
+body {
+  background-color: var(--app-bg) !important;
+  background-image: none !important;
+  font-family: 'Nunito', system-ui, sans-serif !important;
+  color: var(--text-main) !important;
+}
+
+/* Ensure original body background blobs are hidden */
+body::before, body::after {
+  display: none !important;
+}
+
+h1, h2, h3, h4, h5, p, label, .measure-text, .helper-text {
+  color: var(--text-main) !important;
+  font-family: 'Nunito', system-ui, sans-serif !important;
+  text-shadow: none !important;
+}
+
+/* The HUD & Panels (Physical Extruded Casing) */
+.experiments-container,
+.experiment-header,
+.experiment-section,
+.graphs-section,
+.formula-block,
+.diagram-container,
+.ray-diagram-container,
+.graph-container,
+.energygap-scene-card,
+.energygap-controls-card,
+.energygap-analysis-card,
+.energygap-status-panel,
+.energygap-live-grid > div,
+.energygap-helper-box,
+.blackbox-frequency-strip,
+.blackbox-circuit-stage,
+.instrument-display-card,
+.na-sim-panel,
+.na-sim-canvas-wrap,
+.na-control-card,
+.na-explore-d-control,
+.measure-panel,
+.note-box,
+.reference-card,
+.chart-frame,
+.table-container,
+.site-header,
+.site-footer {
+  background-color: var(--app-bg) !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  border-radius: var(--radius-soft) !important;
+  box-shadow: var(--shadow-extruded) !important;
+  color: var(--text-main) !important;
+}
+
+/* Header UI specifics */
+.site-header .portal-title-wrap div,
+.site-header .portal-title,
+.site-header .portal-subtitle {
+  color: var(--text-main) !important;
+}
+.site-header .logo-placeholder {
+  border: none !important;
+  box-shadow: var(--shadow-inset) !important;
+  border-radius: var(--radius-soft) !important;
+  color: var(--text-main) !important;
+  font-family: 'Nunito', sans-serif !important;
+}
+
+.portal-nav {
+  box-shadow: none !important;
+}
+
+.nav-links a {
+  color: var(--text-main) !important;
+  border-radius: var(--radius-pill) !important;
+  transition: all 0.2s ease !important;
+}
+.nav-links a:hover {
+  background: var(--app-bg) !important;
+  box-shadow: var(--shadow-extruded) !important;
+  color: var(--color-primary) !important;
+}
+.nav-links a:active {
+  box-shadow: var(--shadow-inset) !important;
+}
+
+/* Fix elements that are screens/diagrams carving into the physical rig */
+.diagram-placeholder-box, .lab-figure-box, .ray-diagram-card {
+  background: var(--app-bg) !important;
+  border: none !important;
+  box-shadow: var(--shadow-inset) !important;
+  border-radius: var(--radius-soft) !important;
+}
+
+/* Experiment Cards on Home Page */
+.experiment-list li a {
+  background: var(--app-bg) !important;
+  border: none !important;
+  color: var(--text-main) !important;
+  border-radius: var(--radius-soft) !important;
+  box-shadow: var(--shadow-extruded) !important;
+  transition: all 0.2s ease !important;
+  font-weight: 700 !important;
+}
+
+.experiment-list li a:hover {
+  box-shadow: var(--shadow-extruded-hover) !important;
+  transform: translateY(-2px) !important;
+  color: var(--color-primary) !important;
+}
+
+.experiment-list li a:active {
+  box-shadow: var(--shadow-inset) !important;
+  transform: translateY(1px) !important;
+}
+
+/* Typography & Readability (Physics Variables & Numbers) */
+.result-value,
+.energygap-status-value,
+.measure-selected-order,
+.measure-xm-value,
+.bb-node-label,
+.bb-component-label,
+.bb-meter-label,
+.bb-meter-reading,
+.bb-source-frequency,
+.slider-value,
+.live-reading {
+  font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+  color: var(--color-danger) !important; /* Muted LED Red */
+  text-shadow: 0 0 5px rgba(239, 68, 68, 0.4) !important;
+}
+
+.instrument-value {
+  font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+  color: var(--color-primary) !important; /* Cool indicator blue */
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.5) !important;
+  background: var(--app-bg) !important;
+  border: none !important;
+  box-shadow: var(--shadow-inset-deep) !important;
+  border-radius: 8px !important;
+}
+
+/* Controls: Sliders */
+input[type="range"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  background: var(--app-bg) !important;
+  border: none !important;
+  border-radius: var(--radius-pill) !important;
+  height: 12px !important;
+  box-shadow: var(--shadow-inset) !important;
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: var(--app-bg) !important;
+  height: 24px !important;
+  width: 24px !important;
+  border-radius: var(--radius-round) !important;
+  margin-top: -6px !important;
+  box-shadow: var(--shadow-extruded) !important;
+  border: none !important;
+  cursor: grab !important;
+}
+input[type="range"]::-webkit-slider-thumb:active {
+  box-shadow: var(--shadow-inset) !important;
+  cursor: grabbing !important;
+}
+
+/* Controls: Buttons (Extruded Default, Inset Active) */
+button,
+.btn,
+.btn-primary,
+button[id*="calculate"],
+button[id*="compute"],
+button[id*="add"],
+.record-btn {
+  background: var(--app-bg) !important;
+  color: var(--color-primary) !important;
+  border: none !important;
+  border-radius: var(--radius-pill) !important;
+  box-shadow: var(--shadow-extruded) !important;
+  transition: all 0.2s ease !important;
+  font-family: 'Nunito', sans-serif !important;
+  text-transform: uppercase !important;
+  font-weight: 800 !important;
+  letter-spacing: 1px !important;
+}
+
+button:hover,
+.btn:hover,
+.btn-primary:hover,
+button[id*="calculate"]:hover,
+button[id*="compute"]:hover,
+button[id*="add"]:hover,
+.record-btn:hover {
+  box-shadow: var(--shadow-extruded-hover) !important;
+  transform: translateY(-2px) !important;
+}
+
+button:active,
+.btn:active,
+.btn-primary:active,
+button[id*="calculate"]:active,
+button[id*="compute"]:active,
+button[id*="add"]:active,
+.record-btn:active {
+  box-shadow: var(--shadow-inset) !important;
+  transform: translateY(1px) !important;
+}
+
+/* Danger buttons */
+button[id*="reset"],
+.btn-danger {
+  color: var(--color-danger) !important;
+}
+
+/* Controls: Inputs/Selects (Carved Inset) */
+input[type="text"],
+input[type="number"],
+select,
+textarea,
+.measurement-input {
+  background: var(--app-bg) !important;
+  border: none !important;
+  border-radius: var(--radius-soft) !important;
+  box-shadow: var(--shadow-inset) !important;
+  color: var(--color-primary) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  padding: 8px 14px !important;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+  outline: none !important;
+  box-shadow: var(--shadow-inset-deep) !important;
+}
+
+/* Tables */
+.observation-table {
+  border-collapse: separate !important;
+  border-spacing: 8px !important;
+}
+.observation-table th, .observation-table td {
+  border: none !important;
+  color: var(--text-main) !important;
+}
+.observation-table th {
+  background: var(--app-bg) !important;
+  box-shadow: var(--shadow-extruded) !important;
+  border-radius: 8px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  padding: 10px !important;
+}
+.observation-table tbody tr {
+  background: var(--app-bg) !important;
+  box-shadow: var(--shadow-inset) !important;
+  border-radius: 8px !important;
+}
+.observation-table tbody tr td {
+  padding: 8px !important;
+}
+.observation-table tbody tr.active-frequency-row,
+.observation-table tbody tr.is-active,
+.active-frequency-row,
+.planck-recorded-row,
+.energygap-recorded-row {
+  box-shadow: var(--shadow-inset-deep) !important;
+  color: var(--color-primary) !important;
+}
+
+/* Chips/Pills */
+.frequency-chip, .component-option, .na-mode-chip {
+  background: var(--app-bg) !important;
+  border: none !important;
+  color: var(--text-main) !important;
+  border-radius: var(--radius-pill) !important;
+  box-shadow: var(--shadow-extruded) !important;
+}
+.frequency-chip.is-active, .component-option.is-active, .na-mode-chip.is-active {
+  box-shadow: var(--shadow-inset) !important;
+  color: var(--color-primary) !important;
+}
