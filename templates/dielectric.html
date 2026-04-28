@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Experiment 4: Measurement of Dielectric Constant{% endblock %}
+
+{% block content %}
+<div class="experiment-container">
+
+	<div class="experiment-header">
+		<p>Experiment: 4</p>
+		<h2>MEASUREMENT OF DIELECTRIC CONSTANT</h2>
+	</div>
+
+	<section class="experiment-section">
+		<h3><u>AIM</u></h3>
+		<p>To determine the dielectric constant of the dielectric medium present in a parallel plate capacitor by charging–discharging method.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>APPARATUS</u></h3>
+		<p>5V DC power supply, digital voltmeter, timer, capacitor and resistor of known values, toggle switch.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>INTRODUCTION</u></h3>
+		<p>Relative permittivity of a dielectric medium is commonly known as dielectric constant. Relative permittivity is the ratio of the capacitance of a capacitor using that material as a dielectric (C<sub>x</sub>), compared to a similar capacitor that has vacuum as its dielectric (C<sub>0</sub>).</p>
+		<p class="equation-line"><strong>$$\varepsilon_r = \frac{C_x}{C_0}.$$</strong></p>
+		<p>Relative permittivity is a dimensionless quantity that is in general complex-valued; its real and imaginary parts are denoted as</p>
+		<p class="equation-line"><strong>$$\varepsilon_r(\omega) = \varepsilon_r'(\omega) + i\varepsilon_r''(\omega).$$</strong></p>
+		<p>A parallel plate condenser is formed by keeping two metallic plates parallel to each other. By applying a potential across the two plates an electric field is produced inside the space between the two plates. By placing an electrically insulated material within the plates the capacitance can be increased. The resulting capacitance of the parallel plate condenser is given by</p>
+		<p class="equation-line"><strong>$$C = \frac{K\varepsilon_0 A}{d}$$</strong></p>
+		<p>Where, C is the capacitance in Farad. K is dielectric constant, ε<sub>0</sub> is the permittivity 8.85x10<sup>-12</sup> Fm<sup>-1</sup>, A is the area of the plate and d is the distance between the plates or thickness of the dielectric material.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>CHARGING OF CAPACITOR</u></h3>
+		<p>As soon as the switch is closed in position 1 (Fig 1) the battery is connected across the capacitor, current flows and the potential difference across the capacitor begins to rise but, as more and more charge builds up on the capacitor plates, the current and the rate of rise of potential difference both fall. Finally no further current will flow when the p.d. across the capacitor equals that of the supply voltage V<sub>o</sub>. The capacitor is then fully charged.</p>
+		<div class="diagram-placeholder-box" aria-label="Figure 1 placeholder">
+			<p><strong>Figure 1</strong></p>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>DISCHARGING OF CAPACITOR</u></h3>
+		<p>As soon as the switch is put in position 2 a 'large' current starts to flow and the potential difference across the capacitor drops (Fig 2). As charge flows from one plate to the other through the resistor the charge is neutralized and so the current falls and the rate of decrease of potential difference also falls. Eventually when the charge on the plates is zero and the current and potential difference is also zero - capacitor is fully discharged. The value of the resistor does not affect the final potential difference across the capacitor &ndash; only the time that it takes to reach that value. The bigger the resistor the longer the time taken.</p>
+		<div class="diagram-placeholder-box" aria-label="Figure 2 placeholder">
+			<p><strong>Figure 2</strong></p>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>FORMULA:</u></h3>
+		<p class="equation-line"><strong>$$K = \frac{10^{-6} d\, t_{1/2}}{0.693\, \varepsilon_0 A R}$$</strong></p>
+		<p><strong>Where,</strong></p>
+		<p>K is the dielectric constant of the material within the capacitor</p>
+		<p>d is the thickness of the dielectric material in m</p>
+		<p>A is the area of the dielectric material in m<sup>2</sup></p>
+		<p>t<sub>1/2</sub> is the time taken by the capacitor to charge /discharge to 50% of maximum voltage in s</p>
+		<p>ε<sub>0</sub> is the permittivity of free space in F-m<sup>-1</sup></p>
+		<p>R is the resistance in the circuit in Ω</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>NATURE OF GRAPH:</u></h3>
+		<div class="diagram-placeholder-box" aria-label="Nature of graph placeholder">
+			<p><strong>Charging and discharging curves</strong></p>
+			<p>Voltage (Y-axis)</p>
+			<p>Time (X-axis)</p>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>CIRCUIT DIAGRAM:</u></h3>
+		<div class="diagram-placeholder-box" aria-label="Circuit diagram placeholder">
+			<p>Circuit diagram image placeholder</p>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>TABULAR COLUMN :</u></h3>
+		<div class="table-container">
+			<table class="observation-table">
+				<thead>
+					<tr>
+						<th>Time<br>(s)</th>
+						<th>Voltage in charging mode<br>(V)</th>
+						<th>Voltage in discharging mode<br>(V)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr><td>0</td><td></td><td></td></tr>
+					<tr><td>5</td><td></td><td></td></tr>
+					<tr><td>10</td><td></td><td></td></tr>
+					<tr><td>15</td><td></td><td></td></tr>
+					<tr><td>20</td><td></td><td></td></tr>
+					<tr><td>25</td><td></td><td></td></tr>
+					<tr><td>30</td><td></td><td></td></tr>
+					<tr><td>35</td><td></td><td></td></tr>
+					<tr><td>40</td><td></td><td></td></tr>
+					<tr><td>45</td><td></td><td></td></tr>
+					<tr><td>50</td><td></td><td></td></tr>
+					<tr><td>60</td><td></td><td></td></tr>
+					<tr><td>70</td><td></td><td></td></tr>
+					<tr><td>80</td><td></td><td></td></tr>
+					<tr><td>90</td><td></td><td></td></tr>
+					<tr><td>100</td><td></td><td></td></tr>
+					<tr><td>110</td><td></td><td></td></tr>
+					<tr><td>120</td><td></td><td></td></tr>
+					<tr><td>130</td><td></td><td></td></tr>
+					<tr><td>140</td><td></td><td></td></tr>
+					<tr><td>150</td><td></td><td></td></tr>
+					<tr><td>160</td><td></td><td></td></tr>
+					<tr><td>170</td><td></td><td></td></tr>
+					<tr><td>180</td><td></td><td></td></tr>
+					<tr><td>190</td><td></td><td></td></tr>
+					<tr><td>200</td><td></td><td></td></tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>PROCEDURE:</u></h3>
+		<ol class="procedure-list">
+			<li>Make the connections as shown in the circuit diagram.</li>
+			<li>Set the timer to zero by pressing the reset button and short the capacitor so that the voltage across it is zero.</li>
+			<li>Keep the toggle switch in charging mode and turn on the power supply.</li>
+			<li>Note down the voltage V across the capacitor in the at intervals of 10s till the capacitor is completely charged (around 200s).</li>
+			<li>After 200s, turn the toggle switch to discharge mode and note down the voltage in intervals of 10s till the capacitor is completely discharged (around 200s).</li>
+			<li>Draw the charging and discharging curves for the capacitor by plotting the time‘t’ along x-axis and voltage ‘V’ along y-axis.</li>
+			<li>Obtain the value of t<sub>1/2</sub> from graph (where charging and discharging curves meet) and calculate ‘K’, the dielectric constant of the given material using the formula.</li>
+		</ol>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>Precautions:</u></h3>
+		<p>The electrolytic capacitor has polarities and must be connected properly as indicated in the circuit diagram.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>CALCULATIONS:</u></h3>
+		<p>R= 100 kΩ</p>
+		<p>d = 0.1 x 10<sup>-3</sup> m</p>
+		<p>t<sub>1/2</sub>= ............s</p>
+		<p>A = 1440 x 10<sup>-6</sup> m<sup>2</sup></p>
+		<p>ε<sub>0</sub>= 8.854 x 10<sup>-12</sup> Fm<sup>-1</sup></p>
+		<p class="equation-line"><strong>$$K = \frac{10^{-6} d\, t_{1/2}}{0.693\, \varepsilon_0 A R}$$</strong></p>
+		<p>K =</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>RESULT:</u></h3>
+		<p>The dielectric constant of the given dielectric material is ____________.</p>
+	</section>
+
+</div>
+{% endblock %}
