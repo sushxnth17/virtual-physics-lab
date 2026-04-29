@@ -171,6 +171,33 @@ Students can observe:
 - Practical understanding of experimental data recording and analysis
 - Concept of using indirect measurements to identify unknown components
 
+---
+
+### 6.Fermi Energy Experiment
+
+This experiment demonstrates the concept of Fermi energy in metals by analyzing electron behavior and calculating the energy level at absolute zero temperature.
+
+### Features
+- Interactive simulation of electron distribution in a metal
+- Input-based calculation of Fermi energy
+- Visualization of energy levels and electron occupancy
+- Automatic computation using standard Fermi energy formulas
+- Displays key physical parameters like electron density and energy
+- Clean and intuitive interface for quick experimentation
+
+### Learning Outcomes
+
+Students can understand:
+
+- Concept of Fermi energy and its physical significance
+- Behavior of electrons in metals at absolute zero
+- Relationship between electron density and energy levels
+- Application of quantum mechanics in solid-state physics
+- How Fermi energy is calculated and interpreted
+
+---
+
+
 ## Technologies Used
 
 - Python (Flask) – Backend experiment computation
