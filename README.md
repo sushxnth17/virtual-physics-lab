@@ -197,6 +197,35 @@ Students can understand:
 
 ---
 
+### 7.Numerical Aperture of Optical Fiber Experiment
+This experiment determines the numerical aperture (NA) and acceptance angle of an optical fiber by analyzing the light output pattern formed on a screen.
+
+
+### Features
+- Interactive simulation of optical fiber light propagation
+- Adjustable distance between fiber and screen (L)
+- Measurement of spot diameter (D) on the screen
+- Automatic calculation of:
+   Acceptance angle (θₐ)
+   Numerical Aperture (NA)
+- Visualization of light cone and ray propagation
+- Tabular data recording for multiple observations
+- Computation of mean acceptance angle and numerical aperture
+
+
+### Learning Outcomes
+
+Students can understand:
+
+- Concept of numerical aperture and acceptance angle
+- Light propagation through optical fibers
+- Relationship between spot diameter, distance, and angle
+- How optical fibers gather and transmit light
+- Practical method to calculate NA using experimental data
+
+
+---
+
 
 ## Technologies Used
 
@@ -212,13 +241,9 @@ Students can understand:
 
 The following experiments are planned for future development:
 
-- Determination of Fermi Energy
 - Transistor Characteristics 
-- Black Box
-- Numerical Aperture of an Optical Fibre
 - Measurement of Dielectric Constant
 - Bending Loss in Optical Fibre
-- Energy Gap of the Semiconductor
 
 More experiments will be added incrementally to expand the virtual laboratory.
 
