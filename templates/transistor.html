@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="experiment-container">
+	<div class="experiment-header">
+		<p>Experiment: 2</p>
+		<h2>TRANSISTOR CHARACTERISTICS</h2>
+	</div>
+
+	<section class="experiment-section">
+		<h3><u>AIM</u></h3>
+		<p>To study the input and output characteristics of the given NPN transistor in common emitter configuration and hence to determine β, α, input resistance and the knee voltage.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>APPARATUS</u></h3>
+		<p>Transistor, variable DC power supplies, micro-ammeter, milli-ammeter, digital voltmeter and resistors.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>INTRODUCTION</u></h3>
+		<p>The transistor is an active device. A bipolar transistor has three separately doped regions and two p-n junctions. Typical operation modes are cutoff, active and saturation. In this experiment the input and output characteristics of a common-emitter NPN transistor are explored.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>CIRCUIT DIAGRAM</u></h3>
+		<div class="diagram-placeholder-box">
+			<div id="circuit-diagram" class="circuit-diagram">
+				<img src="/static/js/images/transistor_circuit.png" alt="Transistor circuit" class="circuit-diagram" style="max-width:100%;">
+			</div>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>FORMULAE</u></h3>
+		<p class="equation-line"><strong>β = ΔI_C / ΔI_B</strong></p>
+		<p class="equation-line"><strong>α = β / (1 + β)</strong></p>
+		<p class="equation-line"><strong>R_in = V_BE / I_B</strong></p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>NATURE OF GRAPHS</u></h3>
+		<div class="diagram-placeholder-box">
+			<img src="/static/js/images/transistor_input_output.png" alt="Nature of graphs" class="circuit-diagram" style="max-width:100%;">
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>PROCEDURE</u></h3>
+		<ol class="procedure-list">
+			<li>Make the circuit connections as shown in the circuit diagram.</li>
+			<li>To study input characteristics, VCE is set to 2V and VBE is increased from 0 to 0.8V in steps; corresponding IB values are recorded from micro-ammeter.</li>
+			<li>For output characteristics, set IB = 40 µA and vary VCE; record IC. Repeat for IB = 60 µA and 80 µA.</li>
+			<li>Plot graphs and calculate β, α and R_in as per formulae.</li>
+		</ol>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>TABULAR COLUMN & OBSERVATION</u></h3>
+		<div class="table-container">
+			<div class="two-column-tables">
+				<div class="table-block">
+					<h4>Input characteristics (VCE = 2V constant)</h4>
+					<table class="observation-table">
+						<thead>
+							<tr><th>VBE (V)</th><th>IB (µA)</th></tr>
+						</thead>
+						<tbody>
+						{% for v in [0,0.1,0.2,0.3,0.4,0.5,0.55,0.6,0.65,0.7,0.75,0.8] %}
+						<tr>
+							<td>{{ '%.2g'|format(v) }}</td>
+							<td id="ib-{{ v }}">-</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+
+				<div class="table-block">
+					<h4>Output characteristics</h4>
+					<table class="observation-table">
+						<thead>
+						<tr>
+						<th>VCE (V)</th>
+						<th>IC (mA)<br><small>IB=40µA</small></th>
+						<th>IC (mA)<br><small>IB=60µA</small></th>
+						<th>IC (mA)<br><small>IB=80µA</small></th>
+						</tr>
+						</thead>
+						<tbody>
+						{% for v in [0,0.05,0.1,0.15,0.2,0.25,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0] %}
+						<tr>
+							<td>{{ '%.2g'|format(v) }}</td>
+							<td id="ic-40-{{ v }}">-</td>
+							<td id="ic-60-{{ v }}">-</td>
+							<td id="ic-80-{{ v }}">-</td>
+						</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>CONTROL PANEL</u></h3>
+		<div class="control-row">
+			<label for="slider-vbe">VBE</label>
+			<input id="slider-vbe" type="range" min="0" max="0.8" step="0.01">
+			<label for="slider-vce">VCE</label>
+			<input id="slider-vce" type="range" min="0" max="1.0" step="0.01">
+			<label for="select-ib">IB</label>
+			<select id="select-ib"><option>40</option><option>60</option><option>80</option></select>
+			<div class="u-mt-2">
+				<button id="btn-generate-input" class="btn">Generate Input Data</button>
+				<button id="btn-generate-output" class="btn">Generate Output Data</button>
+				<button id="btn-calculate" class="btn">Calculate</button>
+			</div>
+		</div>
+	</section>
+
+	<section class="graphs-section">
+		<h3><u>GRAPH</u></h3>
+		<div class="chart-frame">
+			<canvas id="inputChartCanvas"></canvas>
+		</div>
+		<div class="chart-frame u-mt-3">
+			<canvas id="outputChartCanvas"></canvas>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>CALCULATIONS</u></h3>
+		<p class="equation-line"><strong>β1 = (I_C2 - I_C1) / (I_B2 - I_B1)</strong></p>
+		<p class="equation-line"><strong>β = (β1 + β2 + β3) / 3</strong></p>
+		<p class="equation-line"><strong>α = β / (1 + β)</strong></p>
+		<p class="equation-line"><strong>R_in = V_BE / I_B</strong></p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>RESULT</u></h3>
+		<p>1. The knee voltage Vk is: <span id="vk-report">-</span> V</p>
+		<p>2. The value of β: <span id="beta-report">-</span></p>
+		<p>3. The value of α: <span id="alpha-report">-</span></p>
+		<p>4. Input resistance R_in: <span id="rin-report">-</span> Ω</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>REFERENCES</u></h3>
+		<ol>
+			<li>Semiconductor devices, Kannan Kano</li>
+			<li>Basic principles of Electronics, V K Mehta</li>
+			<li>Electronic Devices and Circuit Theory, Robert Boylestad</li>
+		</ol>
+	</section>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/experiments/transistor_sim.js') }}"></script>
+{% endblock %}
