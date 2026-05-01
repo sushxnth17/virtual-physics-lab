@@ -227,6 +227,36 @@ Students can understand:
 ---
 
 
+### 8.Energy Gap of Semiconductor Experiment
+This experiment determines the energy gap of a semiconductor (thermistor) by studying the variation of resistance with temperature and analyzing the relationship betweenlog R and inverse temperature (1/T).
+
+
+### Features
+- Interactive simulation of thermistor-based circuit setup
+- Temperature-controlled environment (heating and cooling)
+- Real-time resistanceresistancent using virtual ohmmeter
+- Automatic calculation of:
+   Temperature in Kelvin
+   log R values
+  1/T values
+- Graph generation of log R vs 1/T
+- Linear best-fit line to determine slope (S)
+- Automatic computation of energy gap (E₉)
+- Tabular data recording for multiple         temperature readings
+
+
+### Learning Outcomes
+Students can understand:
+- Concept of energy gap in semiconductors
+- Behavior of thermistors with temperature    variation
+- Relationship between resistance and         temperature
+- Graphical analysis using log R vs 1/T
+- How energy gap is experimentally            determined using slope
+
+
+---
+
+
 ## Technologies Used
 
 - Python (Flask) – Backend experiment computation
