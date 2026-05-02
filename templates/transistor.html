@@ -23,12 +23,14 @@
 		<p>The transistor is an active device. A bipolar transistor has three separately doped regions and two p-n junctions. Typical operation modes are cutoff, active and saturation. In this experiment the input and output characteristics of a common-emitter NPN transistor are explored.</p>
 	</section>
 
-	<section class="experiment-section">
-		<h3><u>CIRCUIT DIAGRAM</u></h3>
-		<div class="diagram-placeholder-box">
-			<div id="circuit-diagram" class="circuit-diagram">
-				<img src="/static/js/images/transistor_circuit.png" alt="Transistor circuit" class="circuit-diagram" style="max-width:100%;">
-			</div>
+	<section class="experiment-section reference-section">
+		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
+		<h3><u>Circuit Diagram</u></h3>
+		<div class="reference-card reference-card-single">
+			<figure class="reference-figure reference-figure-single">
+				<img src="{{ url_for('static', filename='js/images/Transistorcircuit.png') }}" alt="Transistor Circuit Diagram" class="reference-image">
+				<figcaption class="lab-caption"><strong>Transistor Circuit Diagram</strong></figcaption>
+			</figure>
 		</div>
 	</section>
 
@@ -39,10 +41,20 @@
 		<p class="equation-line"><strong>R_in = V_BE / I_B</strong></p>
 	</section>
 
-	<section class="experiment-section">
-		<h3><u>NATURE OF GRAPHS</u></h3>
-		<div class="diagram-placeholder-box">
-			<img src="/static/js/images/transistor_input_output.png" alt="Nature of graphs" class="circuit-diagram" style="max-width:100%;">
+	<section class="experiment-section reference-section">
+		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
+		<h3><u>Nature of Graphs (Lab Manual Reference)</u></h3>
+		<div class="reference-card">
+			<div class="reference-grid">
+				<figure class="reference-figure">
+					<img src="{{ url_for('static', filename='js/images/TransistorGraph(input).png') }}" alt="Input characteristics graph" class="reference-image">
+					<figcaption class="lab-caption"><strong>Input Characteristics</strong></figcaption>
+				</figure>
+				<figure class="reference-figure">
+					<img src="{{ url_for('static', filename='js/images/TransistorGraph(output).png') }}" alt="Output characteristics graph" class="reference-image">
+					<figcaption class="lab-caption"><strong>Output Characteristics</strong></figcaption>
+				</figure>
+			</div>
 		</div>
 	</section>
 

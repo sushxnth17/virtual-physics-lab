@@ -170,7 +170,7 @@ function ensureStyles() {
             display: grid;
             grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.9fr);
             gap: 18px;
-            align-items: start;
+            align-items: stretch;
         }
 
         .transistor-card {
@@ -182,10 +182,9 @@ function ensureStyles() {
         }
 
         .simulation-stage {
-            min-height: 480px;
-            display: grid;
-            grid-template-rows: auto 1fr;
-            gap: 12px;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
             align-self: stretch;
         }
 
@@ -200,7 +199,7 @@ function ensureStyles() {
         .control-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 14px;
+            gap: 10px;
             width: 100%;
         }
 
@@ -209,13 +208,13 @@ function ensureStyles() {
             background: linear-gradient(180deg, rgba(13, 22, 39, 0.95), rgba(8, 15, 27, 0.95));
             border-radius: 16px;
             border: 1px solid rgba(120, 170, 255, 0.14);
-            padding: 14px;
+            padding: 12px;
             box-shadow: 0 12px 30px rgba(0,0,0,0.22);
         }
 
         .knob-card h4,
         .meter-card h4 {
-            margin: 0 0 12px;
+            margin: 0 0 8px;
             font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.1em;
@@ -226,12 +225,12 @@ function ensureStyles() {
         .knob-wrap {
             display: grid;
             place-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .rotary-knob {
-            width: 132px;
-            height: 132px;
+            width: 118px;
+            height: 118px;
             border-radius: 50%;
             position: relative;
             background:
@@ -256,7 +255,7 @@ function ensureStyles() {
             left: 50%;
             top: 50%;
             width: 4px;
-            height: 40px;
+            height: 34px;
             background: linear-gradient(180deg, #75d2ff, #2fffa7);
             border-radius: 999px;
             transform-origin: 50% 90%;
@@ -266,7 +265,7 @@ function ensureStyles() {
 
         .rotary-knob .knob-cap {
             position: absolute;
-            inset: 32px;
+            inset: 28px;
             border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.14), rgba(255,255,255,0.04) 35%, rgba(0,0,0,0.25) 70%, rgba(0,0,0,0.4));
             box-shadow: inset 0 0 18px rgba(0,0,0,0.28);
@@ -297,9 +296,9 @@ function ensureStyles() {
             display: grid;
             grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             grid-template-rows: auto auto;
-            align-items: start;
-            gap: 14px;
-            padding: 12px 6px 0;
+            align-items: stretch;
+            gap: 12px;
+            padding: 8px 6px 0;
             width: 100%;
         }
 
@@ -314,15 +313,17 @@ function ensureStyles() {
         .selector-box {
             grid-column: 1;
             grid-row: 1;
-            justify-self: start;
-            width: min(100%, 420px);
+            justify-self: stretch;
+            width: 100%;
+            max-width: 520px;
         }
 
         .mode-box {
             grid-column: 2;
             grid-row: 1;
-            justify-self: end;
-            width: min(100%, 360px);
+            justify-self: stretch;
+            width: 100%;
+            max-width: 520px;
         }
 
         .record-row-bottom {
@@ -337,7 +338,7 @@ function ensureStyles() {
         }
 
         .selector-buttons-bottom {
-            justify-content: flex-start;
+            justify-content: center;
         }
 
         .bottom-controls-mid {
@@ -367,26 +368,28 @@ function ensureStyles() {
 
         .selector-buttons button,
         .mini-action {
-            border: 1px solid rgba(130, 180, 255, 0.2);
-            background: rgba(17, 26, 42, 0.9);
-            color: #dfeaff;
+            border: 1px solid rgba(120, 170, 255, 0.24) !important;
+            background: linear-gradient(180deg, rgba(20, 31, 50, 0.95), rgba(12, 21, 36, 0.95)) !important;
+            color: #d9e9ff !important;
             border-radius: 999px;
             padding: 10px 14px;
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.03), 0 4px 14px rgba(0,0,0,0.24) !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
         }
 
         .selector-buttons button:hover,
         .mini-action:hover {
             transform: translateY(-1px);
-            box-shadow: 0 0 0 1px rgba(75, 173, 255, 0.18), 0 0 18px rgba(47, 255, 167, 0.08);
+            box-shadow: 0 0 0 1px rgba(75, 173, 255, 0.2), 0 0 14px rgba(77, 166, 255, 0.12) !important;
+            border-color: rgba(108, 178, 255, 0.34) !important;
         }
 
         .selector-buttons button.is-active {
-            background: linear-gradient(180deg, rgba(47,255,167,0.2), rgba(26,42,49,0.92));
-            border-color: rgba(47,255,167,0.45);
-            color: #9fffe0;
-            box-shadow: 0 0 24px rgba(47,255,167,0.12);
+            background: linear-gradient(180deg, rgba(45, 140, 235, 0.28), rgba(20, 34, 58, 0.95)) !important;
+            border-color: rgba(104, 183, 255, 0.5) !important;
+            color: #e7f3ff !important;
+            box-shadow: 0 0 16px rgba(77,166,255,0.14), inset 0 0 10px rgba(255,255,255,0.05) !important;
         }
 
         .toggle-row {
@@ -507,10 +510,10 @@ function ensureStyles() {
         }
 
         .mode-switch-wrap .mini-action.is-active {
-            background: linear-gradient(180deg, rgba(77,166,255,0.24), rgba(26,42,49,0.92));
-            border-color: rgba(77,166,255,0.48);
-            color: #dff1ff;
-            box-shadow: 0 0 24px rgba(77,166,255,0.12);
+            background: linear-gradient(180deg, rgba(77,166,255,0.28), rgba(18,32,56,0.95)) !important;
+            border-color: rgba(102, 186, 255, 0.52) !important;
+            color: #e8f4ff !important;
+            box-shadow: 0 0 16px rgba(77,166,255,0.16), inset 0 0 10px rgba(255,255,255,0.06) !important;
         }
 
         .mode-helper {
@@ -544,7 +547,7 @@ function ensureStyles() {
 
         .circuit-frame {
             position: relative;
-            padding: 8px;
+            padding: 10px 12px;
             border-radius: 18px;
             background:
                 radial-gradient(circle at 50% 25%, rgba(47,255,167,0.06), transparent 24%),
@@ -552,11 +555,16 @@ function ensureStyles() {
                 linear-gradient(180deg, rgba(7, 12, 20, 0.96), rgba(10, 16, 27, 0.92));
             border: 1px solid rgba(120, 170, 255, 0.16);
             overflow: hidden;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .circuit-frame svg {
             width: 100%;
             height: auto;
+            max-height: 100%;
             display: block;
         }
 
@@ -740,7 +748,7 @@ function buildSimulationShell() {
         <div class="transistor-layout">
             <div class="transistor-card simulation-stage">
                 <div class="circuit-frame">
-                    <svg id="circuit-svg" viewBox="0 0 1200 560" role="img" aria-label="Transistor common emitter circuit">
+                    <svg id="circuit-svg" viewBox="0 0 1200 460" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Transistor common emitter circuit">
                         <defs>
                             <filter id="glowGreen" x="-50%" y="-50%" width="200%" height="200%">
                                 <feGaussianBlur stdDeviation="4" result="blur" />
@@ -804,10 +812,13 @@ function buildSimulationShell() {
 
         <div class="transistor-bottom-controls">
             <div class="control-box selector-box">
+                <div class="bottom-controls-mid">
+                <span class="mode-label">IB selectors</span>
                 <div class="selector-buttons selector-buttons-bottom">
                 <button type="button" class="mini-action is-active" data-ib="40">40 µA</button>
                 <button type="button" class="mini-action" data-ib="60">60 µA</button>
                 <button type="button" class="mini-action" data-ib="80">80 µA</button>
+                </div>
                 </div>
             </div>
             <div class="control-box mode-box">
@@ -857,104 +868,156 @@ function buildCircuitSvg() {
     flowLayer.innerHTML = '';
     elementsLayer.innerHTML = '';
 
-    const elements = [
-        createSvgEl('text', { x: 72, y: 72, fill: '#dce9ff', 'font-size': 18, 'font-weight': 700 }).appendChild(document.createTextNode('VBB')).parentNode,
-        createSvgEl('text', { x: 984, y: 72, fill: '#dce9ff', 'font-size': 18, 'font-weight': 700 }).appendChild(document.createTextNode('VCC')).parentNode
-    ];
-    elementsLayer.appendChild(elements[0]);
-    elementsLayer.appendChild(elements[1]);
+    // Make the circuit occupy the frame more evenly (less dead space at bottom)
+    const drawingTransform = 'translate(-90 -42) scale(1.12)';
+    wireLayer.setAttribute('transform', drawingTransform);
+    flowLayer.setAttribute('transform', drawingTransform);
+    elementsLayer.setAttribute('transform', drawingTransform);
 
-    const sourceLeft = createSvgEl('g', { filter: 'url(#glowGreen)' });
-    sourceLeft.appendChild(createSvgEl('circle', { cx: 140, cy: 190, r: 28, fill: 'rgba(20,30,46,0.95)', stroke: '#2fffa7', 'stroke-width': 3 }));
-    sourceLeft.appendChild(createSvgEl('text', { x: 140, y: 197, fill: '#2fffa7', 'font-size': 18, 'text-anchor': 'middle', 'font-weight': 700 }).appendChild(document.createTextNode('+')).parentNode);
-    elementsLayer.appendChild(sourceLeft);
+    const addLabel = (text, x, y, size = 18, anchor = 'middle') => {
+        const label = createSvgEl('text', {
+            x,
+            y,
+            fill: '#e9f4ff',
+            'font-size': size,
+            'font-weight': 700,
+            'text-anchor': anchor
+        });
+        label.textContent = text;
+        elementsLayer.appendChild(label);
+    };
 
-    const sourceRight = createSvgEl('g', { filter: 'url(#glowOrange)' });
-    sourceRight.appendChild(createSvgEl('circle', { cx: 1060, cy: 190, r: 28, fill: 'rgba(20,30,46,0.95)', stroke: '#ffb347', 'stroke-width': 3 }));
-    sourceRight.appendChild(createSvgEl('text', { x: 1060, y: 197, fill: '#ffb347', 'font-size': 18, 'text-anchor': 'middle', 'font-weight': 700 }).appendChild(document.createTextNode('+')).parentNode);
-    elementsLayer.appendChild(sourceRight);
+    addLabel('VBB', 84, 78, 18, 'start');
+    addLabel('VCC', 956, 78, 18, 'start');
+    addLabel('H', 360, 106, 16);
+    addLabel('J', 360, 458, 16);
+    addLabel('K', 860, 106, 16);
+    addLabel('L', 860, 458, 16);
 
     const resistor = createSvgEl('path', {
-        d: 'M805 112 h30 l14 26 l-28 26 l28 26 l-28 26 l28 26 l-28 26 l28 26 h-30',
+        d: 'M170 120 L182 110 L194 130 L206 110 L218 130 L230 110 L242 130 L254 110 L266 130 L278 110 L290 120',
         fill: 'none',
         stroke: '#dce9ff',
-        'stroke-width': 4
+        'stroke-width': 3.5,
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round'
     });
     elementsLayer.appendChild(resistor);
+    addLabel('R', 230, 92, 15);
+    addLabel('33 KΩ', 230, 146, 15);
+
+    const microA = createSvgEl('g', {});
+    microA.appendChild(createSvgEl('circle', { cx: 430, cy: 120, r: 34, fill: 'rgba(18,29,47,0.92)', stroke: '#dce9ff', 'stroke-width': 3 }));
+    const microAText = createSvgEl('text', { x: 430, y: 127, fill: '#e9f4ff', 'font-size': 18, 'text-anchor': 'middle', 'font-weight': 700 });
+    microAText.textContent = 'µA';
+    microA.appendChild(microAText);
+    elementsLayer.appendChild(microA);
+
+    const milliA = createSvgEl('g', {});
+    milliA.appendChild(createSvgEl('circle', { cx: 760, cy: 120, r: 34, fill: 'rgba(18,29,47,0.92)', stroke: '#dce9ff', 'stroke-width': 3 }));
+    const milliAText = createSvgEl('text', { x: 760, y: 127, fill: '#e9f4ff', 'font-size': 18, 'text-anchor': 'middle', 'font-weight': 700 });
+    milliAText.textContent = 'mA';
+    milliA.appendChild(milliAText);
+    elementsLayer.appendChild(milliA);
+
+    const vbeMeter = createSvgEl('g', {});
+    vbeMeter.appendChild(createSvgEl('circle', { cx: 360, cy: 300, r: 32, fill: 'rgba(18,29,47,0.92)', stroke: '#dce9ff', 'stroke-width': 3 }));
+    const vbeText = createSvgEl('text', { x: 360, y: 307, fill: '#e9f4ff', 'font-size': 15, 'text-anchor': 'middle', 'font-weight': 700 });
+    vbeText.textContent = 'VBE';
+    vbeMeter.appendChild(vbeText);
+    addLabel('+', 360, 258, 14);
+    addLabel('−', 360, 347, 14);
+    elementsLayer.appendChild(vbeMeter);
+
+    const vceMeter = createSvgEl('g', {});
+    vceMeter.appendChild(createSvgEl('circle', { cx: 860, cy: 300, r: 32, fill: 'rgba(18,29,47,0.92)', stroke: '#dce9ff', 'stroke-width': 3 }));
+    const vceText = createSvgEl('text', { x: 860, y: 307, fill: '#e9f4ff', 'font-size': 15, 'text-anchor': 'middle', 'font-weight': 700 });
+    vceText.textContent = 'VCE';
+    vceMeter.appendChild(vceText);
+    addLabel('+', 860, 258, 14);
+    addLabel('−', 860, 347, 14);
+    elementsLayer.appendChild(vceMeter);
+
+    const vbbSource = createSvgEl('g', { filter: 'url(#glowGreen)' });
+    vbbSource.appendChild(createSvgEl('line', { x1: 104, y1: 258, x2: 136, y2: 232, stroke: '#2fffa7', 'stroke-width': 3 }));
+    vbbSource.appendChild(createSvgEl('line', { x1: 98, y1: 266, x2: 144, y2: 224, stroke: '#2fffa7', 'stroke-width': 2.5, opacity: 0.9 }));
+    vbbSource.appendChild(createSvgEl('line', { x1: 128, y1: 236, x2: 144, y2: 226, stroke: '#2fffa7', 'stroke-width': 2.5 }));
+    elementsLayer.appendChild(vbbSource);
+
+    const vcSource = createSvgEl('g', { filter: 'url(#glowOrange)' });
+    vcSource.appendChild(createSvgEl('line', { x1: 964, y1: 258, x2: 996, y2: 232, stroke: '#ffb347', 'stroke-width': 3 }));
+    vcSource.appendChild(createSvgEl('line', { x1: 958, y1: 266, x2: 1004, y2: 224, stroke: '#ffb347', 'stroke-width': 2.5, opacity: 0.9 }));
+    vcSource.appendChild(createSvgEl('line', { x1: 988, y1: 236, x2: 1004, y2: 226, stroke: '#ffb347', 'stroke-width': 2.5 }));
+    elementsLayer.appendChild(vcSource);
 
     const transistorGroup = createSvgEl('g', { id: 'transistor-group' });
-    const baseLine = createSvgEl('line', { x1: 540, y1: 300, x2: 540, y2: 420, stroke: '#c7d8ff', 'stroke-width': 5, class: 'transistor-core', id: 'transistor-core' });
-    const collectorLine = createSvgEl('line', { x1: 620, y1: 160, x2: 620, y2: 300, stroke: '#c7d8ff', 'stroke-width': 5 });
-    const emitterLine = createSvgEl('line', { x1: 620, y1: 420, x2: 620, y2: 510, stroke: '#c7d8ff', 'stroke-width': 5 });
-    const baseLead = createSvgEl('line', { x1: 420, y1: 360, x2: 540, y2: 360, class: 'wire', id: 'wire-base-lead' });
-    const collectorLead = createSvgEl('line', { x1: 620, y1: 160, x2: 760, y2: 160, class: 'wire', id: 'wire-collector-lead' });
-    const emitterLead = createSvgEl('line', { x1: 620, y1: 510, x2: 760, y2: 510, class: 'wire', id: 'wire-emitter-lead' });
-    const transistorBody = createSvgEl('path', {
-        d: 'M560 300 L620 260 L620 420 L560 360 Z',
+    const transistorBody = createSvgEl('circle', {
+        cx: 620,
+        cy: 280,
+        r: 52,
         fill: 'rgba(18, 29, 47, 0.95)',
         stroke: '#c7d8ff',
         'stroke-width': 4,
         class: 'transistor-core',
         id: 'transistor-body'
     });
+    const baseLine = createSvgEl('line', { x1: 600, y1: 238, x2: 600, y2: 322, stroke: '#c7d8ff', 'stroke-width': 4.5, class: 'transistor-core', id: 'transistor-core' });
+    const collectorInside = createSvgEl('line', { x1: 600, y1: 252, x2: 646, y2: 214, stroke: '#c7d8ff', 'stroke-width': 4.2, class: 'transistor-core' });
+    const emitterInside = createSvgEl('line', { x1: 600, y1: 308, x2: 646, y2: 346, stroke: '#c7d8ff', 'stroke-width': 4.2, class: 'transistor-core' });
     const emitterArrow = createSvgEl('path', {
-        d: 'M596 381 L648 425 L632 431',
+        d: 'M628 332 L651 351',
         fill: 'none',
         stroke: '#2fffa7',
-        'stroke-width': 4,
+        'stroke-width': 3.2,
         'marker-end': 'url(#arrowGreen)'
     });
+
     transistorGroup.appendChild(transistorBody);
     transistorGroup.appendChild(baseLine);
-    transistorGroup.appendChild(collectorLine);
-    transistorGroup.appendChild(emitterLine);
-    transistorGroup.appendChild(baseLead);
-    transistorGroup.appendChild(collectorLead);
-    transistorGroup.appendChild(emitterLead);
+    transistorGroup.appendChild(collectorInside);
+    transistorGroup.appendChild(emitterInside);
     transistorGroup.appendChild(emitterArrow);
     elementsLayer.appendChild(transistorGroup);
 
-    const labels = [
-        ['B', 398, 366],
-        ['C', 612, 150],
-        ['E', 612, 532],
-        ['NPN', 560, 236]
-    ];
-    labels.forEach(([text, x, y]) => {
-        const label = createSvgEl('text', { x, y, fill: '#e9f4ff', 'font-size': 18, 'font-weight': 700, 'text-anchor': 'middle' });
-        label.textContent = text;
-        elementsLayer.appendChild(label);
-    });
-
+    addLabel('B', 584, 286, 15);
+    addLabel('C', 652, 205, 15);
+    addLabel('E', 652, 366, 15);
+    addLabel('npn', 620, 352, 16);
 
     const wires = [
-        ['wire', [[140, 190], [220, 190], [220, 360], [420, 360]]],
-        ['wire', [[620, 160], [760, 160], [760, 112], [805, 112]]],
-        ['wire', [[760, 240], [760, 160]]],
-        ['wire', [[540, 360], [420, 360]]],
-        ['wire', [[620, 510], [760, 510], [760, 510], [900, 510]]],
-        ['wire', [[1060, 190], [1060, 112], [835, 112]]],
-        ['wire', [[140, 190], [140, 112], [760, 112]]]
+        [[120, 120], [170, 120]],
+        [[290, 120], [360, 120]],
+        [[360, 120], [396, 120]],
+        [[464, 120], [520, 120], [520, 280], [600, 280]],
+        [[646, 214], [646, 120], [726, 120]],
+        [[794, 120], [860, 120], [980, 120]],
+        [[120, 120], [120, 430]],
+        [[980, 120], [980, 430]],
+        [[360, 120], [360, 268]],
+        [[360, 332], [360, 430]],
+        [[860, 120], [860, 268]],
+        [[860, 332], [860, 430]],
+        [[646, 346], [646, 430]],
+        [[120, 430], [980, 430]]
     ];
 
-    wires.forEach(([cls, points], index) => {
+    wires.forEach((points, index) => {
         let d = `M ${points[0][0]} ${points[0][1]}`;
         for (let i = 1; i < points.length; i += 1) {
             d += ` L ${points[i][0]} ${points[i][1]}`;
         }
-        const path = createSvgEl('path', { d, class: `${cls} wire`, id: `wire-${index}` });
-        wireLayer.appendChild(path);
+        wireLayer.appendChild(createSvgEl('path', { d, class: 'wire', id: `wire-${index}` }));
     });
 
     transistorRuntime.wirePaths = {
-        base: [[220, 360], [420, 360]],
-        collector: [[760, 112], [835, 112], [1060, 190]],
-        emitter: [[620, 510], [760, 510], [900, 510]]
+        base: [[520, 280], [600, 280]],
+        collector: [[646, 214], [646, 120], [860, 120]],
+        emitter: [[646, 346], [646, 430], [860, 430]]
     };
     transistorRuntime.pathLengths = {
-        base: 200,
-        collector: 360,
-        emitter: 280
+        base: 80,
+        collector: 294,
+        emitter: 298
     };
 
     // Flow dots and inline meter SVG removed per user request
@@ -1015,6 +1078,11 @@ function updateKnobRotation(knob, value, min, max) {
     if (pointer) {
         pointer.style.transform = `translate(-50%, -88%) rotate(${angle}deg)`;
     }
+
+    const valueLabel = document.getElementById(`${knob.id}-value`);
+    if (valueLabel) {
+        valueLabel.textContent = `${formatValue(value, 2)} V`;
+    }
 }
 
 function valueFromPointer(knob, event, min, max) {
@@ -1040,169 +1108,135 @@ function bindKnob(knob, stateKey, min, max) {
         ? transistorRuntime.inputVbeValues
         : transistorRuntime.outputVceValues;
 
-    // Use relative-angle dragging to avoid initial jump when pointerdown occurs away from knob center
-    let startAngle = null;
-    let startValue = null;
-    const onPointerMove = (event) => {
-        if (event.pointerId !== Number(knob.dataset.pointerId || NaN)) {
-            return; // Not our pointer
-        }
-        
+    let dragMode = null;
+    let activePointerId = null;
+    let angleOffset = 0;
+
+    const angleFromEvent = (event) => {
         const rect = knob.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
         const dx = event.clientX - cx;
         const dy = event.clientY - cy;
-        let angle = Math.atan2(dy, dx) * 180 / Math.PI;
-        angle = clamp(angle, -90, 90);
+        return Math.atan2(dy, dx) * 180 / Math.PI;
+    };
 
-        // Calculate relative angle change from start
-        let deltaDeg = angle - startAngle;
-        if (deltaDeg > 180) deltaDeg -= 360;
-        if (deltaDeg < -180) deltaDeg += 360;
+    const valueToAngle = (value) => {
+        const normalized = clamp((value - min) / ((max - min) || 1), 0, 1);
+        return -90 + normalized * 180;
+    };
 
-        // Map delta to value change
-        const valueRange = (max - min) || 1;
-        const deltaValue = (deltaDeg / 180) * valueRange;
-        const rawValue = clamp(startValue + deltaValue, min, max);
+    const angleToValue = (angle) => {
+        const clampedAngle = clamp(angle, -90, 90);
+        const normalized = (clampedAngle + 90) / 180;
+        return min + normalized * (max - min);
+    };
+
+    const applyAngleToState = (absoluteAngle) => {
+        const rawValue = angleToValue(absoluteAngle);
         const nextValue = snapToAllowedValue(rawValue, allowedValues);
-        
-        // Update state and visual
         simulationState[stateKey] = nextValue;
         updateKnobRotation(knob, nextValue, min, max);
         updateSimulationInstantFeedback();
     };
 
-    const onPointerUp = (event) => {
-        if (event.pointerId !== Number(knob.dataset.pointerId || NaN)) {
-            return; // Not our pointer
+    const startDrag = (event, mode) => {
+        if (knob.classList.contains('is-disabled')) {
+            return;
         }
-        
-        // Clean up
-        delete knob.dataset.dragging;
-        delete knob.dataset.pointerId;
-        startAngle = null;
-        startValue = null;
-        
-        // Remove global listeners
+
+        event.preventDefault();
+        dragMode = mode;
+
+        const currentValue = Number(simulationState[stateKey]);
+        const currentAngle = valueToAngle(Number.isFinite(currentValue) ? currentValue : min);
+        const rect = knob.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = event.clientX - cx;
+        const dy = event.clientY - cy;
+        const distance = Math.hypot(dx, dy);
+        const radius = rect.width / 2;
+
+        // Near-center clicks have unstable angle readings. Treat them as direct drag starts.
+        if (distance < radius * 0.35) {
+            angleOffset = 0;
+        } else {
+            const pointerAngle = clamp(angleFromEvent(event), -90, 90);
+            angleOffset = currentAngle - pointerAngle;
+        }
+
+        if (mode === 'pointer') {
+            activePointerId = event.pointerId;
+            try {
+                knob.setPointerCapture?.(event.pointerId);
+            } catch (e) {
+                // ignore capture failures
+            }
+            window.addEventListener('pointermove', onPointerMove);
+            window.addEventListener('pointerup', onPointerUp);
+            window.addEventListener('pointercancel', onPointerUp);
+        } else {
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onMouseUp);
+        }
+    };
+
+    const stopDrag = () => {
+        dragMode = null;
+        activePointerId = null;
+        angleOffset = 0;
         window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('pointerup', onPointerUp);
         window.removeEventListener('pointercancel', onPointerUp);
-        
-        // Try to release capture
-        try {
-            knob.releasePointerCapture(event.pointerId);
-        } catch (e) {
-            // ignore
-        }
-    };
-
-    // Mouse event handlers for Playwright/testing compatibility
-    let mouseStartAngle = null;
-    let mouseStartValue = null;
-    
-    const onMouseMove = (event) => {
-        if (!knob.dataset.mouseDown) {
-            return;
-        }
-        
-        const rect = knob.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = event.clientX - cx;
-        const dy = event.clientY - cy;
-        let angle = Math.atan2(dy, dx) * 180 / Math.PI;
-        angle = clamp(angle, -90, 90);
-
-        // Calculate relative angle change from start
-        let deltaDeg = angle - mouseStartAngle;
-        if (deltaDeg > 180) deltaDeg -= 360;
-        if (deltaDeg < -180) deltaDeg += 360;
-
-        // Map delta to value change
-        const valueRange = (max - min) || 1;
-        const deltaValue = (deltaDeg / 180) * valueRange;
-        const rawValue = clamp(mouseStartValue + deltaValue, min, max);
-        const nextValue = snapToAllowedValue(rawValue, allowedValues);
-        
-        // Update state and visual
-        simulationState[stateKey] = nextValue;
-        updateKnobRotation(knob, nextValue, min, max);
-        updateSimulationInstantFeedback();
-    };
-
-    const onMouseUp = (event) => {
-        delete knob.dataset.mouseDown;
-        mouseStartAngle = null;
-        mouseStartValue = null;
-        
-        // Remove mouse listeners
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('mouseup', onMouseUp);
     };
 
-    knob.addEventListener('pointerdown', (event) => {
-        // ignore when disabled
-        if (knob.classList.contains('is-disabled')) {
+    const onPointerMove = (event) => {
+        if (dragMode !== 'pointer' || event.pointerId !== activePointerId) {
             return;
         }
-        
-        event.preventDefault();
-        
-        // Store pointer info
-        knob.dataset.dragging = '1';
-        knob.dataset.pointerId = String(event.pointerId);
-        
-        // Calculate initial angle at this pointer position
-        const rect = knob.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = event.clientX - cx;
-        const dy = event.clientY - cy;
-        
-        startAngle = Math.atan2(dy, dx) * 180 / Math.PI;
-        startAngle = clamp(startAngle, -90, 90);
-        startValue = Number(simulationState[stateKey]) || min;
-        
-        // Try to capture pointer
-        try {
-            knob.setPointerCapture(event.pointerId);
-        } catch (e) {
-            // ignore if capture fails
+        const pointerAngle = clamp(angleFromEvent(event), -90, 90);
+        applyAngleToState(pointerAngle + angleOffset);
+    };
+
+    const onPointerUp = (event) => {
+        if (dragMode !== 'pointer' || event.pointerId !== activePointerId) {
+            return;
         }
-        
-        // Add global listeners for drag
-        window.addEventListener('pointermove', onPointerMove);
-        window.addEventListener('pointerup', onPointerUp);
-        window.addEventListener('pointercancel', onPointerUp);
+        try {
+            knob.releasePointerCapture?.(event.pointerId);
+        } catch (e) {
+            // ignore release failures
+        }
+        stopDrag();
+    };
+
+    const onMouseMove = (event) => {
+        if (dragMode !== 'mouse') {
+            return;
+        }
+        const pointerAngle = clamp(angleFromEvent(event), -90, 90);
+        applyAngleToState(pointerAngle + angleOffset);
+    };
+
+    const onMouseUp = () => {
+        if (dragMode !== 'mouse') {
+            return;
+        }
+        stopDrag();
+    };
+
+    knob.addEventListener('pointerdown', (event) => {
+        startDrag(event, 'pointer');
     });
 
-    // Mouse event listeners for Playwright/testing compatibility
     knob.addEventListener('mousedown', (event) => {
-        // ignore when disabled
-        if (knob.classList.contains('is-disabled')) {
+        if (window.PointerEvent) {
             return;
         }
-        
-        event.preventDefault();
-        
-        // Mark as mouse drag
-        knob.dataset.mouseDown = '1';
-        
-        // Calculate initial angle at this pointer position
-        const rect = knob.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = event.clientX - cx;
-        const dy = event.clientY - cy;
-        
-        mouseStartAngle = Math.atan2(dy, dx) * 180 / Math.PI;
-        mouseStartAngle = clamp(mouseStartAngle, -90, 90);
-        mouseStartValue = Number(simulationState[stateKey]) || min;
-        
-        // Add global mouse listeners for drag
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
+        startDrag(event, 'mouse');
     });
 }
 
@@ -1250,6 +1284,7 @@ function bindControls() {
 }
 
 function setSimulationMode(mode) {
+    const previousMode = simulationState.mode;
     simulationState.mode = mode === 'output' ? 'output' : 'input';
 
     transistorRuntime.dom.modeButtons.forEach((button) => {
@@ -1278,11 +1313,14 @@ function setSimulationMode(mode) {
 
     if (simulationState.mode === 'input') {
         simulationState.vce = 2.0;
-        updateKnobRotation(transistorRuntime.dom.vceKnob, 1.0, 0, 1.0);
+        updateKnobRotation(transistorRuntime.dom.vceKnob, 0, 0, 1.0);
         const vceValue = document.getElementById('live-vce-value');
         if (vceValue) {
             vceValue.textContent = '2.00 V';
         }
+    } else if (previousMode !== 'output') {
+        simulationState.vce = 0;
+        updateKnobRotation(transistorRuntime.dom.vceKnob, 0, 0, 1.0);
     }
 
     updateSimulationInstantFeedback();
@@ -1297,10 +1335,11 @@ function updateSimulationInstantFeedback() {
     if (vceKnob) {
         if (simulationState.mode === 'input') {
             simulationState.vce = 2.0;
+            updateKnobRotation(vceKnob, 0, 0, 1.0);
         } else {
             simulationState.vce = snapToAllowedValue(simulationState.vce, transistorRuntime.outputVceValues);
+            updateKnobRotation(vceKnob, simulationState.vce, 0, 1.0);
         }
-        updateKnobRotation(vceKnob, simulationState.vce, 0, 1.0);
     }
     if (liveVbeValue) {
         liveVbeValue.textContent = `${formatValue(simulationState.vbe, 2)} V`;
@@ -2058,7 +2097,7 @@ function resetSimulation() {
     transistorRuntime.dom.ibButtons.forEach((button) => button.classList.toggle('is-active', Number(button.dataset.ib) === 40));
     setSimulationMode('input');
     updateKnobRotation(transistorRuntime.dom.vbeKnob, 0, 0, 0.8);
-    updateKnobRotation(transistorRuntime.dom.vceKnob, 1.0, 0, 1.0);
+    updateKnobRotation(transistorRuntime.dom.vceKnob, 0, 0, 1.0);
     updateSimulationInfo('cutoff', 0, 0);
     setCircuitRegion('cutoff');
     updateCharts();
