@@ -3,6 +3,10 @@ import importlib
 
 app = Flask(__name__)
 
+from experiments.transistor import transistor_bp
+
+app.register_blueprint(transistor_bp)
+
 @app.route('/')
 def home():
     # Redirect to experiments page for now

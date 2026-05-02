@@ -60,7 +60,7 @@
 		<h3><u>TABULAR COLUMN & OBSERVATION</u></h3>
 		<div class="table-container">
 			<div class="two-column-tables">
-				<div class="table-block">
+				<div class="table-block" id="input-characteristics-table-block">
 					<h4>Input characteristics (VCE = 2V constant)</h4>
 					<table class="observation-table">
 						<thead>
@@ -69,32 +69,32 @@
 						<tbody>
 						{% for v in [0,0.1,0.2,0.3,0.4,0.5,0.55,0.6,0.65,0.7,0.75,0.8] %}
 						<tr>
-							<td>{{ '%.2g'|format(v) }}</td>
-							<td id="ib-{{ v }}">-</td>
+							<td class="transistor-vbe-fixed" data-vbe="{{ v }}">{{ '%.2g'|format(v) }}</td>
+							<td><input type="number" step="0.01" min="0" class="input-compact transistor-ib-input" data-vbe="{{ v }}" id="ib-{{ v }}"></td>
 						</tr>
 						{% endfor %}
 						</tbody>
 					</table>
 				</div>
 
-				<div class="table-block">
+				<div class="table-block" id="output-characteristics-table-block">
 					<h4>Output characteristics</h4>
 					<table class="observation-table">
 						<thead>
 						<tr>
 						<th>VCE (V)</th>
-						<th>IC (mA)<br><small>IB=40µA</small></th>
-						<th>IC (mA)<br><small>IB=60µA</small></th>
-						<th>IC (mA)<br><small>IB=80µA</small></th>
+						<th>IC (µA)<br><small>IB=40µA</small></th>
+						<th>IC (µA)<br><small>IB=60µA</small></th>
+						<th>IC (µA)<br><small>IB=80µA</small></th>
 						</tr>
 						</thead>
 						<tbody>
 						{% for v in [0,0.05,0.1,0.15,0.2,0.25,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0] %}
 						<tr>
-							<td>{{ '%.2g'|format(v) }}</td>
-							<td id="ic-40-{{ v }}">-</td>
-							<td id="ic-60-{{ v }}">-</td>
-							<td id="ic-80-{{ v }}">-</td>
+							<td class="transistor-vce-fixed" data-vce="{{ v }}">{{ '%.2g'|format(v) }}</td>
+							<td><input type="number" step="0.01" min="0" class="input-compact transistor-ic-input" data-vce="{{ v }}" data-ib="40" id="ic-40-{{ v }}"></td>
+							<td><input type="number" step="0.01" min="0" class="input-compact transistor-ic-input" data-vce="{{ v }}" data-ib="60" id="ic-60-{{ v }}"></td>
+							<td><input type="number" step="0.01" min="0" class="input-compact transistor-ic-input" data-vce="{{ v }}" data-ib="80" id="ic-80-{{ v }}"></td>
 						</tr>
 						{% endfor %}
 						</tbody>
@@ -102,49 +102,28 @@
 				</div>
 			</div>
 		</div>
+		<div class="action-row transistor-action-row">
+			<button type="button" id="plot-graphs-btn" class="btn btn-secondary">Plot Graphs</button>
+			<button type="button" id="calculate-results-btn" class="btn btn-primary">Calculate</button>
+		</div>
+		<div class="action-row" id="transistor-legacy-actions" hidden></div>
 	</section>
 
 	<section class="experiment-section">
-		<h3><u>CONTROL PANEL</u></h3>
-		<div class="control-row">
-			<label for="slider-vbe">VBE</label>
-			<input id="slider-vbe" type="range" min="0" max="0.8" step="0.01">
-			<label for="slider-vce">VCE</label>
-			<input id="slider-vce" type="range" min="0" max="1.0" step="0.01">
-			<label for="select-ib">IB</label>
-			<select id="select-ib"><option>40</option><option>60</option><option>80</option></select>
-			<div class="u-mt-2">
-				<button id="btn-generate-input" class="btn">Generate Input Data</button>
-				<button id="btn-generate-output" class="btn">Generate Output Data</button>
-				<button id="btn-calculate" class="btn">Calculate</button>
-			</div>
-		</div>
-	</section>
-
-	<section class="graphs-section">
 		<h3><u>GRAPH</u></h3>
 		<div class="chart-frame">
-			<canvas id="inputChartCanvas"></canvas>
+			<canvas id="input-graph" aria-label="Input characteristics graph"></canvas>
 		</div>
 		<div class="chart-frame u-mt-3">
-			<canvas id="outputChartCanvas"></canvas>
+			<canvas id="output-graph" aria-label="Output characteristics graph"></canvas>
 		</div>
 	</section>
 
 	<section class="experiment-section">
-		<h3><u>CALCULATIONS</u></h3>
-		<p class="equation-line"><strong>β1 = (I_C2 - I_C1) / (I_B2 - I_B1)</strong></p>
-		<p class="equation-line"><strong>β = (β1 + β2 + β3) / 3</strong></p>
-		<p class="equation-line"><strong>α = β / (1 + β)</strong></p>
-		<p class="equation-line"><strong>R_in = V_BE / I_B</strong></p>
-	</section>
-
-	<section class="experiment-section">
-		<h3><u>RESULT</u></h3>
-		<p>1. The knee voltage Vk is: <span id="vk-report">-</span> V</p>
-		<p>2. The value of β: <span id="beta-report">-</span></p>
-		<p>3. The value of α: <span id="alpha-report">-</span></p>
-		<p>4. Input resistance R_in: <span id="rin-report">-</span> Ω</p>
+		<h3><u>RESULTS</u></h3>
+		<p>1. The value of β (current gain): <span id="beta-value" class="result-placeholder">-</span></p>
+		<p>2. The value of α (forward current transfer ratio): <span id="alpha-value" class="result-placeholder">-</span></p>
+		<p>3. Input resistance R<sub>in</sub>: <span id="rin-value" class="result-placeholder">-</span> Ω</p>
 	</section>
 
 	<section class="experiment-section">
