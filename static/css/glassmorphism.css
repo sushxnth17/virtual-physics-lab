@@ -1,49 +1,66 @@
 /* =============================
-   CIRCUITSPHERE – DARK FUTURISTIC THEME
-   Overrides style.css for a premium lab UI
+   CIRCUITSPHERE – PREMIUM TECHY DESIGN
+   Overrides style.css for Modern SaaS / Futuristic UI
 ================================ */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 
 :root {
   --cs-bg: #0B0F1A;
   --cs-surface: #121826;
   --cs-surface-alt: #1A2235;
   --cs-border: rgba(0, 209, 255, 0.15);
-  --cs-border-strong: rgba(0, 209, 255, 0.3);
+  --cs-border-strong: rgba(0, 209, 255, 0.35);
   --cs-accent: #00D1FF;
-  --cs-accent-dim: rgba(0, 209, 255, 0.08);
-  --cs-accent-glow: rgba(0, 209, 255, 0.25);
+  --cs-accent-dim: rgba(0, 209, 255, 0.1);
+  --cs-accent-glow: rgba(0, 209, 255, 0.3);
   --cs-text: #FFFFFF;
   --cs-text-soft: #9CA3AF;
   --cs-text-muted: #6B7280;
   --cs-success: #10B981;
   --cs-danger: #EF4444;
   --cs-warning: #F59E0B;
-  --cs-highlight: rgba(0, 209, 255, 0.06);
-  --cs-radius: 12px;
+  --cs-highlight: rgba(0, 209, 255, 0.08);
+  --cs-radius: 16px;
   --cs-radius-sm: 8px;
-  --cs-radius-pill: 999px;
-  --cs-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-  --cs-shadow-glow: 0 0 20px rgba(0, 209, 255, 0.12);
-  --cs-transition: 0.25s ease;
+  --cs-radius-pill: 9999px;
+  --cs-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --cs-shadow-glow: 0 0 24px rgba(0, 209, 255, 0.15);
+  --cs-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --cs-font-heading: 'Manrope', sans-serif;
+  --cs-font-body: 'Inter', sans-serif;
+  --cs-font-mono: 'JetBrains Mono', monospace;
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Global Reset ── */
 body {
-  background: var(--cs-bg) !important;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  background: var(--cs-bg) url('backgrounds/darkmode.png') no-repeat center center fixed !important;
+  background-size: cover !important;
+  font-family: var(--cs-font-body) !important;
   color: var(--cs-text) !important;
   min-height: 100vh;
+  transition: color 0.4s ease !important;
 }
 body::before, body::after { display: none !important; }
 
 h1, h2, h3, h4, h5 {
   color: var(--cs-text) !important;
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--cs-font-heading) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
   text-shadow: none !important;
 }
 p, li, label, span, div, td, th, figcaption, strong, em {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--cs-font-body) !important;
 }
 p, li, .measure-text, .helper-text, .formulae-definitions, .formulae-definitions li {
   color: var(--cs-text-soft) !important;
@@ -106,6 +123,7 @@ a:hover { color: #5EEBFF !important; }
   border: 1px solid var(--cs-border) !important;
   border-radius: var(--cs-radius) !important;
   box-shadow: var(--cs-shadow) !important;
+  animation: fadeIn 0.6s ease forwards;
 }
 .experiments-container > h1 { color: var(--cs-text) !important; }
 .experiments-container > p { color: var(--cs-text-soft) !important; }
@@ -146,6 +164,7 @@ a:hover { color: #5EEBFF !important; }
   border-radius: var(--cs-radius) !important;
   box-shadow: var(--cs-shadow) !important;
   color: var(--cs-text) !important;
+  animation: slideInRight 0.5s ease forwards;
 }
 .experiment-section::before,
 .graphs-section::before {
@@ -649,28 +668,29 @@ canvas {
    Soft neutral grey BG, white cards, teal/cyan gradient accents
 =============================================================== */
 body.light-mode {
-  --cs-bg: #F5F7FA;
+  --cs-bg: #F9F9FF;
   --cs-surface: #FFFFFF;
-  --cs-surface-alt: #F0F4F8;
-  --cs-border: rgba(20, 184, 166, 0.15);
-  --cs-border-strong: rgba(20, 184, 166, 0.3);
-  --cs-accent: #0EA5E9;
-  --cs-accent-dim: rgba(14, 165, 233, 0.08);
-  --cs-accent-glow: rgba(14, 165, 233, 0.2);
-  --cs-text: #1E293B;
+  --cs-surface-alt: #F0F3FF;
+  --cs-border: #E2E8F0;
+  --cs-border-strong: #CBD5E1;
+  --cs-accent: #14B8A6;
+  --cs-accent-dim: rgba(20, 184, 166, 0.1);
+  --cs-accent-glow: rgba(20, 184, 166, 0.2);
+  --cs-text: #111C2D;
   --cs-text-soft: #64748B;
   --cs-text-muted: #94A3B8;
   --cs-success: #10B981;
   --cs-danger: #EF4444;
   --cs-warning: #F59E0B;
-  --cs-highlight: rgba(14, 165, 233, 0.06);
-  --cs-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
-  --cs-shadow-glow: 0 2px 12px rgba(14, 165, 233, 0.08);
+  --cs-highlight: rgba(20, 184, 166, 0.08);
+  --cs-shadow: 0 4px 24px rgba(30, 41, 59, 0.05);
+  --cs-shadow-glow: 0 4px 16px rgba(20, 184, 166, 0.15);
 }
 
 /* ── Light: Global ── */
 body.light-mode {
-  background: #F5F7FA !important;
+  background: #F9F9FF url('backgrounds/lightmode.png') no-repeat center center fixed !important;
+  background-size: cover !important;
   color: #1E293B !important;
 }
 body.light-mode h1, body.light-mode h2,
@@ -809,6 +829,7 @@ body.light-mode button[id*="add"]:hover,
 body.light-mode .record-btn:hover {
   background: linear-gradient(135deg, #0D9488 0%, #0284C7 100%) !important;
   box-shadow: 0 4px 20px rgba(14, 165, 233, 0.35) !important;
+  transform: translateY(-2px) !important;
 }
 body.light-mode .btn-secondary {
   background: #FFFFFF !important;
