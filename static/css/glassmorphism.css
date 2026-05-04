@@ -1,314 +1,611 @@
 /* =============================
-   SOFT TACTILE / NEUMORPHISM OVERRIDE (GLOBAL)
+   CIRCUITSPHERE – DARK FUTURISTIC THEME
+   Overrides style.css for a premium lab UI
 ================================ */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 
 :root {
-  --app-bg: #E0E5EC;
-  --text-main: #4A5568;
-  --color-primary: #3B82F6; /* Cool indicator blue */
-  --color-danger: #EF4444; /* Soft glowing red */
-  
-  --shadow-extruded: 9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5);
-  --shadow-extruded-hover: 12px 12px 20px rgba(163,177,198,0.7), -12px -12px 20px rgba(255,255,255, 0.6);
-  --shadow-inset: inset 6px 6px 10px 0 rgba(163,177,198, 0.7), inset -6px -6px 10px 0 rgba(255,255,255, 0.8);
-  --shadow-inset-deep: inset 9px 9px 16px 0 rgba(163,177,198, 0.8), inset -9px -9px 16px 0 rgba(255,255,255, 0.9);
-  
-  --radius-soft: 16px;
-  --radius-pill: 999px;
-  --radius-round: 50%;
+  --cs-bg: #0B0F1A;
+  --cs-surface: #121826;
+  --cs-surface-alt: #1A2235;
+  --cs-border: rgba(0, 209, 255, 0.15);
+  --cs-border-strong: rgba(0, 209, 255, 0.3);
+  --cs-accent: #00D1FF;
+  --cs-accent-dim: rgba(0, 209, 255, 0.08);
+  --cs-accent-glow: rgba(0, 209, 255, 0.25);
+  --cs-text: #FFFFFF;
+  --cs-text-soft: #9CA3AF;
+  --cs-text-muted: #6B7280;
+  --cs-success: #10B981;
+  --cs-danger: #EF4444;
+  --cs-warning: #F59E0B;
+  --cs-highlight: rgba(0, 209, 255, 0.06);
+  --cs-radius: 12px;
+  --cs-radius-sm: 8px;
+  --cs-radius-pill: 999px;
+  --cs-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --cs-shadow-glow: 0 0 20px rgba(0, 209, 255, 0.12);
+  --cs-transition: 0.25s ease;
 }
 
+/* ── Global Reset ── */
 body {
-  background: linear-gradient(135deg, #e0f2fe, #bae6fd) !important;
-  font-family: 'Nunito', system-ui, sans-serif !important;
-  color: var(--text-main) !important;
+  background: var(--cs-bg) !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  color: var(--cs-text) !important;
   min-height: 100vh;
 }
+body::before, body::after { display: none !important; }
 
-/* Ensure original body background blobs are hidden */
-body::before, body::after {
-  display: none !important;
-}
-
-h1, h2, h3, h4, h5, p, label, .measure-text, .helper-text {
-  color: var(--text-main) !important;
-  font-family: 'Nunito', system-ui, sans-serif !important;
+h1, h2, h3, h4, h5 {
+  color: var(--cs-text) !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
   text-shadow: none !important;
 }
-
-/* The HUD & Panels (Physical Extruded Casing) */
-.experiments-container,
-.experiment-header,
-.experiment-section,
-.graphs-section,
-.formula-block,
-.diagram-container,
-.ray-diagram-container,
-.graph-container,
-.energygap-scene-card,
-.energygap-controls-card,
-.energygap-analysis-card,
-.energygap-status-panel,
-.energygap-live-grid > div,
-.energygap-helper-box,
-.blackbox-frequency-strip,
-.blackbox-circuit-stage,
-.instrument-display-card,
-.na-sim-panel,
-.na-sim-canvas-wrap,
-.na-control-card,
-.na-explore-d-control,
-.measure-panel,
-.note-box,
-.reference-card,
-.chart-frame,
-.table-container,
-.site-header,
-.site-footer {
-  background-color: var(--app-bg) !important;
-  background-image: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border: none !important;
-  border-radius: var(--radius-soft) !important;
-  box-shadow: var(--shadow-extruded) !important;
-  color: var(--text-main) !important;
+p, li, label, span, div, td, th, figcaption, strong, em {
+  font-family: 'Inter', system-ui, sans-serif !important;
 }
-
-/* Header UI specifics */
-.site-header .portal-title-wrap div,
-.site-header .portal-title,
-.site-header .portal-subtitle {
-  color: var(--text-main) !important;
+p, li, .measure-text, .helper-text, .formulae-definitions, .formulae-definitions li {
+  color: var(--cs-text-soft) !important;
 }
-.site-header .logo-placeholder {
-  border: none !important;
-  box-shadow: var(--shadow-inset) !important;
-  border-radius: var(--radius-soft) !important;
-  color: var(--text-main) !important;
-  font-family: 'Nunito', sans-serif !important;
-}
+label { color: var(--cs-text) !important; }
+strong { color: var(--cs-text) !important; }
+a { color: var(--cs-accent) !important; }
+a:hover { color: #5EEBFF !important; }
 
+/* ── Header ── */
+.site-header {
+  background: var(--cs-surface) !important;
+  border-bottom: 1px solid var(--cs-border) !important;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 0 !important;
+  backdrop-filter: blur(12px) !important;
+}
+.portal-title-wrap, .portal-title, .portal-subtitle,
+.site-header .portal-title, .site-header .portal-subtitle {
+  color: var(--cs-text) !important;
+}
+.portal-subtitle { color: var(--cs-text-soft) !important; }
+.portal-title { color: var(--cs-accent) !important; }
+.logo-placeholder {
+  border: 1px solid var(--cs-border) !important;
+  background: var(--cs-surface-alt) !important;
+  color: var(--cs-text-soft) !important;
+  border-radius: var(--cs-radius) !important;
+  box-shadow: none !important;
+}
 .portal-nav {
+  border-top: 1px solid var(--cs-border) !important;
+  background: rgba(0, 209, 255, 0.03) !important;
+  box-shadow: none !important;
+}
+.nav-links a {
+  color: var(--cs-text-soft) !important;
+  border-radius: var(--cs-radius-pill) !important;
+  transition: all var(--cs-transition) !important;
+  font-weight: 600 !important;
+}
+.nav-links a:hover, .nav-links a:focus-visible {
+  color: var(--cs-accent) !important;
+  background: var(--cs-accent-dim) !important;
   box-shadow: none !important;
 }
 
-.nav-links a {
-  color: var(--text-main) !important;
-  border-radius: var(--radius-pill) !important;
-  transition: all 0.2s ease !important;
+/* ── Footer ── */
+.site-footer {
+  background: var(--cs-surface) !important;
+  border-top: 1px solid var(--cs-border) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
-.nav-links a:hover {
-  background: var(--app-bg) !important;
-  box-shadow: var(--shadow-extruded) !important;
-  color: var(--color-primary) !important;
-}
-.nav-links a:active {
-  box-shadow: var(--shadow-inset) !important;
-}
+.site-footer p { color: var(--cs-text-soft) !important; }
 
-/* Fix elements that are screens/diagrams carving into the physical rig */
-.diagram-placeholder-box, .lab-figure-box, .ray-diagram-card {
-  background: var(--app-bg) !important;
-  border: none !important;
-  box-shadow: var(--shadow-inset) !important;
-  border-radius: var(--radius-soft) !important;
+/* ── Experiments List ── */
+.experiments-container {
+  background: var(--cs-surface) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius) !important;
+  box-shadow: var(--cs-shadow) !important;
 }
+.experiments-container > h1 { color: var(--cs-text) !important; }
+.experiments-container > p { color: var(--cs-text-soft) !important; }
 
-/* Experiment Cards on Home Page */
 .experiment-list li a {
-  background: var(--app-bg) !important;
-  border: none !important;
-  color: var(--text-main) !important;
-  border-radius: var(--radius-soft) !important;
-  box-shadow: var(--shadow-extruded) !important;
-  transition: all 0.2s ease !important;
-  font-weight: 700 !important;
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  color: var(--cs-text) !important;
+  border-radius: var(--cs-radius) !important;
+  box-shadow: none !important;
+  transition: all var(--cs-transition) !important;
+  font-weight: 600 !important;
 }
-
 .experiment-list li a:hover {
-  box-shadow: var(--shadow-extruded-hover) !important;
-  transform: translateY(-2px) !important;
-  color: var(--color-primary) !important;
+  border-color: var(--cs-border-strong) !important;
+  box-shadow: var(--cs-shadow-glow) !important;
+  transform: translateY(-3px) !important;
+  color: var(--cs-accent) !important;
 }
 
-.experiment-list li a:active {
-  box-shadow: var(--shadow-inset) !important;
-  transform: translateY(1px) !important;
+/* ── Experiment Page Sections ── */
+.experiment-container { gap: 1.25rem !important; }
+
+.experiment-header {
+  background: linear-gradient(135deg, var(--cs-surface) 0%, var(--cs-surface-alt) 100%) !important;
+  border: 1px solid var(--cs-border-strong) !important;
+  border-radius: var(--cs-radius) !important;
+  box-shadow: var(--cs-shadow), var(--cs-shadow-glow) !important;
+}
+.experiment-header p { color: var(--cs-accent) !important; }
+.experiment-header h2 { color: var(--cs-text) !important; }
+
+.experiment-section,
+.graphs-section {
+  background: var(--cs-surface) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-left: 4px solid var(--cs-accent) !important;
+  border-radius: var(--cs-radius) !important;
+  box-shadow: var(--cs-shadow) !important;
+  color: var(--cs-text) !important;
+}
+.experiment-section::before,
+.graphs-section::before {
+  background: linear-gradient(90deg, var(--cs-accent), transparent) !important;
+  height: 2px !important;
+  opacity: 0.5;
+}
+.experiment-section h3,
+.graphs-section h3 { color: var(--cs-text) !important; }
+.experiment-section h3 u { text-decoration-color: var(--cs-accent) !important; }
+.experiment-section h4,
+.graphs-section h4 { color: var(--cs-text) !important; }
+
+.info-section-card { background: var(--cs-surface) !important; }
+.formula-block {
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius-sm) !important;
+}
+.formulae-definitions {
+  border-top: 1px dashed rgba(0, 209, 255, 0.2) !important;
 }
 
-/* Typography & Readability (Physics Variables & Numbers) */
-.result-value,
-.energygap-status-value,
-.measure-selected-order,
-.measure-xm-value,
-.bb-node-label,
-.bb-component-label,
-.bb-meter-label,
-.bb-meter-reading,
-.bb-source-frequency,
-.slider-value,
-.live-reading {
-  font-family: 'JetBrains Mono', 'Courier New', monospace !important;
-  color: var(--color-danger) !important; /* Muted LED Red */
-  text-shadow: 0 0 5px rgba(239, 68, 68, 0.4) !important;
+/* Reference sections */
+.reference-section { border-left-color: var(--cs-accent) !important; }
+.reference-kicker { color: var(--cs-accent) !important; }
+.reference-card {
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius) !important;
+  box-shadow: none !important;
 }
 
-.instrument-value {
-  font-family: 'JetBrains Mono', 'Courier New', monospace !important;
-  color: var(--color-primary) !important; /* Cool indicator blue */
-  text-shadow: 0 0 8px rgba(59, 130, 246, 0.5) !important;
-  background: var(--app-bg) !important;
-  border: none !important;
-  box-shadow: var(--shadow-inset-deep) !important;
-  border-radius: 8px !important;
+/* ── Diagram / Graph Containers ── */
+.diagram-container,
+.ray-diagram-container,
+.graph-container {
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius-sm) !important;
+  box-shadow: none !important;
+}
+.diagram-placeholder-box,
+.lab-figure-box,
+.ray-diagram-card {
+  background: var(--cs-surface-alt) !important;
+  border: 1px dashed rgba(0, 209, 255, 0.25) !important;
+  border-radius: var(--cs-radius-sm) !important;
+  box-shadow: none !important;
+}
+.diagram-placeholder-box p { color: var(--cs-text-soft) !important; }
+.lab-caption { color: var(--cs-text-soft) !important; }
+.ray-caption { color: var(--cs-text-soft) !important; }
+.chart-frame {
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius) !important;
+  box-shadow: none !important;
 }
 
-/* Controls: Sliders */
-input[type="range"] {
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  background: transparent !important;
+/* ── Buttons ── */
+button, .btn {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: none !important;
+  border-radius: var(--cs-radius-pill) !important;
+  transition: all var(--cs-transition) !important;
 }
-input[type="range"]::-webkit-slider-runnable-track {
-  background: var(--app-bg) !important;
-  border: none !important;
-  border-radius: var(--radius-pill) !important;
-  height: 12px !important;
-  box-shadow: var(--shadow-inset) !important;
-}
-input[type="range"]::-webkit-slider-thumb {
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  background: var(--app-bg) !important;
-  height: 24px !important;
-  width: 24px !important;
-  border-radius: var(--radius-round) !important;
-  margin-top: -6px !important;
-  box-shadow: var(--shadow-extruded) !important;
-  border: none !important;
-  cursor: grab !important;
-}
-input[type="range"]::-webkit-slider-thumb:active {
-  box-shadow: var(--shadow-inset) !important;
-  cursor: grabbing !important;
-}
-
-/* Controls: Buttons (Extruded Default, Inset Active) */
-button,
-.btn,
 .btn-primary,
 button[id*="calculate"],
 button[id*="compute"],
 button[id*="add"],
 .record-btn {
-  background: var(--app-bg) !important;
-  color: var(--color-primary) !important;
+  background: var(--cs-accent) !important;
+  color: #0B0F1A !important;
   border: none !important;
-  border-radius: var(--radius-pill) !important;
-  box-shadow: var(--shadow-extruded) !important;
-  transition: all 0.2s ease !important;
-  font-family: 'Nunito', sans-serif !important;
-  text-transform: uppercase !important;
-  font-weight: 800 !important;
-  letter-spacing: 1px !important;
+  box-shadow: 0 0 16px rgba(0, 209, 255, 0.3) !important;
 }
-
-button:hover,
-.btn:hover,
 .btn-primary:hover,
 button[id*="calculate"]:hover,
 button[id*="compute"]:hover,
 button[id*="add"]:hover,
 .record-btn:hover {
-  box-shadow: var(--shadow-extruded-hover) !important;
+  background: #33DBFF !important;
+  box-shadow: 0 0 28px rgba(0, 209, 255, 0.5) !important;
   transform: translateY(-2px) !important;
 }
-
-button:active,
-.btn:active,
-.btn-primary:active,
-button[id*="calculate"]:active,
-button[id*="compute"]:active,
-button[id*="add"]:active,
-.record-btn:active {
-  box-shadow: var(--shadow-inset) !important;
-  transform: translateY(1px) !important;
+.btn-secondary {
+  background: var(--cs-surface-alt) !important;
+  color: var(--cs-accent) !important;
+  border: 1px solid var(--cs-border-strong) !important;
+  box-shadow: none !important;
+}
+.btn-secondary:hover {
+  background: rgba(0, 209, 255, 0.1) !important;
+  box-shadow: 0 0 16px rgba(0, 209, 255, 0.2) !important;
+}
+button[id*="reset"], .btn-danger {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: var(--cs-danger) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  box-shadow: none !important;
+}
+.btn-danger:hover, button[id*="reset"]:hover {
+  background: rgba(239, 68, 68, 0.25) !important;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.2) !important;
 }
 
-/* Danger buttons */
-button[id*="reset"],
-.btn-danger {
-  color: var(--color-danger) !important;
-}
-
-/* Controls: Inputs/Selects (Carved Inset) */
+/* ── Inputs / Selects ── */
 input[type="text"],
 input[type="number"],
 select,
 textarea,
-.measurement-input {
-  background: var(--app-bg) !important;
-  border: none !important;
-  border-radius: var(--radius-soft) !important;
-  box-shadow: var(--shadow-inset) !important;
-  color: var(--color-primary) !important;
+.measurement-input,
+.current-input {
+  background: var(--cs-bg) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius-sm) !important;
+  box-shadow: none !important;
+  color: var(--cs-text) !important;
   font-family: 'JetBrains Mono', monospace !important;
-  padding: 8px 14px !important;
+  padding: 8px 12px !important;
 }
-
 input[type="text"]:focus,
 input[type="number"]:focus,
 select:focus,
 textarea:focus {
   outline: none !important;
-  box-shadow: var(--shadow-inset-deep) !important;
+  border-color: var(--cs-accent) !important;
+  box-shadow: 0 0 0 3px rgba(0, 209, 255, 0.15) !important;
 }
 
-/* Tables */
+/* ── Sliders ── */
+input[type="range"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+  accent-color: var(--cs-accent) !important;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius-pill) !important;
+  height: 8px !important;
+  box-shadow: none !important;
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: var(--cs-accent) !important;
+  height: 20px !important;
+  width: 20px !important;
+  border-radius: 50% !important;
+  margin-top: -7px !important;
+  box-shadow: 0 0 10px rgba(0, 209, 255, 0.4) !important;
+  border: 2px solid var(--cs-bg) !important;
+  cursor: pointer !important;
+}
+
+/* ── Tables ── */
+.table-container {
+  background: var(--cs-surface) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius) !important;
+  box-shadow: none !important;
+}
 .observation-table {
-  border-collapse: separate !important;
-  border-spacing: 8px !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
 }
-.observation-table th, .observation-table td {
-  border: none !important;
-  color: var(--text-main) !important;
+.observation-table th,
+.observation-table td {
+  border: 1px solid rgba(0, 209, 255, 0.1) !important;
+  color: var(--cs-text) !important;
+  padding: 10px 12px !important;
 }
-.observation-table th {
-  background: var(--app-bg) !important;
-  box-shadow: var(--shadow-extruded) !important;
-  border-radius: 8px !important;
-  font-family: 'Nunito', sans-serif !important;
-  font-weight: 800 !important;
-  padding: 10px !important;
+.observation-table th, .observation-table thead th {
+  background: #0D1B2A !important;
+  color: var(--cs-accent) !important;
+  font-weight: 700 !important;
+  font-family: 'Inter', sans-serif !important;
+  border-bottom: 2px solid var(--cs-accent) !important;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
 }
 .observation-table tbody tr {
-  background: var(--app-bg) !important;
-  box-shadow: var(--shadow-inset) !important;
-  border-radius: 8px !important;
+  background: var(--cs-surface) !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  transition: background var(--cs-transition) !important;
+}
+.observation-table tbody tr:nth-child(even) {
+  background: var(--cs-surface-alt) !important;
+}
+.observation-table tbody tr:hover {
+  background: rgba(0, 209, 255, 0.05) !important;
 }
 .observation-table tbody tr td {
-  padding: 8px !important;
+  padding: 10px 12px !important;
+  color: var(--cs-text-soft) !important;
 }
+
+/* Active / highlighted rows */
 .observation-table tbody tr.active-frequency-row,
 .observation-table tbody tr.is-active,
 .active-frequency-row,
 .planck-recorded-row,
 .energygap-recorded-row {
-  box-shadow: var(--shadow-inset-deep) !important;
-  color: var(--color-primary) !important;
+  background: rgba(0, 209, 255, 0.08) !important;
+  box-shadow: inset 3px 0 0 var(--cs-accent) !important;
+}
+.energygap-recorded-row td { color: var(--cs-accent) !important; font-weight: 600 !important; }
+
+/* ── Data Values / Results ── */
+.result-value,
+.result-placeholder {
+  font-family: 'JetBrains Mono', monospace !important;
+  color: var(--cs-accent) !important;
+  text-shadow: 0 0 8px rgba(0, 209, 255, 0.3) !important;
+  font-weight: 700 !important;
+}
+.result-blank {
+  border-bottom-color: var(--cs-border-strong) !important;
+  color: var(--cs-accent) !important;
+}
+.equation-line { color: var(--cs-accent) !important; }
+.equation-line strong { color: var(--cs-accent) !important; }
+
+/* ── Simulation Panels ── */
+.energygap-scene-card,
+.energygap-controls-card,
+.energygap-analysis-card,
+.energygap-status-panel {
+  background: var(--cs-surface) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius) !important;
+  box-shadow: none !important;
+}
+.energygap-status-panel {
+  background: var(--cs-surface-alt) !important;
+}
+.energygap-status-kicker,
+.energygap-analysis-label {
+  color: var(--cs-accent) !important;
+}
+.energygap-status-value { color: var(--cs-text) !important; }
+.energygap-live-grid > div {
+  background: var(--cs-surface) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius-sm) !important;
+  box-shadow: none !important;
+}
+.energygap-live-label { color: var(--cs-text-muted) !important; }
+.energygap-live-grid strong { color: var(--cs-accent) !important; }
+.energygap-helper-box {
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  color: var(--cs-text-soft) !important;
+  border-radius: var(--cs-radius-sm) !important;
+  box-shadow: none !important;
+}
+.energygap-instruction,
+.energygap-table-note { color: var(--cs-text-soft) !important; }
+
+/* ── BlackBox Circuit SVG ── */
+.blackbox-circuit-card,
+.blackbox-frequency-strip,
+.blackbox-circuit-stage {
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius) !important;
+  box-shadow: none !important;
+}
+.bb-wire--main, .bb-wire--branch, .bb-wire--lead, .bb-wire--voltmeter {
+  stroke: var(--cs-accent) !important;
+}
+.bb-meter { fill: var(--cs-surface) !important; stroke: var(--cs-border-strong) !important; }
+.bb-component-box { fill: var(--cs-surface-alt) !important; stroke: var(--cs-accent) !important; }
+.bb-node-label, .bb-component-label, .bb-meter-label, .bb-source-frequency {
+  fill: var(--cs-accent) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+.bb-meter-reading {
+  fill: var(--cs-accent) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  text-shadow: 0 0 6px rgba(0, 209, 255, 0.4) !important;
 }
 
-/* Chips/Pills */
-.frequency-chip, .component-option, .na-mode-chip {
-  background: var(--app-bg) !important;
-  border: none !important;
-  color: var(--text-main) !important;
-  border-radius: var(--radius-pill) !important;
-  box-shadow: var(--shadow-extruded) !important;
+/* ── NA Optical Fibre ── */
+.na-sim-panel, .na-sim-canvas-wrap, .na-control-card, .na-explore-d-control {
+  background: var(--cs-surface) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius) !important;
+  box-shadow: none !important;
 }
-.frequency-chip.is-active, .component-option.is-active, .na-mode-chip.is-active {
-  box-shadow: var(--shadow-inset) !important;
-  color: var(--color-primary) !important;
+.na-mode-chip {
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  color: var(--cs-text-soft) !important;
+  border-radius: var(--cs-radius-pill) !important;
+  box-shadow: none !important;
+}
+.na-mode-chip.is-active {
+  background: var(--cs-accent-dim) !important;
+  color: var(--cs-accent) !important;
+  border-color: var(--cs-accent) !important;
+  box-shadow: 0 0 10px rgba(0, 209, 255, 0.2) !important;
+}
+
+/* ── Chips / Component Options ── */
+.frequency-chip, .component-option {
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  color: var(--cs-text-soft) !important;
+  border-radius: var(--cs-radius-pill) !important;
+  box-shadow: none !important;
+}
+.frequency-chip.is-active, .component-option.is-active {
+  background: var(--cs-accent-dim) !important;
+  color: var(--cs-accent) !important;
+  border-color: var(--cs-accent) !important;
+}
+
+/* ── Measure / Note panels ── */
+.measure-panel, .note-box {
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius) !important;
+  box-shadow: none !important;
+}
+.note-box strong { color: var(--cs-accent) !important; }
+
+/* ── Simulation Wrap / Canvas ── */
+.simulation-wrap {
+  background: var(--cs-surface) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius) !important;
+  padding: 1rem !important;
+}
+canvas {
+  border-radius: var(--cs-radius-sm) !important;
+}
+
+/* ── Planck LED indicators ── */
+.planck-led { box-shadow: 0 0 8px currentColor !important; }
+.slider-value { color: var(--cs-accent) !important; font-family: 'JetBrains Mono', monospace !important; }
+
+/* ── Photodiode inline styles override ── */
+[style*="background-color: #ffffff"],
+[style*="background-color: #f9f9f9"],
+[style*="background-color: #f0f7ff"],
+[style*="background-color: #f0fff0"],
+[style*="background-color: #f5f5f5"],
+[style*="background-color: #fffbf0"],
+[style*="background-color: #f0f8ff"],
+[style*="background: #f8fbff"],
+[style*="background: #fdfefe"],
+[style*="background-color: #f5f9ff"],
+[style*="background: #f5f9fe"],
+[style*="background: #f0f8ff"],
+[style*="background: white"],
+[style*="background:#eef6ff"] {
+  background-color: var(--cs-surface-alt) !important;
+  background: var(--cs-surface-alt) !important;
+}
+[style*="border: 1px solid #ddd"],
+[style*="border: 1px solid #d9e3ee"],
+[style*="border: 1px solid #d7e3f0"],
+[style*="border: 1px solid #c8d4e0"],
+[style*="border: 1px solid #cfdceb"] {
+  border-color: var(--cs-border) !important;
+}
+[style*="color: #333"],
+[style*="color: #555"],
+[style*="color: #666"],
+[style*="color: #1f3b57"],
+[style*="color: #28455f"] {
+  color: var(--cs-text-soft) !important;
+}
+[style*="color: #4a90e2"],
+[style*="color: #0f4c81"],
+[style*="color: #4bc04b"],
+[style*="color: #2e7d32"],
+[style*="color: #e65100"],
+[style*="color: #0d47a1"],
+[style*="color: #6a1b9a"] {
+  color: var(--cs-accent) !important;
+}
+[style*="border-left: 4px solid"] {
+  border-left-color: var(--cs-accent) !important;
+}
+[style*="border: 2px solid #0f4c81"],
+[style*="border: 2px solid #4a90e2"],
+[style*="border: 2px solid #4bc04b"],
+[style*="border: 2px solid #4caf50"] {
+  border-color: var(--cs-border-strong) !important;
+}
+
+/* ── Dielectric circuit controls ── */
+#voltageDisplay, #timerDisplay {
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  color: var(--cs-accent) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+#procedureMsg {
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  color: var(--cs-text-soft) !important;
+}
+#calculationResult {
+  background: var(--cs-surface) !important;
+  border: 2px solid var(--cs-accent) !important;
+}
+#calculationResult h4 { color: var(--cs-accent) !important; }
+#calculationResult [style*="background: white"] {
+  background: var(--cs-surface-alt) !important;
+}
+#kValue, #tHalfValue {
+  color: var(--cs-accent) !important;
+}
+
+/* ── Frequency Control ── */
+.frequency-control { color: var(--cs-text) !important; }
+.frequency-control label { color: var(--cs-text) !important; }
+#freqValue { color: var(--cs-accent) !important; font-family: 'JetBrains Mono', monospace !important; }
+
+/* ── Split columns ── */
+.split-columns .column-panel {
+  background: var(--cs-surface-alt) !important;
+  border: 1px solid var(--cs-border) !important;
+  border-radius: var(--cs-radius) !important;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--cs-bg); }
+::-webkit-scrollbar-thumb { background: rgba(0, 209, 255, 0.2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 209, 255, 0.35); }
+
+/* ── Selection ── */
+::selection {
+  background: rgba(0, 209, 255, 0.3);
+  color: var(--cs-text);
+}
+
+/* ── Images: invert-safe wrapper for light circuit diagrams ── */
+.reference-image, .circuit-diagram, .lab-figure-image,
+.diagram-container img, .diagram-placeholder-box img {
+  filter: brightness(0.9) contrast(1.1);
+  border-radius: var(--cs-radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .experiment-header { padding: 1.25rem !important; }
+  .experiment-section, .graphs-section { padding: 1rem !important; }
+  .observation-table th, .observation-table td { padding: 8px !important; font-size: 0.85rem; }
 }
