@@ -609,3 +609,451 @@ canvas {
   .experiment-section, .graphs-section { padding: 1rem !important; }
   .observation-table th, .observation-table td { padding: 8px !important; font-size: 0.85rem; }
 }
+
+/* =============================================================
+   THEME TOGGLE BUTTON
+=============================================================== */
+.theme-toggle-btn {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  width: 52px;
+  height: 52px;
+  border-radius: 50% !important;
+  border: 2px solid var(--cs-border-strong) !important;
+  background: var(--cs-surface) !important;
+  color: var(--cs-accent) !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 209, 255, 0.15) !important;
+  transition: all 0.35s ease !important;
+  font-size: 1.35rem;
+  padding: 0 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+.theme-toggle-btn:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 28px rgba(0, 0, 0, 0.5), 0 0 25px rgba(0, 209, 255, 0.3) !important;
+}
+.theme-toggle-btn .icon-sun,
+.theme-toggle-btn .icon-moon { transition: opacity 0.3s ease, transform 0.3s ease; }
+.theme-toggle-btn .icon-sun { display: none; }
+.theme-toggle-btn .icon-moon { display: inline; }
+
+/* =============================================================
+   LIGHT MODE – Activated by body.light-mode
+   Soft neutral grey BG, white cards, teal/cyan gradient accents
+=============================================================== */
+body.light-mode {
+  --cs-bg: #F5F7FA;
+  --cs-surface: #FFFFFF;
+  --cs-surface-alt: #F0F4F8;
+  --cs-border: rgba(20, 184, 166, 0.15);
+  --cs-border-strong: rgba(20, 184, 166, 0.3);
+  --cs-accent: #0EA5E9;
+  --cs-accent-dim: rgba(14, 165, 233, 0.08);
+  --cs-accent-glow: rgba(14, 165, 233, 0.2);
+  --cs-text: #1E293B;
+  --cs-text-soft: #64748B;
+  --cs-text-muted: #94A3B8;
+  --cs-success: #10B981;
+  --cs-danger: #EF4444;
+  --cs-warning: #F59E0B;
+  --cs-highlight: rgba(14, 165, 233, 0.06);
+  --cs-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+  --cs-shadow-glow: 0 2px 12px rgba(14, 165, 233, 0.08);
+}
+
+/* ── Light: Global ── */
+body.light-mode {
+  background: #F5F7FA !important;
+  color: #1E293B !important;
+}
+body.light-mode h1, body.light-mode h2,
+body.light-mode h3, body.light-mode h4,
+body.light-mode h5 { color: #1E293B !important; }
+body.light-mode p, body.light-mode li,
+body.light-mode .measure-text, body.light-mode .helper-text,
+body.light-mode .formulae-definitions,
+body.light-mode .formulae-definitions li { color: #64748B !important; }
+body.light-mode label { color: #1E293B !important; }
+body.light-mode strong { color: #1E293B !important; }
+body.light-mode a { color: #0EA5E9 !important; }
+body.light-mode a:hover { color: #0284C7 !important; }
+
+/* ── Light: Header ── */
+body.light-mode .site-header {
+  background: linear-gradient(135deg, #14B8A6 0%, #0EA5E9 100%) !important;
+  border-bottom: none !important;
+  box-shadow: 0 2px 16px rgba(14, 165, 233, 0.18) !important;
+}
+body.light-mode .portal-title,
+body.light-mode .portal-subtitle,
+body.light-mode .site-header .portal-title,
+body.light-mode .site-header .portal-subtitle { color: #FFFFFF !important; }
+body.light-mode .portal-subtitle { opacity: 0.85; }
+body.light-mode .logo-placeholder {
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+body.light-mode .portal-nav {
+  border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+body.light-mode .nav-links a {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+body.light-mode .nav-links a:hover,
+body.light-mode .nav-links a:focus-visible {
+  color: #FFFFFF !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+/* ── Light: Footer ── */
+body.light-mode .site-footer {
+  background: #FFFFFF !important;
+  border-top: 1px solid #E2E8F0 !important;
+}
+body.light-mode .site-footer p { color: #64748B !important; }
+
+/* ── Light: Experiments List ── */
+body.light-mode .experiments-container {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03) !important;
+}
+body.light-mode .experiments-container > h1 { color: #1E293B !important; }
+body.light-mode .experiment-list li a {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #1E293B !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+}
+body.light-mode .experiment-list li a:hover {
+  border-color: #14B8A6 !important;
+  box-shadow: 0 4px 16px rgba(20, 184, 166, 0.12) !important;
+  color: #0EA5E9 !important;
+}
+
+/* ── Light: Experiment Header ── */
+body.light-mode .experiment-header {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0FDFA 100%) !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03) !important;
+}
+body.light-mode .experiment-header p { color: #14B8A6 !important; }
+body.light-mode .experiment-header h2 { color: #1E293B !important; }
+
+/* ── Light: Sections ── */
+body.light-mode .experiment-section,
+body.light-mode .graphs-section {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-left: 4px solid #14B8A6 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03) !important;
+}
+body.light-mode .experiment-section::before,
+body.light-mode .graphs-section::before {
+  background: linear-gradient(90deg, #14B8A6, transparent) !important;
+}
+body.light-mode .experiment-section h3 u { text-decoration-color: #14B8A6 !important; }
+body.light-mode .formula-block {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+}
+body.light-mode .formulae-definitions { border-top-color: #E2E8F0 !important; }
+body.light-mode .reference-kicker { color: #14B8A6 !important; }
+body.light-mode .reference-card {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+/* ── Light: Diagram / Graph ── */
+body.light-mode .diagram-container,
+body.light-mode .ray-diagram-container,
+body.light-mode .graph-container {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+}
+body.light-mode .diagram-placeholder-box,
+body.light-mode .lab-figure-box,
+body.light-mode .ray-diagram-card {
+  background: #F8FAFC !important;
+  border: 1px dashed #CBD5E1 !important;
+}
+body.light-mode .diagram-placeholder-box p { color: #64748B !important; }
+body.light-mode .chart-frame {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+/* ── Light: Buttons ── */
+body.light-mode .btn-primary,
+body.light-mode button[id*="calculate"],
+body.light-mode button[id*="compute"],
+body.light-mode button[id*="add"],
+body.light-mode .record-btn {
+  background: linear-gradient(135deg, #14B8A6 0%, #0EA5E9 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 10px rgba(14, 165, 233, 0.25) !important;
+}
+body.light-mode .btn-primary:hover,
+body.light-mode button[id*="calculate"]:hover,
+body.light-mode button[id*="compute"]:hover,
+body.light-mode button[id*="add"]:hover,
+body.light-mode .record-btn:hover {
+  background: linear-gradient(135deg, #0D9488 0%, #0284C7 100%) !important;
+  box-shadow: 0 4px 20px rgba(14, 165, 233, 0.35) !important;
+}
+body.light-mode .btn-secondary {
+  background: #FFFFFF !important;
+  color: #14B8A6 !important;
+  border: 2px solid #14B8A6 !important;
+}
+body.light-mode .btn-secondary:hover {
+  background: #F0FDFA !important;
+  box-shadow: 0 2px 12px rgba(20, 184, 166, 0.15) !important;
+}
+body.light-mode button[id*="reset"],
+body.light-mode .btn-danger {
+  background: #FEF2F2 !important;
+  color: #EF4444 !important;
+  border: 1px solid #FECACA !important;
+}
+body.light-mode .btn-danger:hover,
+body.light-mode button[id*="reset"]:hover {
+  background: #FEE2E2 !important;
+}
+
+/* ── Light: Inputs ── */
+body.light-mode input[type="text"],
+body.light-mode input[type="number"],
+body.light-mode select,
+body.light-mode textarea,
+body.light-mode .measurement-input,
+body.light-mode .current-input {
+  background: #FFFFFF !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #1E293B !important;
+}
+body.light-mode input[type="text"]:focus,
+body.light-mode input[type="number"]:focus,
+body.light-mode select:focus,
+body.light-mode textarea:focus {
+  border-color: #14B8A6 !important;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15) !important;
+}
+
+/* ── Light: Sliders ── */
+body.light-mode input[type="range"]::-webkit-slider-runnable-track {
+  background: #E2E8F0 !important;
+  border: none !important;
+}
+body.light-mode input[type="range"]::-webkit-slider-thumb {
+  background: linear-gradient(135deg, #14B8A6, #0EA5E9) !important;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3) !important;
+  border: 2px solid #FFFFFF !important;
+}
+
+/* ── Light: Tables ── */
+body.light-mode .table-container {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+}
+body.light-mode .observation-table th,
+body.light-mode .observation-table thead th {
+  background: #F0FDFA !important;
+  color: #0F766E !important;
+  border-bottom: 2px solid #14B8A6 !important;
+  border-color: #E2E8F0 !important;
+  border-bottom-color: #14B8A6 !important;
+}
+body.light-mode .observation-table th,
+body.light-mode .observation-table td {
+  border-color: #E2E8F0 !important;
+  color: #1E293B !important;
+}
+body.light-mode .observation-table tbody tr {
+  background: #FFFFFF !important;
+}
+body.light-mode .observation-table tbody tr:nth-child(even) {
+  background: #F8FAFC !important;
+}
+body.light-mode .observation-table tbody tr:hover {
+  background: #F0FDFA !important;
+}
+body.light-mode .observation-table tbody tr td {
+  color: #64748B !important;
+}
+body.light-mode .observation-table tbody tr.active-frequency-row,
+body.light-mode .observation-table tbody tr.is-active,
+body.light-mode .active-frequency-row,
+body.light-mode .planck-recorded-row,
+body.light-mode .energygap-recorded-row {
+  background: #F0FDFA !important;
+  box-shadow: inset 3px 0 0 #14B8A6 !important;
+}
+
+/* ── Light: Data Values ── */
+body.light-mode .result-value,
+body.light-mode .result-placeholder {
+  color: #0F766E !important;
+  text-shadow: none !important;
+}
+body.light-mode .result-blank { border-bottom-color: #14B8A6 !important; color: #0F766E !important; }
+body.light-mode .equation-line,
+body.light-mode .equation-line strong { color: #0F766E !important; }
+
+/* ── Light: Simulation Panels ── */
+body.light-mode .energygap-scene-card,
+body.light-mode .energygap-controls-card,
+body.light-mode .energygap-analysis-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+}
+body.light-mode .energygap-status-panel {
+  background: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+body.light-mode .energygap-status-kicker,
+body.light-mode .energygap-analysis-label { color: #14B8A6 !important; }
+body.light-mode .energygap-status-value { color: #1E293B !important; }
+body.light-mode .energygap-live-grid > div {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+}
+body.light-mode .energygap-live-label { color: #94A3B8 !important; }
+body.light-mode .energygap-live-grid strong { color: #0F766E !important; }
+body.light-mode .energygap-helper-box {
+  background: #F0FDFA !important;
+  border: 1px solid #CCFBF1 !important;
+  color: #64748B !important;
+}
+
+/* ── Light: BlackBox ── */
+body.light-mode .blackbox-circuit-card,
+body.light-mode .blackbox-frequency-strip,
+body.light-mode .blackbox-circuit-stage {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+/* ── Light: NA / Chips ── */
+body.light-mode .na-sim-panel, body.light-mode .na-sim-canvas-wrap,
+body.light-mode .na-control-card, body.light-mode .na-explore-d-control {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+}
+body.light-mode .na-mode-chip, body.light-mode .frequency-chip,
+body.light-mode .component-option {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #64748B !important;
+}
+body.light-mode .na-mode-chip.is-active,
+body.light-mode .frequency-chip.is-active,
+body.light-mode .component-option.is-active {
+  background: #F0FDFA !important;
+  color: #0F766E !important;
+  border-color: #14B8A6 !important;
+}
+
+/* ── Light: Note/Measure panels ── */
+body.light-mode .measure-panel,
+body.light-mode .note-box {
+  background: #F0FDFA !important;
+  border: 1px solid #CCFBF1 !important;
+}
+body.light-mode .note-box strong { color: #0F766E !important; }
+
+/* ── Light: Simulation wrap ── */
+body.light-mode .simulation-wrap {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+/* ── Light: Split columns ── */
+body.light-mode .split-columns .column-panel {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+/* ── Light: Frequency control ── */
+body.light-mode .frequency-control label,
+body.light-mode .frequency-control { color: #1E293B !important; }
+body.light-mode #freqValue { color: #0F766E !important; }
+body.light-mode .slider-value { color: #0F766E !important; }
+
+/* ── Light: Dielectric overrides ── */
+body.light-mode #voltageDisplay, body.light-mode #timerDisplay {
+  background: #F0FDFA !important;
+  border: 1px solid #CCFBF1 !important;
+  color: #0F766E !important;
+}
+body.light-mode #procedureMsg {
+  background: #F0FDFA !important;
+  border: 1px solid #14B8A6 !important;
+  color: #64748B !important;
+}
+body.light-mode #calculationResult {
+  background: #FFFFFF !important;
+  border: 2px solid #14B8A6 !important;
+}
+body.light-mode #calculationResult h4 { color: #0F766E !important; }
+body.light-mode #kValue, body.light-mode #tHalfValue { color: #0F766E !important; }
+
+/* ── Light: Images (no dark filter) ── */
+body.light-mode .reference-image,
+body.light-mode .circuit-diagram,
+body.light-mode .lab-figure-image,
+body.light-mode .diagram-container img,
+body.light-mode .diagram-placeholder-box img {
+  filter: none !important;
+  background: transparent !important;
+}
+
+/* ── Light: Inline style overrides (photodiode etc.) ── */
+body.light-mode [style*="color: #333"],
+body.light-mode [style*="color: #555"],
+body.light-mode [style*="color: #666"] { color: #64748B !important; }
+body.light-mode [style*="color: #4a90e2"],
+body.light-mode [style*="color: #0f4c81"],
+body.light-mode [style*="color: #4bc04b"],
+body.light-mode [style*="color: #2e7d32"],
+body.light-mode [style*="color: #e65100"],
+body.light-mode [style*="color: #0d47a1"],
+body.light-mode [style*="color: #6a1b9a"] { color: #0F766E !important; }
+
+/* ── Light: Scrollbar ── */
+body.light-mode::-webkit-scrollbar-track { background: #F5F7FA; }
+body.light-mode::-webkit-scrollbar-thumb { background: rgba(20, 184, 166, 0.25); }
+body.light-mode::-webkit-scrollbar-thumb:hover { background: rgba(20, 184, 166, 0.4); }
+
+/* ── Light: Selection ── */
+body.light-mode ::selection {
+  background: rgba(20, 184, 166, 0.2);
+  color: #1E293B;
+}
+
+/* ── Light: Toggle button appearance ── */
+body.light-mode .theme-toggle-btn {
+  background: #FFFFFF !important;
+  border: 2px solid #14B8A6 !important;
+  color: #14B8A6 !important;
+  box-shadow: 0 2px 12px rgba(20, 184, 166, 0.15) !important;
+}
+body.light-mode .theme-toggle-btn:hover {
+  box-shadow: 0 4px 20px rgba(20, 184, 166, 0.25) !important;
+}
+body.light-mode .theme-toggle-btn .icon-sun { display: inline; }
+body.light-mode .theme-toggle-btn .icon-moon { display: none; }
+
+/* ── Light: Responsive ── */
+@media (max-width: 768px) {
+  .theme-toggle-btn { bottom: 16px; right: 16px; width: 44px; height: 44px; font-size: 1.15rem; }
+}

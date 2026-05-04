@@ -10,6 +10,10 @@
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/glassmorphism.css') }}">
+	<script>
+		// Prevent flash of wrong theme
+		(function(){var t=localStorage.getItem('cs-theme');if(t==='light')document.documentElement.style.background='#F5F7FA';})();
+	</script>
 </head>
 <body>
 	<header class="site-header">
@@ -58,6 +62,29 @@
 		};
 	</script>
 	<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+	<!-- Theme Toggle Button -->
+	<button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
+		<span class="icon-moon">🌙</span>
+		<span class="icon-sun">☀️</span>
+	</button>
+
+	<script>
+	(function() {
+		const btn = document.getElementById('themeToggleBtn');
+		const saved = localStorage.getItem('cs-theme');
+		if (saved === 'light') {
+			document.body.classList.add('light-mode');
+		}
+		btn.addEventListener('click', function() {
+			document.body.classList.toggle('light-mode');
+			const isLight = document.body.classList.contains('light-mode');
+			localStorage.setItem('cs-theme', isLight ? 'light' : 'dark');
+		});
+	})();
+	</script>
+
 	{% block scripts %}{% endblock %}
 </body>
 </html>
+
