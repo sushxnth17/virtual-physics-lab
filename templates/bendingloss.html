@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Bending Loss in Optical Fibers{% endblock %}
+
+{% block content %}
+<div class="experiment-container">
+
+	<div class="experiment-header">
+		<p>Experiment: 8</p>
+		<h2>BENDING LOSS IN OPTICAL FIBERS</h2>
+	</div>
+
+	<section class="experiment-section">
+		<h3><u>AIM</u></h3>
+		<p>To determine the attenuation constant of the given optical fiber.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>APPARATUS</u></h3>
+		<p>Optical fibers of length 1 m and 100 m, laser source, small solar panel and screen.</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>INTRODUCTION</u></h3>
+		<p>
+			Bending loss occurs when guided light escapes from an optical fiber due to curvature or
+			micro-bending of the waveguide. A larger bend generally causes higher attenuation, which
+			is measured by comparing output power for different fiber lengths or bend conditions.
+		</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>FORMULA</u></h3>
+		<div class="formulae-list">
+			<p><strong>$$\alpha = \frac{10}{L_1 - L_2} \log_{10}\left(\frac{P_{output}}{P_{input}}\right) \; \text{dB/km}$$</strong></p>
+		</div>
+		<div class="formulae-definitions">
+			<p><strong>Where:</strong></p>
+			<ul>
+				<li><strong>L<sub>1</sub>, L<sub>2</sub></strong> = fiber lengths in km</li>
+				<li><strong>P<sub>input</sub></strong> = input power</li>
+				<li><strong>P<sub>output</sub></strong> = output power</li>
+			</ul>
+		</div>
+	</section>
+
+	<section class="experiment-section reference-section">
+		<p class="reference-kicker">Reference (Based on Lab Manual)</p>
+		<h3><u>RAY DIAGRAM</u></h3>
+		<div class="reference-card reference-card-single">
+			<figure class="reference-figure reference-figure-single">
+				<div class="diagram-placeholder-box" style="min-height:240px;display:flex;align-items:center;justify-content:center;text-align:center;padding:1.5rem;">
+					<div>
+						<p style="margin:0 0 0.5rem 0;font-weight:700;">Diagram placeholder</p>
+						<p style="margin:0;max-width:30rem;">Add the bending-loss fiber setup illustration here when the reference image is available.</p>
+					</div>
+				</div>
+				<figcaption class="lab-caption"><strong>Figure:</strong> Laser source, optical fiber and solar panel arrangement for bending-loss measurement.</figcaption>
+			</figure>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>TABULAR COLUMN</u></h3>
+		<div class="table-container">
+			<table class="observation-table">
+				<thead>
+					<tr>
+						<th>Length of optical fiber (km)</th>
+						<th>Voltage across the solar panel (V)</th>
+						<th>Attenuation constant<br>$$\alpha = \frac{10}{L_1 - L_2} \log_{10}\left(\frac{V_2}{V_1}\right)$$</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>L<sub>1</sub></td>
+						<td>V<sub>1</sub></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>L<sub>2</sub></td>
+						<td>V<sub>2</sub></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>PROCEDURE</u></h3>
+		<ol class="procedure-list">
+			<li>Connect the laser source to the optical fiber and align the output with the solar panel.</li>
+			<li>Measure the output voltage for the 1 m fiber and record it as V<sub>1</sub>.</li>
+			<li>Repeat the measurement for the 100 m fiber and record it as V<sub>2</sub>.</li>
+			<li>Use the measured values of L<sub>1</sub>, L<sub>2</sub>, V<sub>1</sub> and V<sub>2</sub> to calculate the attenuation constant.</li>
+		</ol>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>RESULT</u></h3>
+		<p>The attenuation constant is found to be <span class="result-placeholder">.............</span> dB/km</p>
+	</section>
+
+	<section class="experiment-section">
+		<h3><u>NOTES</u></h3>
+		<ol class="procedure-list">
+			<li>This exercise may be repeated for optical fibers of different lengths.</li>
+			<li>Replace the solar panel with an LDR and compare the attenuation constant.</li>
+		</ol>
+	</section>
+
+</div>
+{% endblock %}
