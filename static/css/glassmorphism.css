@@ -44,7 +44,7 @@
 /* ── Global Reset ── */
 body {
   background: var(--cs-bg) url('backgrounds/darkmode.png') no-repeat center center fixed !important;
-  background-size: cover !important;
+  background-size: 100% 100% !important;
   font-family: var(--cs-font-body) !important;
   color: var(--cs-text) !important;
   min-height: 100vh;
@@ -690,7 +690,7 @@ body.light-mode {
 /* ── Light: Global ── */
 body.light-mode {
   background: #F9F9FF url('backgrounds/lightmode.png') no-repeat center center fixed !important;
-  background-size: cover !important;
+  background-size: 100% 100% !important;
   color: #1E293B !important;
 }
 body.light-mode h1, body.light-mode h2,

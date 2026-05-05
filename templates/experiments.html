@@ -1,295 +1,269 @@
 {% extends "base.html" %}
 
+{% block title %}Dashboard – Simulation Command Center{% endblock %}
+
 {% block content %}
-<!-- Tailwind for layout -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    darkMode: 'class',
-    corePlugins: { preflight: false }
-  }
-</script>
-
+<!-- Dashboard Overrides -->
 <style>
-/* ── System Animations ── */
-@keyframes panelFadeIn {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
+    /* Hide Default Layout Elements */
+    .site-header, .site-footer {
+        display: none !important;
+    }
 
-@keyframes slideRight {
-    0% { opacity: 0; transform: translateX(-20px); }
-    100% { opacity: 1; transform: translateX(0); }
-}
+    :root {
+        --cs-bg-rgb: 11, 15, 26;
+        --cs-surface-rgb: 18, 24, 38;
+        --cs-accent-rgb: 0, 209, 255;
+    }
 
-/* ── Global Background Fix ── */
-body {
-    background-size: 100% 100% !important;
-    background-position: center !important;
-    background-attachment: fixed !important;
-}
+    body.light-mode {
+        --cs-bg-rgb: 249, 249, 255;
+        --cs-surface-rgb: 255, 255, 255;
+        --cs-accent-rgb: 20, 184, 166;
+    }
 
-/* ── Container Logic ── */
-.dashboard-viewport {
-    min-height: 100vh;
-    padding: 60px 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    .main-content.container {
+        max-width: none;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        background: transparent !important;
+    }
 
-.system-panel {
-    background: rgba(13, 18, 30, 0.45);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(0, 255, 200, 0.1);
-    border-radius: 40px;
-    animation: panelFadeIn 0.8s ease-out both;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.3);
-}
+    /* Custom Navbar */
+    .hp-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        padding: 16px 0;
+        background: rgba(var(--cs-bg-rgb), 0.8);
+        backdrop-filter: blur(15px);
+        border-bottom: 1px solid var(--cs-border);
+    }
 
-body.light-mode .system-panel {
-    background: rgba(255, 255, 255, 0.65);
-    border-color: rgba(20, 184, 166, 0.15);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.05);
-}
+    /* Hero Section */
+    .dashboard-hero {
+        padding-top: 120px;
+        padding-bottom: 60px;
+        background: radial-gradient(circle at 50% 0%, var(--cs-accent-dim) 0%, transparent 70%);
+    }
 
-/* ── Header ── */
-.system-title {
-    font-size: 3.5rem;
-    font-weight: 900;
-    letter-spacing: -0.02em;
-    color: white;
-}
+    .section-title {
+        font-family: 'Manrope', sans-serif;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1.1;
+    }
 
-body.light-mode .system-title { color: #0f172a; }
+    /* Experiment Cards */
+    .exp-card {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--cs-border);
+        background: rgba(var(--cs-surface-rgb), 0.5);
+        backdrop-filter: blur(10px);
+    }
+    .exp-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--cs-accent);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 20px var(--cs-accent-dim);
+    }
+    .exp-card img {
+        transition: transform 0.6s ease;
+    }
+    .exp-card:hover img {
+        transform: scale(1.1);
+    }
 
-.accent-line {
-    width: 100px;
-    height: 4px;
-    background: #00ffc8;
-    border-radius: 2px;
-}
+    /* Category Badges */
+    .cat-badge {
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: 0.1em;
+        font-size: 0.65rem;
+    }
 
-body.light-mode .accent-line { background: #14b8a6; }
-
-/* ── Status Badge ── */
-.status-badge {
-    background: rgba(0, 255, 200, 0.08);
-    border: 1px solid rgba(0, 255, 200, 0.2);
-    color: #00ffc8;
-    font-size: 0.65rem;
-    font-weight: 800;
-    padding: 6px 16px;
-    border-radius: 100px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    letter-spacing: 0.1em;
-}
-
-body.light-mode .status-badge {
-    background: rgba(20, 184, 166, 0.1);
-    border-color: rgba(20, 184, 166, 0.2);
-    color: #0d9488;
-}
-
-.status-dot {
-    width: 6px;
-    height: 6px;
-    background: currentColor;
-    border-radius: 50%;
-    box-shadow: 0 0 10px currentColor;
-}
-
-/* ── Module Group ── */
-.group-header {
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: #64748b;
-    letter-spacing: 0.15em;
-    padding-top: 40px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-body.light-mode .group-header { border-top-color: rgba(0,0,0,0.05); }
-
-/* ── Cards ── */
-.exp-card {
-    background: rgba(30, 41, 59, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 24px;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.exp-card:hover {
-    background: rgba(51, 65, 85, 0.5);
-    border-color: rgba(0, 255, 200, 0.3);
-    transform: translateY(-4px);
-}
-
-body.light-mode .exp-card {
-    background: rgba(255, 255, 255, 0.4);
-    border-color: rgba(0,0,0,0.05);
-}
-
-body.light-mode .exp-card:hover {
-    background: white;
-    border-color: rgba(20, 184, 166, 0.2);
-}
-
-.icon-box {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 255, 200, 0.1);
-    border: 1px solid rgba(0, 255, 200, 0.15);
-    border-radius: 12px;
-    color: #00ffc8;
-}
-
-body.light-mode .icon-box {
-    background: rgba(20, 184, 166, 0.1);
-    color: #0d9488;
-}
-
-.card-title {
-    font-weight: 700;
-    font-size: 1.125rem;
-    color: white;
-}
-
-body.light-mode .card-title { color: #0f172a; }
-
-.card-desc {
-    font-size: 0.75rem;
-    color: #64748b;
-    font-weight: 500;
-}
+    /* Animations */
+    [data-aos] {
+        transition-duration: 800ms !important;
+    }
 </style>
 
-<div class="dashboard-viewport">
-    <div class="w-full max-w-6xl system-panel p-10 md:p-16 relative">
-        
-        <!-- Status Indicator Row -->
-        <div class="flex justify-between items-start mb-16">
-            <div class="status-badge">
-                <div class="status-dot"></div>
-                SYSTEM OPERATIONAL
-            </div>
-            <div class="text-[10px] font-mono text-slate-500 tracking-[0.3em] opacity-50 uppercase">
-                CS-LAB // CORE-V2.4
+<!-- Dashboard Navbar -->
+<nav class="hp-nav">
+    <div class="container mx-auto px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-[var(--cs-accent)] flex items-center justify-center text-white font-black shadow-[0_0_10px_var(--cs-accent)]">CS</div>
+            <span class="text-xl font-black tracking-tighter">SIMULATION<span class="text-[var(--cs-accent)]">HUB</span></span>
+        </div>
+        <div class="flex items-center gap-8">
+            <a href="/" class="font-bold hover:text-[var(--cs-accent)] transition-colors text-sm">Homepage</a>
+            <div class="h-6 w-px bg-[var(--cs-border)]"></div>
+            <div class="flex items-center gap-2 text-xs font-mono opacity-60">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                CORE V2.4 ONLINE
             </div>
         </div>
-
-        <!-- Main Header -->
-        <div class="mb-20">
-            <h1 class="system-title mb-4">Virtual Physics Lab</h1>
-            <div class="accent-line mb-8"></div>
-            <p class="text-slate-400 text-lg max-w-2xl font-medium leading-relaxed">
-                Choose a specialized experimental module to begin high-fidelity simulation 
-                and data telemetry acquisition.
-            </p>
-        </div>
-
-        <!-- Sections Grid -->
-        <div class="space-y-16">
-            
-            <!-- Group 1 -->
-            <div class="group-container animation-delay-200">
-                <h3 class="group-header uppercase mb-8">ELECTRONIC SYSTEMS</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {% set g1 = [
-                        {'id': 'lcr', 'name': 'Lcr Circuit', 'desc': 'Inductance-Capacitance-Resistance tuning.'},
-                        {'id': 'diffraction', 'name': 'Diffraction Circuit', 'desc': 'Light wave interference patterns.'},
-                        {'id': 'fermi', 'name': 'Fermi Circuit', 'desc': 'Energy distribution in semiconductors.'}
-                    ] %}
-                    {% for item in g1 %}
-                    {% if item.id in experiments %}
-                    <a href="/experiments/{{ item.id }}" class="exp-card flex items-center justify-between p-6 no-underline group">
-                        <div class="flex items-center gap-5">
-                            <div class="icon-box">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                            </div>
-                            <div>
-                                <div class="card-title">{{ item.name }}</div>
-                                <div class="card-desc">{{ item.desc }}</div>
-                            </div>
-                        </div>
-                        <div class="text-slate-600 group-hover:text-[#00ffc8] transition-transform group-hover:translate-x-1">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                        </div>
-                    </a>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- Group 2 -->
-            <div class="group-container animation-delay-400">
-                <h3 class="group-header uppercase mb-8">QUANTUM & PHOTONICS</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {% set g2 = [
-                        {'id': 'planck', 'name': 'Planck Module', 'desc': 'Constant measurement via LED spectra.'},
-                        {'id': 'photodiode', 'name': 'Photodiode Module', 'desc': 'Light-to-current conversion analysis.'},
-                        {'id': 'na_optical_fibre', 'name': 'NA Optical Fibre', 'desc': 'Numerical aperture & light guidance.'}
-                    ] %}
-                    {% for item in g2 %}
-                    {% if item.id in experiments %}
-                    <a href="/experiments/{{ item.id }}" class="exp-card flex items-center justify-between p-6 no-underline group">
-                        <div class="flex items-center gap-5">
-                            <div class="icon-box">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.364-6.364l-.707-.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M12 13a4 4 0 110-8 4 4 0 010 8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                            </div>
-                            <div>
-                                <div class="card-title">{{ item.name }}</div>
-                                <div class="card-desc">{{ item.desc }}</div>
-                            </div>
-                        </div>
-                        <div class="text-slate-600 group-hover:text-[#00ffc8] transition-transform group-hover:translate-x-1">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                        </div>
-                    </a>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- Group 3 -->
-            <div class="group-container animation-delay-600">
-                <h3 class="group-header uppercase mb-8">SOLID STATE & SYSTEMS</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {% set g3 = [
-                        {'id': 'blackbox', 'name': 'Blackbox Unit', 'desc': 'Component identification via response.'},
-                        {'id': 'energygap', 'name': 'Energygap Unit', 'desc': 'Semiconductor bandgap calculations.'},
-                        {'id': 'dielectric', 'name': 'Dielectric Unit', 'desc': 'Material permittivity & charge decay.'},
-                        {'id': 'transistor', 'name': 'Transistor Unit', 'desc': 'Semiconductor switching characteristics.'}
-                    ] %}
-                    {% for item in g3 %}
-                    {% if item.id in experiments %}
-                    <a href="/experiments/{{ item.id }}" class="exp-card flex items-center justify-between p-6 no-underline group">
-                        <div class="flex items-center gap-5">
-                            <div class="icon-box">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                            </div>
-                            <div>
-                                <div class="card-title">{{ item.name }}</div>
-                                <div class="card-desc">{{ item.desc }}</div>
-                            </div>
-                        </div>
-                        <div class="text-slate-600 group-hover:text-[#00ffc8] transition-transform group-hover:translate-x-1">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                        </div>
-                    </a>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-
-        </div>
-
     </div>
+</nav>
+
+<div class="dashboard-content min-h-screen pb-24">
+    <!-- HERO -->
+    <header class="dashboard-hero">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
+                <div data-aos="fade-right">
+                    <h1 class="section-title text-4xl lg:text-6xl mb-4 uppercase">Simulation<br><span class="text-[var(--cs-accent)]">Command Center</span></h1>
+                    <p class="text-lg text-[var(--cs-text-soft)] max-w-xl">Initialize high-fidelity experimental modules for precision data acquisition and theoretical validation.</p>
+                </div>
+                <div class="flex gap-12 border-l border-[var(--cs-border)] pl-12" data-aos="fade-left">
+                    <div>
+                        <div class="text-3xl font-black text-[var(--cs-accent)]">10</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest opacity-60">Modules</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-black text-[var(--cs-accent)]">99%</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest opacity-60">Precision</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-black text-[var(--cs-accent)]">2ms</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest opacity-60">Latency</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MODULES GRID -->
+    <main class="container mx-auto px-6 mt-16">
+        
+        <!-- Category: Electronics -->
+        <div class="mb-20">
+            <div class="flex items-center gap-4 mb-10" data-aos="fade-right">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent to-[var(--cs-border)]"></div>
+                <h3 class="text-xs font-mono font-bold tracking-[0.4em] uppercase opacity-40">Electronic Systems</h3>
+                <div class="h-px w-20 bg-[var(--cs-border)]"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% set electronics = [
+                    {'id': 'lcr', 'name': 'LCR Resonance', 'desc': 'Inductance, Capacitance, and Resistance frequency tuning.', 'img': 'lcr.png'},
+                    {'id': 'diffraction', 'name': 'Laser Diffraction', 'desc': 'Wavelength measurement via interference patterns.', 'img': 'diffraction.png'},
+                    {'id': 'fermi', 'name': 'Fermi Distribution', 'desc': 'Semiconductor energy level shift analysis.', 'img': 'fermi.png'}
+                ] %}
+                {% for exp in electronics %}
+                {% if exp.id in experiments %}
+                <a href="/experiments/{{ exp.id }}" class="exp-card group rounded-[2rem] overflow-hidden" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="/static/images/{{ exp.img }}" alt="{{ exp.name }}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[var(--cs-surface)] to-transparent opacity-60"></div>
+                        <div class="absolute top-4 left-6">
+                            <span class="cat-badge px-3 py-1 rounded-full bg-[var(--cs-accent-dim)] text-[var(--cs-accent)] border border-[var(--cs-accent)] font-bold uppercase">Electronics</span>
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <h4 class="text-xl font-bold mb-3 group-hover:text-[var(--cs-accent)] transition-colors">{{ exp.name }}</h4>
+                        <p class="text-sm text-[var(--cs-text-soft)] mb-6 leading-relaxed">{{ exp.desc }}</p>
+                        <div class="flex items-center gap-2 text-[var(--cs-accent)] font-bold text-xs uppercase tracking-widest">
+                            Initialize Module
+                            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </div>
+                    </div>
+                </a>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Category: Photonics & Quantum -->
+        <div class="mb-20">
+            <div class="flex items-center gap-4 mb-10" data-aos="fade-right">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent to-[var(--cs-border)]"></div>
+                <h3 class="text-xs font-mono font-bold tracking-[0.4em] uppercase opacity-40">Quantum & Photonics</h3>
+                <div class="h-px w-20 bg-[var(--cs-border)]"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% set photonics = [
+                    {'id': 'planck', 'name': 'Planck\'s Constant', 'desc': 'Quantum energy measurement via LED spectra.', 'img': 'planck.png'},
+                    {'id': 'photodiode', 'name': 'Photodiode Response', 'desc': 'I-V characteristics under varying illumination.', 'img': 'photodiode.png'},
+                    {'id': 'na_optical_fibre', 'name': 'Numerical Aperture', 'desc': 'Light acceptance & guidance in optical fibers.', 'img': 'na_optical_fibre.png'}
+                ] %}
+                {% for exp in photonics %}
+                {% if exp.id in experiments %}
+                <a href="/experiments/{{ exp.id }}" class="exp-card group rounded-[2rem] overflow-hidden" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="/static/images/{{ exp.img }}" alt="{{ exp.name }}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[var(--cs-surface)] to-transparent opacity-60"></div>
+                        <div class="absolute top-4 left-6">
+                            <span class="cat-badge px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold uppercase">Photonics</span>
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <h4 class="text-xl font-bold mb-3 group-hover:text-[var(--cs-accent)] transition-colors">{{ exp.name }}</h4>
+                        <p class="text-sm text-[var(--cs-text-soft)] mb-6 leading-relaxed">{{ exp.desc }}</p>
+                        <div class="flex items-center gap-2 text-[var(--cs-accent)] font-bold text-xs uppercase tracking-widest">
+                            Initialize Module
+                            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </div>
+                    </div>
+                </a>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Category: Solid State -->
+        <div class="mb-20">
+            <div class="flex items-center gap-4 mb-10" data-aos="fade-right">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent to-[var(--cs-border)]"></div>
+                <h3 class="text-xs font-mono font-bold tracking-[0.4em] uppercase opacity-40">Solid State Physics</h3>
+                <div class="h-px w-20 bg-[var(--cs-border)]"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% set solidstate = [
+                    {'id': 'transistor', 'name': 'Transistors', 'desc': 'Input/Output characteristics of BJT.', 'img': 'transistor.png'},
+                    {'id': 'dielectric', 'name': 'Dielectric Const', 'desc': 'Permittivity & charge decay rates.', 'img': 'dielectric.png'},
+                    {'id': 'energygap', 'name': 'Energy Band Gap', 'desc': 'Band gap energy in semiconductors.', 'img': 'energygap.png'},
+                    {'id': 'blackbox', 'name': 'BlackBox Unit', 'desc': 'Component identification & analysis.', 'img': 'blackbox.png'}
+                ] %}
+                {% for exp in solidstate %}
+                {% if exp.id in experiments %}
+                <a href="/experiments/{{ exp.id }}" class="exp-card group rounded-[2rem] overflow-hidden" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                    <div class="h-40 overflow-hidden relative">
+                        <img src="/static/images/{{ exp.img }}" alt="{{ exp.name }}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[var(--cs-surface)] to-transparent opacity-60"></div>
+                        <div class="absolute top-4 left-6">
+                            <span class="cat-badge px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold uppercase">Solid State</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h4 class="text-lg font-bold mb-2 group-hover:text-[var(--cs-accent)] transition-colors">{{ exp.name }}</h4>
+                        <p class="text-[10px] text-[var(--cs-text-soft)] mb-4 leading-relaxed line-clamp-2">{{ exp.desc }}</p>
+                        <div class="flex items-center gap-2 text-[var(--cs-accent)] font-bold text-[10px] uppercase tracking-widest">
+                            Enter
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </div>
+                    </div>
+                </a>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+    </main>
 </div>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<script>
+    // Initialize AOS
+    AOS.init({
+        once: true,
+        mirror: false
+    });
+</script>
 {% endblock %}

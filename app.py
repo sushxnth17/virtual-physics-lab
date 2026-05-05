@@ -9,8 +9,7 @@ app.register_blueprint(transistor_bp)
 
 @app.route('/')
 def home():
-    # Redirect to experiments page for now
-    return redirect('/experiments')
+    return render_template('index.html')
 
 @app.route('/experiments')
 def experiments():
