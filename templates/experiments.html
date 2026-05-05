@@ -234,7 +234,8 @@ body.light-mode .card-title { color: #0f172a; }
                     {% set g2 = [
                         {'id': 'planck', 'name': 'Planck Module', 'desc': 'Constant measurement via LED spectra.'},
                         {'id': 'photodiode', 'name': 'Photodiode Module', 'desc': 'Light-to-current conversion analysis.'},
-                        {'id': 'na_optical_fibre', 'name': 'NA Optical Fibre', 'desc': 'Numerical aperture & light guidance.'}
+                        {'id': 'na_optical_fibre', 'name': 'NA Optical Fibre', 'desc': 'Numerical aperture & light guidance.'},
+                        {'id': 'bendingloss', 'name': 'Bending Loss', 'desc': 'Attenuation caused by optical fiber bends.'}
                     ] %}
                     {% for item in g2 %}
                     {% if item.id in experiments %}
