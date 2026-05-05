@@ -14,7 +14,7 @@
   --cs-accent-dim: rgba(0, 209, 255, 0.1);
   --cs-accent-glow: rgba(0, 209, 255, 0.3);
   --cs-text: #FFFFFF;
-  --cs-text-soft: #9CA3AF;
+  --cs-text-soft: #E5E7EB;
   --cs-text-muted: #6B7280;
   --cs-success: #10B981;
   --cs-danger: #EF4444;
@@ -43,7 +43,7 @@
 
 /* ── Global Reset ── */
 body {
-  background: var(--cs-bg) url('backgrounds/darkmode.png') no-repeat center center fixed !important;
+  background: linear-gradient(rgba(11, 15, 26, 0.6), rgba(11, 15, 26, 0.6)), url('backgrounds/darkmode.png') no-repeat center center fixed !important;
   background-size: 100% 100% !important;
   font-family: var(--cs-font-body) !important;
   color: var(--cs-text) !important;
@@ -57,7 +57,7 @@ h1, h2, h3, h4, h5 {
   font-family: var(--cs-font-heading) !important;
   font-weight: 700 !important;
   letter-spacing: -0.02em !important;
-  text-shadow: none !important;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
 }
 p, li, label, span, div, td, th, figcaption, strong, em {
   font-family: var(--cs-font-body) !important;
@@ -668,42 +668,43 @@ canvas {
    Soft neutral grey BG, white cards, teal/cyan gradient accents
 =============================================================== */
 body.light-mode {
-  --cs-bg: #F9F9FF;
-  --cs-surface: #FFFFFF;
+  --cs-bg: #F4F7FF;
+  --cs-surface: rgba(255, 255, 255, 0.75);
   --cs-surface-alt: #F0F3FF;
-  --cs-border: #E2E8F0;
-  --cs-border-strong: #CBD5E1;
+  --cs-border: rgba(30, 41, 59, 0.1);
+  --cs-border-strong: rgba(30, 41, 59, 0.2);
   --cs-accent: #14B8A6;
-  --cs-accent-dim: rgba(20, 184, 166, 0.1);
-  --cs-accent-glow: rgba(20, 184, 166, 0.2);
-  --cs-text: #111C2D;
-  --cs-text-soft: #64748B;
+  --cs-accent-dim: rgba(20, 184, 166, 0.08);
+  --cs-accent-glow: rgba(20, 184, 166, 0.15);
+  --cs-text: #0F172A;
+  --cs-text-soft: #475569;
   --cs-text-muted: #94A3B8;
   --cs-success: #10B981;
   --cs-danger: #EF4444;
   --cs-warning: #F59E0B;
-  --cs-highlight: rgba(20, 184, 166, 0.08);
-  --cs-shadow: 0 4px 24px rgba(30, 41, 59, 0.05);
-  --cs-shadow-glow: 0 4px 16px rgba(20, 184, 166, 0.15);
+  --cs-highlight: rgba(20, 184, 166, 0.05);
+  --cs-shadow: 0 4px 24px rgba(30, 41, 59, 0.04);
+  --cs-shadow-glow: 0 4px 16px rgba(20, 184, 166, 0.1);
 }
 
 /* ── Light: Global ── */
 body.light-mode {
-  background: #F9F9FF url('backgrounds/lightmode.png') no-repeat center center fixed !important;
+  background: #F4F7FF url('backgrounds/lightmode.png') no-repeat center center fixed !important;
   background-size: 100% 100% !important;
   color: #1E293B !important;
 }
 body.light-mode h1, body.light-mode h2,
 body.light-mode h3, body.light-mode h4,
-body.light-mode h5 { color: #1E293B !important; }
-body.light-mode p, body.light-mode li,
-body.light-mode .measure-text, body.light-mode .helper-text,
-body.light-mode .formulae-definitions,
-body.light-mode .formulae-definitions li { color: #64748B !important; }
+body.light-mode h5 { 
+    color: #0F172A !important; 
+    text-shadow: none !important;
+    letter-spacing: -0.03em !important;
+}
+body.light-mode p, body.light-mode li { color: #475569 !important; }
 body.light-mode label { color: #1E293B !important; }
-body.light-mode strong { color: #1E293B !important; }
-body.light-mode a { color: #0EA5E9 !important; }
-body.light-mode a:hover { color: #0284C7 !important; }
+body.light-mode strong { color: #0F172A !important; }
+body.light-mode a { color: #14B8A6 !important; }
+body.light-mode a:hover { color: #0D9488 !important; }
 
 /* ── Light: Header ── */
 body.light-mode .site-header {
