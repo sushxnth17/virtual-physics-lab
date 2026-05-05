@@ -121,7 +121,7 @@
                 </div>
                 <div class="flex gap-12 border-l border-[var(--cs-border)] pl-12" data-aos="fade-left">
                     <div>
-                        <div class="text-3xl font-black text-[var(--cs-accent)]">10</div>
+                        <div class="text-3xl font-black text-[var(--cs-accent)]">11</div>
                         <div class="text-[10px] font-bold uppercase tracking-widest opacity-60">Modules</div>
                     </div>
                     <div>
@@ -188,7 +188,8 @@
                 {% set photonics = [
                     {'id': 'planck', 'name': 'Planck\'s Constant', 'desc': 'Quantum energy measurement via LED spectra.', 'img': 'planck.png'},
                     {'id': 'photodiode', 'name': 'Photodiode Response', 'desc': 'I-V characteristics under varying illumination.', 'img': 'photodiode.png'},
-                    {'id': 'na_optical_fibre', 'name': 'Numerical Aperture', 'desc': 'Light acceptance & guidance in optical fibers.', 'img': 'na_optical_fibre.png'}
+                    {'id': 'na_optical_fibre', 'name': 'Numerical Aperture', 'desc': 'Light acceptance & guidance in optical fibers.', 'img': 'na_optical_fibre.png'},
+                    {'id': 'bendingloss', 'name': 'Bending Loss', 'desc': 'Attenuation analysis in curved optical fibers.', 'img': 'bendingloss.png'}
                 ] %}
                 {% for exp in photonics %}
                 {% if exp.id in experiments %}
