@@ -6,21 +6,25 @@ and computes the attenuation constant from two measured fiber lengths.
 """
 
 import math
+import random
 
 
-def simulate_voltage(L, V0=5.0, k=0.8):
+RECORDED_READINGS = []
+
+
+def simulate_voltage(L, V0=5.0, k=0.12):
 	"""
 	Simulate the output voltage at a given optical fiber length.
 
 	The model uses exponential decay to represent attenuation of light intensity
-	along the fiber:
+	along the fiber with small random noise:
 
-		V = V0 * exp(-k * L)
+		V = V0 * exp(-k * L) + noise
 
 	Parameters:
 		L (float): Fiber length in km.
 		V0 (float, optional): Initial voltage / light level. Must be positive.
-		k (float, optional): Attenuation coefficient. Must be positive.
+		k (float, optional): Attenuation coefficient (0.12 for realistic 0.5-1.2 dB/km attenuation).
 
 	Returns:
 		float: Simulated voltage rounded to 3 decimal places.
@@ -42,7 +46,10 @@ def simulate_voltage(L, V0=5.0, k=0.8):
 		raise ValueError("k must be greater than 0")
 
 	voltage = V0 * math.exp(-k * L)
-	return round(voltage, 3)
+	# Add small random noise (±0.002 V) for realistic sensor variance
+	noise = random.uniform(-0.002, 0.002)
+	voltage_with_noise = voltage + noise
+	return round(voltage_with_noise, 3)
 
 
 def compute_attenuation(L1, L2, V1, V2):
@@ -50,7 +57,7 @@ def compute_attenuation(L1, L2, V1, V2):
 	Calculate the attenuation constant for two fiber measurements.
 
 	Formula:
-		alpha = (10 / (L1 - L2)) * log10(V2 / V1)
+		alpha = (10 / abs(L1 - L2)) * log10(V1 / V2)
 
 	Parameters:
 		L1 (float): First fiber length in km.
@@ -74,7 +81,7 @@ def compute_attenuation(L1, L2, V1, V2):
 		raise ValueError("V1 and V2 must be greater than 0")
 
 	try:
-		alpha = (10.0 / (L1 - L2)) * math.log10(V2 / V1)
+		alpha = (10.0 / abs(L1 - L2)) * math.log10(V1 / V2)
 	except (ValueError, ZeroDivisionError, OverflowError) as exc:
 		raise ValueError(f"Unable to compute attenuation: {exc}") from exc
 
@@ -84,7 +91,7 @@ def compute_attenuation(L1, L2, V1, V2):
 	return round(alpha, 4)
 
 
-def compute_experiment(L1, L2, V0=5.0, k=0.8):
+def compute_experiment(L1, L2, V0=5.0, k=0.12):
 	"""
 	Run the full bending-loss experiment simulation.
 
@@ -157,7 +164,68 @@ def compute_bendingloss_response(**kwargs):
 
 	The app expects a function named compute_<experiment>_response.
 	"""
-	return compute_api(**kwargs)
+	# For the interactive simulation we accept a single fiber length (meters)
+	# and return the simulated output voltage plus a running attenuation value
+	# computed from the most recent pair of readings.
+	try:
+		if kwargs.get('reset'):
+			RECORDED_READINGS.clear()
+			return {
+				'success': True,
+				'data': {
+					'length_m': None,
+					'length_km': None,
+					'voltage': None,
+					'attenuation_constant': None,
+					'reset': True,
+				},
+			}
+
+		length_m = kwargs.get('length_m')
+		if length_m is None:
+			raise ValueError('length_m is required')
+		# Convert to float and to kilometers for the internal model
+		length_m = float(length_m)
+		if length_m <= 0:
+			raise ValueError('length_m must be positive')
+		# Optional parameters
+		V0 = float(kwargs.get('V0', 5.0))
+		k = float(kwargs.get('k', 0.8))
+		# Use existing simulate_voltage which expects length in km
+		L_km = length_m / 1000.0
+		voltage = simulate_voltage(L_km, V0=V0, k=k)
+
+		current_reading = {
+			'length_m': length_m,
+			'length_km': L_km,
+			'voltage': voltage,
+		}
+
+		attenuation_constant = None
+		if RECORDED_READINGS:
+			previous_reading = RECORDED_READINGS[-1]
+			try:
+				attenuation_constant = compute_attenuation(
+					previous_reading['length_km'],
+					current_reading['length_km'],
+					previous_reading['voltage'],
+					current_reading['voltage'],
+				)
+			except ValueError:
+				attenuation_constant = None
+
+		RECORDED_READINGS.append(current_reading)
+		return {
+			'success': True,
+			'data': {
+				'length_m': length_m,
+				'length_km': L_km,
+				'voltage': voltage,
+				'attenuation_constant': attenuation_constant,
+			}
+		}
+	except (ValueError, TypeError) as exc:
+		return {'success': False, 'error': str(exc)}
 
 
 
