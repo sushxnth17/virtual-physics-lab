@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CircuitSphere | Virtual Physics Lab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Unicorn Studio SDK -->
+    <script src="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.12/dist/unicornStudio.umd.js"></script>
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+    <!-- Unicorn Studio Background Container -->
+    <div id="unicorn-canvas" 
+         data-us-project="wnYcBbCwfr2vd3qmAuYs" 
+         data-us-width="100%" 
+         data-us-height="100%" 
+         data-us-scale="1" 
+         data-us-dpi="1">
+    </div>
+
+    <!-- Dark Overlay for Readability -->
+    <div class="overlay"></div>
+
+    <main class="hero">
+        <div class="scan-line"></div>
+        <div class="content">
+            <div class="status-badge" id="status-badge">
+                <span class="status-dot"></span>
+                PHYSICS ENGINE // ONLINE
+            </div>
+            <div class="title-container">
+                <h1 class="main-title" id="main-title">
+                    <span class="pop-out">C</span>
+                    <span class="pop-out">i</span>
+                    <span class="pop-out">r</span>
+                    <span class="pop-out">c</span>
+                    <span class="pop-out">u</span>
+                    <span class="pop-out">i</span>
+                    <span class="pop-out">t</span>
+                    <span class="pop-out">S</span>
+                    <span class="pop-out">p</span>
+                    <span class="pop-out">h</span>
+                    <span class="pop-out">e</span>
+                    <span class="pop-out">r</span>
+                    <span class="pop-out">e</span>
+                </h1>
+            </div>
+            <p class="tagline" id="tagline">
+                <span class="tagline-row">INTERACTIVE PHYSICS.</span>
+                <span class="tagline-row">REIMAGINED.</span>
+            </p>
+            <div class="btn-container" id="btn-container">
+                <a href="/dashboard" class="btn-get-started">
+                    <span class="btn-bracket">[</span>
+                    START SIMULATION
+                    <span class="btn-bracket">]</span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Unicorn Studio
+        // The SDK will look for the div with data-us-project
+        UnicornStudio.init().then((scenes) => {
+            console.log('CircuitSphere Engine Initialized', scenes);
+        }).catch(err => {
+            console.error('Failed to initialize background engine', err);
+        });
+
+        // GSAP Animations
+        const startAnimations = () => {
+            const tl = gsap.timeline();
+
+            // Set initial states
+            gsap.set(".pop-out", { opacity: 0, scale: 0.5, y: 50, filter: "blur(10px)" });
+            gsap.set("#tagline", { opacity: 0, y: 30 });
+            gsap.set("#btn-container", { opacity: 0, y: 40 });
+            gsap.set("#status-badge", { opacity: 0, x: -20 });
+
+            // 1. Status Badge slide in
+            tl.to("#status-badge", {
+                opacity: 1,
+                x: 0,
+                duration: 1,
+                ease: "power3.out"
+            })
+
+            // 2. Title popping up letter by letter
+            .to(".pop-out", {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                filter: "blur(0px)",
+                duration: 0.8,
+                stagger: {
+                    each: 0.05,
+                    from: "start"
+                },
+                ease: "expo.out"
+            }, "-=0.5")
+            
+            // 3. Neon Glow Pulse after title appears
+            .to(".main-title", {
+                textShadow: "0 0 50px rgba(0, 209, 255, 0.8)",
+                duration: 1.5,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            }, "-=0.5")
+
+            // 4. Tagline reveal with letter spacing contraction
+            .to("#tagline", {
+                opacity: 1,
+                y: 0,
+                duration: 1.2,
+                ease: "power4.out"
+            }, "-=1")
+
+            // 5. Button entry with a bounce
+            .to("#btn-container", {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: "back.out(2)"
+            }, "-=0.8");
+
+            // 6. Subtle floating animation for the content
+            gsap.to(".content", {
+                y: -15,
+                duration: 4,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
+        };
+
+        // Start animations as soon as possible, don't wait for the heavy background
+        if (document.readyState === 'complete') {
+            startAnimations();
+        } else {
+            window.addEventListener('load', startAnimations);
+        }
+
+        // Force hide watermark after delay (fallback)
+        const hideWatermark = () => {
+            const badges = document.querySelectorAll('[class*="unicorn"], a[href*="unicornstudio"]');
+            badges.forEach(b => {
+                b.style.display = 'none';
+                b.style.opacity = '0';
+                b.style.visibility = 'hidden';
+                b.remove();
+            });
+
+            // Target by text content
+            const allElements = document.getElementsByTagName('*');
+            for (let i = 0; i < allElements.length; i++) {
+                const el = allElements[i];
+                if (el.innerText && el.innerText.includes('unicorn.studio')) {
+                    el.style.display = 'none';
+                    el.remove();
+                }
+            }
+        };
+
+        // Actively monitor for watermark injection
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) { // Element node
+                        if ((node.innerText && node.innerText.toLowerCase().includes('unicorn.studio')) || 
+                            (node.className && typeof node.className === 'string' && node.className.includes('unicorn-studio-badge'))) {
+                            node.style.display = 'none';
+                            node.remove();
+                        }
+                    }
+                });
+            });
+            hideWatermark();
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+        
+        // Initial run
+        setTimeout(hideWatermark, 100);
+        setTimeout(hideWatermark, 500);
+        setTimeout(hideWatermark, 1000);
+        setTimeout(hideWatermark, 2000);
+    </script>
+</body>
+</html>

@@ -8,6 +8,10 @@ from experiments.transistor import transistor_bp
 app.register_blueprint(transistor_bp)
 
 @app.route('/')
+def landing():
+    return render_template('landing.html')
+
+@app.route('/dashboard')
 def home():
     return render_template('index.html')
 

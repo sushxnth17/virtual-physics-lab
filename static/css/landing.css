@@ -1,0 +1,217 @@
+:root {
+    --bg-color: #0d141d;
+    --primary-color: #00D1FF;
+    --text-color: #dce3f0;
+    --accent-glow: rgba(0, 209, 255, 0.4);
+    --font-main: 'Inter', sans-serif;
+}
+
+/* Hide Unicorn Studio Watermark - Ultra Aggressive */
+[class*="unicorn-studio-badge"], 
+[id*="unicorn-studio-badge"],
+a[href*="unicornstudio.io"],
+div[style*="z-index: 10000"],
+div[style*="z-index: 9999"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    top: -9999px !important;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-main);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+#unicorn-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.hero {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: 
+        radial-gradient(circle at center, rgba(13, 20, 29, 0.2) 0%, rgba(13, 20, 29, 0.9) 100%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60 0v60H0V0h60zM1 1v58h58V1H1z' fill='%2300D1FF' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+    position: relative;
+    overflow: hidden;
+}
+
+.content {
+    z-index: 10;
+    max-width: 1200px;
+    padding: 2rem;
+    perspective: 1000px;
+    will-change: transform;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.title-container {
+    margin-bottom: 1.5rem;
+}
+
+.main-title {
+    font-size: clamp(3rem, 12vw, 8rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #fff;
+    text-shadow: 0 0 30px var(--accent-glow);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.tagline {
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+    font-weight: 500;
+    color: rgba(220, 227, 240, 0.6);
+    margin-bottom: 4rem;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.tagline-row {
+    display: block;
+    line-height: 1.2;
+}
+
+.btn-container {
+    opacity: 0;
+}
+
+.btn-get-started {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.2rem 3rem;
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-decoration: none;
+    color: var(--primary-color);
+    background-color: rgba(0, 209, 255, 0.05);
+    border-radius: 4px;
+    box-shadow: 0 0 20px var(--accent-glow);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    border: 1px solid var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    position: relative;
+}
+
+.btn-bracket {
+    font-family: monospace;
+    font-size: 1.4rem;
+    margin: 0 10px;
+    transition: transform 0.3s ease;
+}
+
+.btn-get-started:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 40px var(--primary-color);
+    background-color: var(--primary-color);
+    color: #000;
+}
+
+.btn-get-started:hover .btn-bracket {
+    color: #000;
+    transform: scale(1.2);
+}
+
+/* Background overlay for better contrast */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(13, 20, 29, 0) 0%, rgba(13, 20, 29, 0.5) 100%);
+    pointer-events: none;
+}
+
+.pop-out {
+    display: inline-block;
+    opacity: 0;
+    will-change: transform, opacity;
+    filter: blur(10px);
+}
+
+/* Scanning Line Effect */
+.scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+    box-shadow: 0 0 15px var(--primary-color);
+    opacity: 0.3;
+    z-index: 5;
+    animation: scan 4s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes scan {
+    0% { top: 0%; }
+    100% { top: 100%; }
+}
+
+.status-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--primary-color);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.4; }
+    50% { opacity: 1; }
+    100% { opacity: 0.4; }
+}
