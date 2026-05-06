@@ -2,6 +2,382 @@
 
 {% block title %}Bending Loss in Optical Fibers{% endblock %}
 
+{% block head %}
+<style>
+/* Lab-style apparatus styling */
+.apparatus-card { position: relative; background: #fafafa; border: 1px solid #e6e6e6; padding: 1rem; border-radius: 8px; box-shadow: 0 6px 12px rgba(20,20,30,0.04); overflow: hidden; }
+.wire-canvas {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	z-index: 1;
+}
+.apparatus-row { position: relative; z-index: 2; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.apparatus-node {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 96px;
+}
+.node-caption {
+	position: absolute;
+	bottom: -28px;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 0.85rem;
+	color: #475569 !important;
+	white-space: nowrap;
+}
+
+/* Override global glassmorphism text forcing inside this simulation only */
+.apparatus-card,
+.apparatus-card p,
+.apparatus-card span,
+.apparatus-card div,
+.apparatus-card label,
+.apparatus-card th,
+.apparatus-card td {
+	color: #1f2a37 !important;
+}
+
+/* Laser box */
+.laser-assembly { position: relative; display: inline-block; }
+.laser-box {
+	width: 148px;
+	height: 86px;
+	border-radius: 9px;
+	background: linear-gradient(165deg, #1d1f24 0%, #0d0f12 65%, #1a1d21 100%);
+	color: #fff;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 8px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+	position: relative;
+	border: 1px solid #2b3037;
+}
+.laser-box::before {
+	content: "";
+	position: absolute;
+	left: 8px;
+	right: 8px;
+	top: 8px;
+	height: 5px;
+	border-radius: 3px;
+	background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+}
+.laser-label { font-size:1.05rem; font-weight:700; letter-spacing:0.2px; }
+.laser-indicator {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background: #8b0000;
+	box-shadow: inset 0 -1px 2px rgba(0,0,0,0.5);
+	margin-top: 9px;
+	opacity: 0.35;
+}
+.laser-aperture {
+	position: absolute;
+	right: -12px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background: radial-gradient(circle at 35% 35%, #d8dee5 0%, #7a838e 40%, #252b33 76%);
+	border: 1px solid #232931;
+}
+.laser-coupler {
+	width: 16px;
+	height: 6px;
+	border-radius: 6px;
+	background: linear-gradient(90deg, #a8b6c7, #d0dae5);
+	box-shadow: inset 0 -1px 1px rgba(0,0,0,0.2);
+	margin-left: -8px;
+	margin-right: -4px;
+}
+.laser-aperture::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #1b2128;
+}
+.laser-feet {
+	display: flex;
+	justify-content: space-between;
+	width: 108px;
+	margin: 5px auto 0;
+}
+.laser-foot {
+	width: 24px;
+	height: 5px;
+	border-radius: 4px;
+	background: #575d66;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.laser-model {
+	position: absolute;
+	left: 10px;
+	bottom: 8px;
+	font-size: 0.64rem;
+	color: #b5c0ce;
+	letter-spacing: 0.4px;
+}
+.apparatus-card .laser-box,
+.apparatus-card .laser-box * { color: #f8fafc !important; }
+
+/* Fiber cable */
+.fiber-wrap { flex:1 1 320px; display:flex; align-items:center; }
+.fiber-wrap { margin-left: -2px; }
+.fiber-tube {
+	height: 12px;
+	background: linear-gradient(90deg,#dbe6f0,#cad7e8);
+	border-radius: 999px;
+	box-shadow: inset 0 -1px 3px rgba(0,0,0,0.12), inset 0 1px 1px rgba(255,255,255,0.7);
+	position: relative;
+	overflow: hidden;
+	--beam-duration: 1000ms;
+}
+.fiber-reflections {
+	position: absolute;
+	inset: 0;
+	background-image: repeating-linear-gradient(
+		130deg,
+		rgba(165, 34, 34, 0.0) 0px,
+		rgba(165, 34, 34, 0.0) 10px,
+		rgba(165, 34, 34, 0.42) 11px,
+		rgba(165, 34, 34, 0.0) 14px
+	);
+	opacity: 0;
+}
+.beam-inside {
+	position: absolute;
+	width: 12px;
+	height: 6px;
+	top: 4px;
+	left: -10%;
+	border-radius: 999px;
+	background: linear-gradient(90deg, rgba(255, 205, 205, 0.95), rgba(239, 68, 68, 0.98), rgba(153, 27, 27, 0.95));
+	box-shadow:
+		0 0 2px rgba(255, 220, 220, 0.9),
+		0 0 7px rgba(239, 68, 68, 0.7),
+		0 0 12px rgba(220, 38, 38, 0.35);
+	opacity: 0;
+}
+
+.fiber-tube.beam-on .beam-inside {
+	opacity: 1;
+	animation: fiberBeamTravel var(--beam-duration) linear infinite;
+}
+
+.fiber-tube.beam-on .fiber-reflections {
+	opacity: 1;
+	animation: fiberScatter var(--beam-duration) linear infinite;
+}
+
+@keyframes fiberBeamTravel {
+	0% { left: -8%; top: 3px; }
+	8% { top: 1px; }
+	16% { top: 7px; }
+	24% { top: 2px; }
+	32% { top: 8px; }
+	40% { top: 3px; }
+	48% { top: 7px; }
+	56% { top: 2px; }
+	64% { top: 8px; }
+	72% { top: 3px; }
+	80% { top: 6px; }
+	88% { top: 2px; }
+	100% { left: 102%; top: 4px; }
+}
+
+@keyframes fiberScatter {
+	0% { background-position: -40px 0; }
+	100% { background-position: 160px 0; }
+}
+
+/* Detector */
+.detector { width:120px; height:84px; background:#1f2933; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.12); display:flex; align-items:center; justify-content:center; color:#d1e7d6; }
+.detector-glow { position:absolute; inset:6px; border-radius:4px; background:transparent; transition: background 220ms ease; }
+.apparatus-card .detector,
+.apparatus-card .detector * { color: #d7e8da !important; }
+.detector,
+.voltmeter { position: relative; }
+.terminal {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	border: 1px solid rgba(0,0,0,0.35);
+	box-shadow: inset 0 -1px 1px rgba(0,0,0,0.35);
+	z-index: 3;
+}
+.terminal.red { background: #cf2e2e; }
+.terminal.black { background: #242424; }
+.terminal.detector-red { right: -4px; top: 22px; }
+.terminal.detector-black { right: -4px; top: 52px; }
+.terminal.meter-red { left: -4px; top: 16px; }
+.terminal.meter-black { left: -4px; top: 36px; }
+
+/* Voltmeter */
+.voltmeter { width:110px; height:56px; background:#0b0f10; border-radius:6px; padding:8px; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 -4px 8px rgba(0,0,0,0.4); }
+.voltmeter-readout { font-family: 'JetBrains Mono', monospace; color:#3be04a; font-size:1.05rem; }
+.apparatus-card .voltmeter-readout { color: #3be04a !important; }
+
+/* Controls */
+.sim-controls { display:flex; gap:12px; align-items:center; margin-top:12px; flex-wrap:wrap; }
+.sim-controls {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 12px;
+	align-items: end;
+	margin-top: 14px;
+}
+.control-label { font-size:0.9rem; color:#333; }
+.control-block {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+.control-inline {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	justify-content: space-between;
+}
+.select, .btn { padding:0.55rem 0.7rem; border-radius:6px; border:1px solid #d0d7dd; background:#fff; min-height: 40px; }
+.btn { background:#2b6cb0; color:#fff; border-color:#24548b; cursor:pointer; }
+.btn-ghost { background:#fff; color:#333; border:1px solid #cfd9e3; }
+
+.live-status {
+	margin-top: 14px;
+	padding: 12px 14px;
+	border: 1px solid #d7e1ea;
+	border-radius: 8px;
+	background: #f8fbfe;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+}
+.live-status-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px;
+}
+.status-item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+}
+.status-label {
+	font-size: 0.78rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: #64748b !important;
+}
+.status-value {
+	font-size: 1rem;
+	font-weight: 700;
+	color: #0f172a !important;
+}
+.signal-high { color: #166534 !important; }
+.signal-medium { color: #a16207 !important; }
+.signal-low { color: #b91c1c !important; }
+
+.apparatus-card .control-label { color: #334155 !important; }
+.apparatus-card .select {
+	background: #ffffff !important;
+	color: #1f2a37 !important;
+	border-color: #cbd5e1 !important;
+}
+.apparatus-card .btn {
+	background: #2b6cb0 !important;
+	color: #ffffff !important;
+	border-color: #24548b !important;
+}
+.apparatus-card .btn.btn-ghost {
+	background: #f8fafc !important;
+	color: #334155 !important;
+	border-color: #cbd5e1 !important;
+}
+
+/* Toggle (simple) */
+.toggle { display:inline-flex; align-items:center; gap:8px; }
+.toggle input { width:16px; height:16px; }
+
+/* Readings table */
+#readingsTable { width:100%; border-collapse:collapse; margin-top:8px; }
+#readingsTable th, #readingsTable td { padding:0.65rem 0.7rem; border-bottom:1px solid #eef2f6; text-align:left; vertical-align: middle; }
+.apparatus-card #readingsTable th {
+	color: #334155 !important;
+	font-weight: 700;
+	background: #f1f5f9;
+}
+.apparatus-card #readingsTable td { color: #1f2937 !important; }
+.apparatus-card #readingsTable tbody tr:nth-child(even) { background: #f8fbff; }
+.apparatus-card #readingsTable tbody tr:hover { background: #eef5fc; }
+.apparatus-card #readingsTable tbody tr.is-new-row {
+	animation: flashRow 900ms ease;
+}
+.apparatus-card #readingsTable tbody tr.is-latest-row {
+	background: #fff7e6;
+}
+@keyframes flashRow {
+	0% { background: #fff2c7; transform: translateY(-2px); }
+	100% { background: transparent; transform: translateY(0); }
+}
+
+/* Observation table styling */
+.observation-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 8px;
+}
+.observation-table th,
+.observation-table td {
+	padding: 0.75rem 0.85rem;
+	border-bottom: 1px solid #cbd5e1;
+	text-align: left;
+	vertical-align: middle;
+	color: #0f172a !important;
+}
+.observation-table th {
+	color: #1f2937 !important;
+	font-weight: 700;
+	background: #e2e8f0;
+}
+.observation-table tbody tr {
+	background: #ffffff;
+}
+.observation-table tbody tr:nth-child(even) {
+	background: #f8fafc;
+}
+.observation-table tbody tr:hover {
+	background: #f1f5f9;
+}
+.observation-table td div {
+	color: #0f172a !important;
+}
+
+@media (max-width:720px){
+	.apparatus-row { flex-direction:column; align-items:stretch; }
+	.fiber-wrap { order:2; }
+	.node-caption { position: static; transform: none; margin-top: 8px; text-align: center; }
+	.wire-link { width: 100%; min-width: 0; height: 54px; margin: 0; }
+	.wire-red { top: 18px; }
+	.wire-black { top: 34px; }
+	.sim-controls { grid-template-columns: 1fr; }
+	.live-status-grid { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="experiment-container">
 
@@ -60,10 +436,98 @@
 		</div>
 	</section>
 
+	<!-- Interactive simulation card (lab-style apparatus) -->
+	<section class="experiment-section">
+		<h3><u>Interactive Simulation</u></h3>
+		<div class="apparatus-card">
+
+			<canvas id="wireCanvas" class="wire-canvas" aria-hidden="true"></canvas>
+			<div class="apparatus-row">
+				<div class="apparatus-node">
+					<div class="laser-assembly">
+						<div class="laser-box" id="laser">
+							<div class="laser-label">Laser</div>
+							<div class="laser-indicator" id="laserIndicator"></div>
+							<div class="laser-model">He-Ne Source</div>
+							<div class="laser-aperture" aria-hidden="true"></div>
+						</div>
+						<div class="laser-feet" aria-hidden="true">
+							<div class="laser-foot"></div>
+							<div class="laser-foot"></div>
+						</div>
+					</div>
+					<div class="node-caption">Source</div>
+				</div>
+
+				<div class="laser-coupler" aria-hidden="true"></div>
+
+				<div class="fiber-wrap">
+					<div class="fiber-tube" id="fiber" style="width:100%;">
+						<div class="fiber-reflections" aria-hidden="true"></div>
+						<div class="beam-inside" id="beam" style="transform:translateX(-120%);"></div>
+					</div>
+				</div>
+
+				<div class="apparatus-node" style="min-width:120px;">
+					<div class="detector" id="panel">
+						<div class="detector-glow" id="panel-glow"></div>
+						<div class="terminal red detector-red" aria-hidden="true"></div>
+						<div class="terminal black detector-black" aria-hidden="true"></div>
+						<div>Detector</div>
+					</div>
+					<div class="node-caption">Solar Panel</div>
+				</div>
+
+				<div class="apparatus-node" style="min-width:110px;">
+					<div class="voltmeter">
+						<div class="terminal red meter-red" aria-hidden="true"></div>
+						<div class="terminal black meter-black" aria-hidden="true"></div>
+						<div id="voltmeter" class="voltmeter-readout">0.000 V</div>
+					</div>
+					<div class="node-caption">Voltmeter</div>
+				</div>
+			</div>
+
+			<div class="sim-controls">
+				<div class="control-block">
+					<label class="toggle control-label" for="laserToggle">Power <input type="checkbox" id="laserToggle"></label>
+				</div>
+				<label class="control-block control-label" for="fiberLength">Fiber Length
+					<select id="fiberLength" class="select">
+						<option value="1">1 m</option>
+						<option value="10">10 m</option>
+						<option value="50">50 m</option>
+						<option value="100">100 m</option>
+					</select>
+				</label>
+				<button id="recordBtn" class="btn">Record Reading</button>
+				<button id="resetBtn" class="btn btn-ghost">Reset</button>
+			</div>
+
+			<div class="live-status" aria-live="polite">
+				<div class="live-status-grid">
+					<div class="status-item">
+						<span class="status-label">Laser Status</span>
+						<span id="laserStatusValue" class="status-value">OFF</span>
+					</div>
+					<div class="status-item">
+						<span class="status-label">Current Fiber Length</span>
+						<span id="currentLengthValue" class="status-value">1 m</span>
+					</div>
+					<div class="status-item">
+						<span class="status-label">Signal Strength</span>
+						<span id="signalStrengthValue" class="status-value signal-low">Low</span>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</section>
+
 	<section class="experiment-section">
 		<h3><u>TABULAR COLUMN</u></h3>
 		<div class="table-container">
-			<table class="observation-table">
+			<table id="observationTable" class="observation-table">
 				<thead>
 					<tr>
 						<th>Length of optical fiber (km)</th>
@@ -73,17 +537,19 @@
 				</thead>
 				<tbody>
 					<tr>
-						<td>L<sub>1</sub></td>
-						<td>V<sub>1</sub></td>
-						<td></td>
+						<td id="lengthRow1">L<sub>1</sub></td>
+						<td id="voltageRow1">V<sub>1</sub></td>
+						<td id="attenuationCell" rowspan="2"></td>
 					</tr>
 					<tr>
-						<td>L<sub>2</sub></td>
-						<td>V<sub>2</sub></td>
-						<td></td>
+						<td id="lengthRow2">L<sub>2</sub></td>
+						<td id="voltageRow2">V<sub>2</sub></td>
 					</tr>
 				</tbody>
 			</table>
+			<p class="table-helper-note" style="margin: 0.75rem 0 0; color: #64748b !important; font-size: 0.92rem;">
+				Attenuation constant is calculated using two successive readings.
+			</p>
 		</div>
 	</section>
 
@@ -99,7 +565,7 @@
 
 	<section class="experiment-section">
 		<h3><u>RESULT</u></h3>
-		<p>The attenuation constant is found to be <span class="result-placeholder">.............</span> dB/km</p>
+		<p>The attenuation constant is found to be <span id="attenuationResult" class="result-placeholder">.............</span> dB/km</p>
 	</section>
 
 	<section class="experiment-section">
@@ -109,6 +575,10 @@
 			<li>Replace the solar panel with an LDR and compare the attenuation constant.</li>
 		</ol>
 	</section>
-
+ 
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/bendingloss.js') }}"></script>
 {% endblock %}
