@@ -256,6 +256,36 @@ Students can understand:
 
 ---
 
+### 9.Determination of Dielectric Constant
+This experiment determines the dielectric constant of a dielectric material by studying the charging and discharging behavior of a capacitor in an RC circuit and analyzing the variation of voltage with time.
+
+
+### Features
+- Interactive simulation of RC circuit setup
+- Virtual capacitor charging and discharging process
+- Adjustable dielectric material insertion
+- Real-time voltage monitoring using virtual voltmeter
+- Automatic calculation of time constant (RC)
+- Dynamic plotting of charging and discharging curves
+- Automatic computation of dielectric constant (K)
+- Tabular recording of voltage and time readings
+- Interactive controls for resistance and capacitance variation
+- Realistic circuit visualization with animated current flow
+
+
+### Learning Outcomes
+Students can understand:
+- Concept of dielectric materials and polarization
+- Effect of dielectric medium on capacitance
+- Charging and discharging behavior of capacitors
+- Relationship between voltage and time in RC circuits
+- Determination of dielectric constant experimentally
+- Importance of dielectric materials in electronic circuits
+- Graphical analysis of capacitor response curves
+- Practical applications of capacitors and dielectrics
+
+---
+
 
 ## Technologies Used
 
@@ -272,7 +302,6 @@ Students can understand:
 The following experiments are planned for future development:
 
 - Transistor Characteristics 
-- Measurement of Dielectric Constant
 - Bending Loss in Optical Fibre
 
 More experiments will be added incrementally to expand the virtual laboratory.
