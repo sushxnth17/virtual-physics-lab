@@ -286,6 +286,36 @@ Students can understand:
 
 ---
 
+### 10.Bending Loss in Optical Fiber 
+This experiment determines the attenuation constant of an optical fiber by studying the reduction in light intensity and output voltage for different fiber lengths and bending conditions.
+
+
+### Features
+- Interactive simulation of optical fiber communication setup
+- Virtual laser source with ON/OFF control
+- Realistic optical fiber transmission visualization
+- Adjustable optical fiber lengths
+- Solar panel detector for light intensity measurement
+- Real-time voltage display using virtual voltmeter
+- Automatic calculation of attenuation constant
+- Dynamic signal strength indication
+- Tabular recording of fiber length and voltage readings
+- Visual demonstration of light attenuation in optical fibers
+
+
+### Learning Outcomes
+Students can understand:
+- Basic principle of optical fiber communication
+- Concept of attenuation and bending loss in fibers
+- Effect of fiber length on signal strength
+- Relationship between optical power and output voltage
+- Experimental determination of attenuation constant
+- Working of laser source and optical detectors
+- Importance of low-loss transmission in communication systems
+- Applications of optical fibers in modern networking and communication
+
+---
+
 
 ## Technologies Used
 
