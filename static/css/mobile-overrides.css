@@ -1,0 +1,43 @@
+/* Mobile-only overrides: keep desktop appearance unchanged */
+
+@media (max-width: 860px) {
+  /* Mobile nav toggle: hide nav-links by default and show when body.nav-open */
+  .portal-nav .nav-links {
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+
+  body.nav-open .portal-nav .nav-links {
+    display: flex;
+    background: rgba(255,255,255,0.03);
+    border-top: 1px solid rgba(255,255,255,0.04);
+    margin-top: 0.5rem;
+  }
+
+  .mobile-nav-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    color: inherit;
+    font-size: 1.6rem;
+    cursor: pointer;
+  }
+
+  .portal-nav .container { display:flex; align-items:center; justify-content:space-between; }
+}
+
+@media (max-width: 480px) {
+  /* Reduce heavy hero text and buttons */
+  .main-title { font-size: clamp(1.6rem, 10vw, 3rem); }
+  .tagline { margin-bottom: 2rem; }
+  .btn-get-started { padding: 0.7rem 1.2rem; font-size: 0.95rem; }
+}
+
+/* Ensure landing page canvas is hidden on small screens (reduces GPU/memory use) */
+@media (max-width: 768px) {
+  #unicorn-canvas { display: none !important; }
+}
