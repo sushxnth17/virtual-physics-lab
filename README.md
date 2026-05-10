@@ -316,6 +316,36 @@ Students can understand:
 
 ---
 
+### 11.Transistor Characteristics
+This experiment studies the DC characteristics of a bipolar junction transistor (BJT) by measuring the collector current (`IC`) as a function of collector-emitter voltage (`VCE`) for different base currents (`IB`), and the transfer characteristics (`IC` vs `IB`) at a fixed `VCE`.
+
+
+### Features
+- Interactive simulation of a common-emitter transistor setup
+- Adjustable base current (`IB`) or base-bias control
+- Adjustable collector-emitter voltage (`VCE`) with optional automatic sweep
+- Virtual ammeter and voltmeter for real-time measurements
+- Observation table for systematic data recording of `VCE`, `IB`, and `IC`
+- Automatic graph generation:
+  - `IC` vs `VCE` (family of output characteristic curves for different `IB`)
+  - `IC` vs `IB` (transfer characteristic at fixed `VCE`)
+- Automatic calculation of:
+  - DC current gain (β = `IC` / `IB`) in the active region
+  - Output resistance / Early-effect estimation from `IC` vs `VCE` slope
+- Instrument-noise simulation to emulate realistic measurement variation
+
+
+### Learning Outcomes
+Students can understand:
+- Operating regions of a BJT: cutoff, active, and saturation
+- How `IC` depends on both `IB` and `VCE` (including Early effect)
+- Determination of DC current gain (β) from transfer characteristics
+- Extraction of output resistance and its significance for amplifier design
+- Practical data collection, plotting, and parameter extraction from characteristic curves
+
+
+---
+
 
 ## Technologies Used
 
@@ -325,18 +355,9 @@ Students can understand:
 - Chart.js – Graph generation
 - GitHub – Version control and collaboration
 
----
-
-## Upcoming Experiments
-
-The following experiments are planned for future development:
-
-- Transistor Characteristics 
-- Bending Loss in Optical Fibre
-
-More experiments will be added incrementally to expand the virtual laboratory.
 
 ---
+
 
 ## Future Improvements
 
