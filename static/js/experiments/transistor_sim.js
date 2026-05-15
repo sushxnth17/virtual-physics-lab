@@ -1263,7 +1263,7 @@ function bindKnob(knob, stateKey, min, max) {
 }
 
 function bindControls() {
-    const { vbeKnob, vceKnob, autoFillToggle, autoFillWrap, ibButtons, modeButtons, recordReadingBtn, plotGraphsBtn, calculateResultsBtn } = transistorRuntime.dom;
+    const { vbeKnob, vceKnob, autoFillToggle, autoFillWrap, ibButtons, modeButtons, recordReadingBtn, plotGraphsBtn, calculateResultsBtn, resetBtn } = transistorRuntime.dom;
 
     bindKnob(vbeKnob, 'vbe', 0, 0.8);
     bindKnob(vceKnob, 'vce', 0, 1.0);
@@ -1302,6 +1302,10 @@ function bindControls() {
 
     if (calculateResultsBtn) {
         calculateResultsBtn.addEventListener('click', calculateResultsFromTableData);
+    }
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetSimulation);
     }
 }
 
@@ -2137,6 +2141,22 @@ function resetSimulation() {
     if (ibValue) ibValue.textContent = '0.00 µA';
     if (icValue) icValue.textContent = '0.00 mA';
 
+    const betaValue = document.getElementById('beta-value');
+    const alphaValue = document.getElementById('alpha-value');
+    const rinValue = document.getElementById('rin-value');
+    if (betaValue) {
+        betaValue.textContent = '-';
+    }
+    if (alphaValue) {
+        alphaValue.textContent = '-';
+    }
+    if (rinValue) {
+        rinValue.textContent = '-';
+    }
+
+    setChartMessage('input-graph', '');
+    setChartMessage('output-graph', '');
+
     document.querySelectorAll('.observation-table input').forEach((input) => {
         input.value = '';
     });
@@ -2148,6 +2168,7 @@ function resetSimulation() {
     updateSimulationInfo('cutoff', 0, 0);
     setCircuitRegion('cutoff');
     updateCharts();
+    alert('Experiment reset successfully!');
 }
 
 function removeLegacyUi() {
