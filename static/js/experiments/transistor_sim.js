@@ -1491,7 +1491,28 @@ function trimArray(array, limit = 120) {
 }
 
 function pushGraphPoint(series, point) {
-    series.push(point);
+    if (!Array.isArray(series) || !point) {
+        return;
+    }
+
+    const normalizedX = num(point.x, NaN);
+    if (!Number.isFinite(normalizedX)) {
+        return;
+    }
+
+    const normalizedPoint = {
+        x: normalizedX,
+        y: num(point.y, 0)
+    };
+
+    const existingIndex = series.findIndex((entry) => Number.isFinite(num(entry?.x, NaN)) && Math.abs(num(entry.x, NaN) - normalizedX) < 1e-6);
+    if (existingIndex >= 0) {
+        series[existingIndex] = normalizedPoint;
+    } else {
+        series.push(normalizedPoint);
+    }
+
+    series.sort((a, b) => num(a.x, 0) - num(b.x, 0));
     trimArray(series);
 }
 
