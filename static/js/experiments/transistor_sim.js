@@ -61,6 +61,7 @@ const transistorRuntime = {
         emitter: 0
     },
     chartsReady: false,
+    graphsPlotted: false,
     hiddenLegacySections: false
 };
 
@@ -683,6 +684,27 @@ function ensureStyles() {
             fill: #2fffa7;
             filter: drop-shadow(0 0 8px rgba(47,255,167,0.9));
         }
+        .transistor-graph-frame {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: auto;
+            min-height: 400px;
+            padding: 0.9rem;
+            overflow: hidden;
+        }
+
+        .transistor-graph-frame canvas {
+            flex: 1 1 auto;
+            min-height: 320px;
+            height: 320px !important;
+        }
+
+        .transistor-chart-message {
+            position: static;
+            margin-top: 0 !important;
+            line-height: 1.35;
+        }
 
         @media (max-width: 820px) {
             .transistor-layout {
@@ -1241,7 +1263,7 @@ function bindKnob(knob, stateKey, min, max) {
 }
 
 function bindControls() {
-    const { vbeKnob, vceKnob, autoFillToggle, autoFillWrap, ibButtons, modeButtons, recordReadingBtn, plotGraphsBtn, calculateResultsBtn } = transistorRuntime.dom;
+    const { vbeKnob, vceKnob, autoFillToggle, autoFillWrap, ibButtons, modeButtons, recordReadingBtn, plotGraphsBtn, calculateResultsBtn, resetBtn } = transistorRuntime.dom;
 
     bindKnob(vbeKnob, 'vbe', 0, 0.8);
     bindKnob(vceKnob, 'vce', 0, 1.0);
@@ -1280,6 +1302,10 @@ function bindControls() {
 
     if (calculateResultsBtn) {
         calculateResultsBtn.addEventListener('click', calculateResultsFromTableData);
+    }
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetSimulation);
     }
 }
 
@@ -1491,7 +1517,28 @@ function trimArray(array, limit = 120) {
 }
 
 function pushGraphPoint(series, point) {
-    series.push(point);
+    if (!Array.isArray(series) || !point) {
+        return;
+    }
+
+    const normalizedX = num(point.x, NaN);
+    if (!Number.isFinite(normalizedX)) {
+        return;
+    }
+
+    const normalizedPoint = {
+        x: normalizedX,
+        y: num(point.y, 0)
+    };
+
+    const existingIndex = series.findIndex((entry) => Number.isFinite(num(entry?.x, NaN)) && Math.abs(num(entry.x, NaN) - normalizedX) < 1e-6);
+    if (existingIndex >= 0) {
+        series[existingIndex] = normalizedPoint;
+    } else {
+        series.push(normalizedPoint);
+    }
+
+    series.sort((a, b) => num(a.x, 0) - num(b.x, 0));
     trimArray(series);
 }
 
@@ -1609,6 +1656,7 @@ function plotGraphsFromTableData() {
     };
 
     ensureCharts();
+    transistorRuntime.graphsPlotted = true;
     updateCharts();
     setChartMessage('input-graph', inputData.length ? 'Input characteristic plotted from the filled VBE / IB table.' : 'Input table is empty.');
     setChartMessage('output-graph', hasOutputPoints ? 'Output characteristics plotted from the filled VCE / IC table.' : 'Output table is empty.');
@@ -1717,7 +1765,7 @@ function writeInputTableValue(vbe, ibVal, force = false) {
     }
 
     cell.value = formatValue(ibVal, 4);
-    if (simulationState.lastRecorded.input !== recordKey) {
+    if (transistorRuntime.graphsPlotted && simulationState.lastRecorded.input !== recordKey) {
         simulationState.lastRecorded.input = recordKey;
         pushGraphPoint(simulationState.inputData, { x: snappedVbe, y: ibVal });
     }
@@ -1736,7 +1784,7 @@ function writeOutputTableValue(ib, vce, icVal, force = false) {
     }
 
     cell.value = formatValue(icVal, 4);
-    if (simulationState.lastRecorded.output !== recordKey) {
+    if (transistorRuntime.graphsPlotted && simulationState.lastRecorded.output !== recordKey) {
         simulationState.lastRecorded.output = recordKey;
         pushGraphPoint(simulationState.outputData[ib], { x: snappedVce, y: icVal });
     }
@@ -1744,6 +1792,9 @@ function writeOutputTableValue(ib, vce, icVal, force = false) {
 
 function updateCharts() {
     ensureCharts();
+    if (!transistorRuntime.graphsPlotted) {
+        return;
+    }
     if (inputChart) {
         inputChart.data.datasets[0].data = simulationState.inputData;
         inputChart.update('none');
@@ -1972,7 +2023,6 @@ async function stepSimulation(timestamp) {
         }
 
         updateCharts();
-        updateSimulationInfo(region, ibVal, icVal);
         buildFlowDots(region, icVal, timestamp || performance.now());
     } catch (error) {
         console.error('[transistor] live simulation step failed', error);
@@ -2051,6 +2101,7 @@ function resetSimulation() {
         outputData: { 40: [], 60: [], 80: [] },
         lastRecorded: { input: null, output: null }
     };
+    transistorRuntime.graphsPlotted = false;
 
     transistorRuntime.meterState.ib.display = 0;
     transistorRuntime.meterState.ib.target = 0;
@@ -2090,6 +2141,22 @@ function resetSimulation() {
     if (ibValue) ibValue.textContent = '0.00 µA';
     if (icValue) icValue.textContent = '0.00 mA';
 
+    const betaValue = document.getElementById('beta-value');
+    const alphaValue = document.getElementById('alpha-value');
+    const rinValue = document.getElementById('rin-value');
+    if (betaValue) {
+        betaValue.textContent = '-';
+    }
+    if (alphaValue) {
+        alphaValue.textContent = '-';
+    }
+    if (rinValue) {
+        rinValue.textContent = '-';
+    }
+
+    setChartMessage('input-graph', '');
+    setChartMessage('output-graph', '');
+
     document.querySelectorAll('.observation-table input').forEach((input) => {
         input.value = '';
     });
@@ -2101,6 +2168,7 @@ function resetSimulation() {
     updateSimulationInfo('cutoff', 0, 0);
     setCircuitRegion('cutoff');
     updateCharts();
+    alert('Experiment reset successfully!');
 }
 
 function removeLegacyUi() {
@@ -2129,7 +2197,6 @@ async function initializeSimulation() {
     setSimulationMode('input');
     updateSimulationInstantFeedback();
     ensureCharts();
-    updateCharts();
     setCircuitRegion('cutoff');
     startSimulationLoop();
 }

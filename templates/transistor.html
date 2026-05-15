@@ -117,16 +117,17 @@
 		<div class="action-row transistor-action-row">
 			<button type="button" id="plot-graphs-btn" class="btn btn-secondary">Plot Graphs</button>
 			<button type="button" id="calculate-results-btn" class="btn btn-primary">Calculate</button>
+			<button type="button" id="resetBtn" class="btn btn-danger">Reset</button>
 		</div>
 		<div class="action-row" id="transistor-legacy-actions" hidden></div>
 	</section>
 
 	<section class="experiment-section">
 		<h3><u>GRAPH</u></h3>
-		<div class="chart-frame">
+		<div class="chart-frame transistor-graph-frame">
 			<canvas id="input-graph" aria-label="Input characteristics graph"></canvas>
 		</div>
-		<div class="chart-frame u-mt-3">
+		<div class="chart-frame transistor-graph-frame u-mt-3">
 			<canvas id="output-graph" aria-label="Output characteristics graph"></canvas>
 		</div>
 	</section>
