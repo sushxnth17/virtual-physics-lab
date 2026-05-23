@@ -167,7 +167,7 @@
         const dpr = window.devicePixelRatio || 1;
         // Clear using canvas pixel dimensions, accounting for devicePixelRatio scaling
         wireCtx.clearRect(0, 0, wireCanvas.width / dpr, wireCanvas.height / dpr);
-        
+
         const detectorRed = document.querySelector('.terminal.detector-red');
         const detectorBlack = document.querySelector('.terminal.detector-black');
         const meterRed = document.querySelector('.terminal.meter-red');
@@ -223,8 +223,8 @@
         try {
             const res = await fetch('/api/bendingloss', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({length_m})
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ length_m })
             });
             const json = await res.json();
             if (!json || !json.success) {
@@ -302,9 +302,9 @@
         lastReading = null;
         fetch('/api/bendingloss', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ reset: true })
-        }).catch(() => {});
+        }).catch(() => { });
         updateStatus({ laserOn: false, length: Number(fiberLength.value), voltage: 0 });
     });
 
